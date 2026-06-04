@@ -33,6 +33,7 @@ EXPLICIT_TARGETS: list[tuple[str, str]] = [
     ("artifacts_pinned", "results/frozen/lambda2_gap_table.csv"),
     ("artifacts_pinned", "results/frozen/wls_condition_report.csv"),
     ("artifacts_pinned", "results/frozen/compute_budget_table.csv"),
+    ("artifacts_pinned", "results/frozen/hardware_feasibility_note.md"),
     ("artifacts_pinned", "results/pilot/pilot_power_report.csv"),
     ("artifacts_pinned", "results/pilot/pilot_power_report.md"),
     ("artifacts_pinned", "analysis/adjudication_template.csv"),
@@ -63,6 +64,7 @@ CHECKLIST_0_1 = {
     "lambda2": ["results/frozen/lambda2_gap_table.csv"],
     "wls": ["results/frozen/wls_condition_report.csv"],
     "budget": ["results/frozen/compute_budget_table.csv"],
+    "hardware": ["results/frozen/hardware_feasibility_note.md"],
     "pilot": [
         "results/pilot/pilot_power_report.csv",
         "results/pilot/pilot_power_report.md",

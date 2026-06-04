@@ -14,6 +14,15 @@ venv/
 # Results / data / figures are regenerated; keep dirs (via .gitkeep) but not contents
 results/*
 !results/.gitkeep
+!results/frozen/
+results/frozen/*
+!results/frozen/compute_budget_table.csv
+!results/frozen/frozen_instances.csv
+!results/frozen/frozen_qaoa_angles.csv
+!results/frozen/hardware_feasibility_note.md
+!results/frozen/instance_selection_diagnostics.md
+!results/frozen/lambda2_gap_table.csv
+!results/frozen/wls_condition_report.csv
 !results/pilot/
 results/pilot/*
 !results/pilot/pilot_power_report.csv
