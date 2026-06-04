@@ -1,4 +1,4 @@
-PAP hash certificate is generated after the frozen design commit by
-pap/hash_pap.py. The generated certificate overwrites this file and writes
-freeze_manifest.json; neither certificate file is included in the aggregate
-payload being certified.
+PAP_HASH=8fe9f95848d12e202dcc94090b53b8d44c935a1ad63c4f3fa912e536b3294d7c
+FROZEN_COMMIT_SHA=945afabf85c2023dba359849d79313b68a7905d1
+MANIFEST=freeze_manifest.json
+HASH_ALGORITHM=sha256

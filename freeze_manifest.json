@@ -1,0 +1,382 @@
+{
+  "checklist_0_1": {
+    "adjudication_template": [
+      "analysis/adjudication_template.csv"
+    ],
+    "angles": [
+      "results/frozen/frozen_qaoa_angles.csv"
+    ],
+    "budget": [
+      "results/frozen/compute_budget_table.csv"
+    ],
+    "configs": [
+      "config/grids.yaml",
+      "config/noise_channel_spec.json",
+      "config/readout_mitigation_spec.yaml"
+    ],
+    "failure_protocol": [
+      "pap/failure_protocol.md"
+    ],
+    "instances": [
+      "results/frozen/frozen_instances.csv"
+    ],
+    "lambda2": [
+      "results/frozen/lambda2_gap_table.csv"
+    ],
+    "pap": [
+      "EXPERIMENTAL_PLAN.md",
+      "REPRODUCIBILITY_PLAN.md"
+    ],
+    "pilot": [
+      "results/pilot/pilot_power_report.csv",
+      "results/pilot/pilot_power_report.md"
+    ],
+    "wls": [
+      "results/frozen/wls_condition_report.csv"
+    ]
+  },
+  "created_utc": "2026-06-04T13:24:22Z",
+  "frozen_commit_sha": "945afabf85c2023dba359849d79313b68a7905d1",
+  "hash_algorithm": "sha256",
+  "pap_hash": "8fe9f95848d12e202dcc94090b53b8d44c935a1ad63c4f3fa912e536b3294d7c",
+  "repo_root_name": "finite-shot-vd-sv",
+  "schema_version": 1,
+  "targets": [
+    {
+      "bytes": 1484,
+      "category": "artifacts_pinned",
+      "path": "analysis/adjudication_template.csv",
+      "sha256": "25ee620e08b82320fc3f16379640dc0847e36952e9f7f2bf70f8fcdf2a8a158d"
+    },
+    {
+      "bytes": 1149,
+      "category": "artifacts_pinned",
+      "path": "results/frozen/compute_budget_table.csv",
+      "sha256": "1906ff7c8eb616b0dee5400a0e8d85269b58a6be6ed4ad76088c2d9fa94d4bbd"
+    },
+    {
+      "bytes": 7248,
+      "category": "artifacts_pinned",
+      "path": "results/frozen/frozen_instances.csv",
+      "sha256": "e590c198744fa4b22945549c9cd620b1781e10860fa051c1e771da668d9069f0"
+    },
+    {
+      "bytes": 1442,
+      "category": "artifacts_pinned",
+      "path": "results/frozen/frozen_qaoa_angles.csv",
+      "sha256": "66b1037f29519038bf21a93c88d30e80735fc72f315dd91bce978d45a7a38ff5"
+    },
+    {
+      "bytes": 599,
+      "category": "artifacts_pinned",
+      "path": "results/frozen/instance_selection_diagnostics.md",
+      "sha256": "2bde5901311df8b9690061235b773e75b565cdfc0e3556218a655160d9807482"
+    },
+    {
+      "bytes": 31269,
+      "category": "artifacts_pinned",
+      "path": "results/frozen/lambda2_gap_table.csv",
+      "sha256": "a58fa52e25811d5a76a07a599017368c5445b8a37c59177a77909dd5d0596afe"
+    },
+    {
+      "bytes": 446,
+      "category": "artifacts_pinned",
+      "path": "results/frozen/wls_condition_report.csv",
+      "sha256": "1c12569c913e673707b2ea1bcbde4cd964e80e8b466721e4f46ad00a9b05e68b"
+    },
+    {
+      "bytes": 8442,
+      "category": "artifacts_pinned",
+      "path": "results/pilot/pilot_power_report.csv",
+      "sha256": "7e1dc6551798942fec55d5e99895a3b6bcd56d7cd94957b15b36c5c6a450a58b"
+    },
+    {
+      "bytes": 3006,
+      "category": "artifacts_pinned",
+      "path": "results/pilot/pilot_power_report.md",
+      "sha256": "ff7f1fecba31fa2d64454e763f1e0131ad8655ec40ff2a158a7b0621a0713c78"
+    },
+    {
+      "bytes": 3147,
+      "category": "configs",
+      "path": "config/grids.yaml",
+      "sha256": "ebed254a3b10f5b215eb789eb9acef767064cf5e4e9663c365476fdcbf8e5615"
+    },
+    {
+      "bytes": 1656,
+      "category": "configs",
+      "path": "config/noise_channel_spec.json",
+      "sha256": "96327dde5e8b3e256238f6b373b96b68b60baeee2d904f02dd34cdf78e4d45ac"
+    },
+    {
+      "bytes": 937,
+      "category": "configs",
+      "path": "config/readout_mitigation_spec.yaml",
+      "sha256": "6349117958648f58e6b134b4e4812c19960acf0fd157d4dedf40ba90f36184e4"
+    },
+    {
+      "bytes": 1101,
+      "category": "configs",
+      "path": "reproducibility/config/level1_coefficients.yaml",
+      "sha256": "1e5e3154472e04c9409dabe934253ec41f3298239006f99b66c64ae94c10725c"
+    },
+    {
+      "bytes": 1085,
+      "category": "configs",
+      "path": "reproducibility/config/level1_crossing.yaml",
+      "sha256": "87fdcb6d5288d3fbae68fc8585e8af4adeb1dc581ee8e1f2ac6ec06cc8df530e"
+    },
+    {
+      "bytes": 502,
+      "category": "configs",
+      "path": "reproducibility/config/level2_device_sim.yaml",
+      "sha256": "50733a4063a8274ccbeb0f2924e829024dbcb8d095ab4ceccda00535a9ad7fc0"
+    },
+    {
+      "bytes": 318,
+      "category": "configs",
+      "path": "reproducibility/config/level3_hardware.yaml",
+      "sha256": "c98f0e031b1d0f60453cc6774006d92a7a9d06646b8d6b69cdb579c055c52f52"
+    },
+    {
+      "bytes": 1013,
+      "category": "configs",
+      "path": "reproducibility/config/rng_policy.yaml",
+      "sha256": "4f4b821dd9f96c6452afd4db58f844412a70c509b0dd96517a605ee1ef49ee7a"
+    },
+    {
+      "bytes": 5802,
+      "category": "configs",
+      "path": "reproducibility/config/schemas.yaml",
+      "sha256": "595cb5859e6f79d4d01490f5bc7b3fbbd70d4875262a913cdedb03d0ba5e4a3e"
+    },
+    {
+      "bytes": 3313,
+      "category": "configs",
+      "path": "reproducibility/config/tolerances.yaml",
+      "sha256": "7dd4dc6fd1e86714fdec3f4d7fed87e0079775d472df51d719e5f97ad0e399ad"
+    },
+    {
+      "bytes": 9028,
+      "category": "hashing",
+      "path": "pap/hash_pap.py",
+      "sha256": "ac49d9bda23e597a871f7fdfa02040ece348a64eed09665421bd7d35c2b16589"
+    },
+    {
+      "bytes": 73621,
+      "category": "pap",
+      "path": "EXPERIMENTAL_PLAN.md",
+      "sha256": "43fab60dfed2fda73ee74a6b62de422523417678f379791699db72a61c88ef8f"
+    },
+    {
+      "bytes": 5719,
+      "category": "pap",
+      "path": "METHODS.md",
+      "sha256": "1506733faddba4ae416e8215d30ebbd68870d0ef505245e969288208c4a00bf4"
+    },
+    {
+      "bytes": 59871,
+      "category": "pap",
+      "path": "REPRODUCIBILITY_PLAN.md",
+      "sha256": "44ae0f9c69fe24cae11103803e435673505446c2bba46297999b3ec2c2b04fd8"
+    },
+    {
+      "bytes": 2457,
+      "category": "pap",
+      "path": "pap/failure_protocol.md",
+      "sha256": "19a3ce24ae8f90e76c13a2f031d054d84bc1147e5eccff7e6e8e2cfa7d8a8ee8"
+    },
+    {
+      "bytes": 164,
+      "category": "scripts",
+      "path": "experiments/__init__.py",
+      "sha256": "9af02262c775981b3a359705b8e2f13fd92a8b4fb6665c1b7659de1a7c60eaea"
+    },
+    {
+      "bytes": 6531,
+      "category": "scripts",
+      "path": "experiments/_common.py",
+      "sha256": "5aaf349a82b505fd7d0bd832a65af8b8fdf8c237329cfcdd860b44acb144e1a1"
+    },
+    {
+      "bytes": 4537,
+      "category": "scripts",
+      "path": "experiments/e1_quotient_decomposition.py",
+      "sha256": "93ea77eab07f70064cbd874694aa1e1085c5157d4a3d3e3c016c184bc55bfe6f"
+    },
+    {
+      "bytes": 3981,
+      "category": "scripts",
+      "path": "experiments/e2_c_sv_zero.py",
+      "sha256": "a9638696a6e436887ae3265819b1f5c611ff225d3abb5fe31b7a2e0fb3c0fb3c"
+    },
+    {
+      "bytes": 2760,
+      "category": "scripts",
+      "path": "experiments/e3_delta_vd_generator.py",
+      "sha256": "ad46cad959f2014f6924f1a25151857b7e4a024b62fd4e0e84db193afe3c8459"
+    },
+    {
+      "bytes": 2587,
+      "category": "scripts",
+      "path": "experiments/e4_delta_sv_firstorder.py",
+      "sha256": "2fcf573c6d88c46dea9c28ce8d39e3830d87b0919b6f498d5366fd556136f9b2"
+    },
+    {
+      "bytes": 4875,
+      "category": "scripts",
+      "path": "experiments/e5_denominator_concentration.py",
+      "sha256": "e3051a1b6448ec9da4ff0522b8f99b57190a4abb8e85ff59ecab532d48323003"
+    },
+    {
+      "bytes": 4387,
+      "category": "scripts",
+      "path": "experiments/e7_certified_crossing.py",
+      "sha256": "525436002bd928d55e004f9eb6bc21164af3428e007e0c53f6305f3a45fc4e02"
+    },
+    {
+      "bytes": 5236,
+      "category": "scripts",
+      "path": "experiments/e7_resource_observable_sensitivity.py",
+      "sha256": "7e562c818a77b1a89144af28d7eb3b184187574f4c01d08929c3a5455a9edb20"
+    },
+    {
+      "bytes": 6909,
+      "category": "scripts",
+      "path": "ground_truth/compute_budget_table.py",
+      "sha256": "1f24f1f3547e9618b7aca69345baa2538ef0b39c08e3d1f5ea9950330deef0f7"
+    },
+    {
+      "bytes": 15365,
+      "category": "scripts",
+      "path": "ground_truth/compute_frozen_model_specs.py",
+      "sha256": "dd07163c1c669d4169447a1c1710efb30da241a9649419810339fafbd2be1d3d"
+    },
+    {
+      "bytes": 4375,
+      "category": "scripts",
+      "path": "ground_truth/compute_lambda2_gaps.py",
+      "sha256": "59c42efeb5ca3429b7cd48bb14e04c1dc12461386719b59edea0af30e24eb0ee"
+    },
+    {
+      "bytes": 2336,
+      "category": "scripts",
+      "path": "ground_truth/compute_wls_condition.py",
+      "sha256": "9d03610ede9d53637b7d375cfcbb4670506feb00dc561257bf96b5a3ddd4fe0b"
+    },
+    {
+      "bytes": 2661,
+      "category": "scripts",
+      "path": "ground_truth/instance_ensemble.py",
+      "sha256": "7fafa5ab3c79574e83f79d0475fcc16bfa63d5f7d672606e3124191cd3b9c075"
+    },
+    {
+      "bytes": 34,
+      "category": "scripts",
+      "path": "pilot/__init__.py",
+      "sha256": "48b5e0facaa03966ed143473f9f4a3a0b970c36253bce17c7b5bba72eb41772f"
+    },
+    {
+      "bytes": 24069,
+      "category": "scripts",
+      "path": "pilot/run_power_pilot.py",
+      "sha256": "e8c18f7f7bab3edfc65db2b5edfb9b4fe67c67ee14d1ff536fc0fbd7fb98c0e3"
+    },
+    {
+      "bytes": 5758,
+      "category": "scripts",
+      "path": "reproducibility/run_all.py",
+      "sha256": "aa82d80e67ebd6e634149eed24c30aca9ca2a55989835d591a24c7c610b0051c"
+    },
+    {
+      "bytes": 7325,
+      "category": "scripts",
+      "path": "reproducibility/verify.py",
+      "sha256": "147643ba186433c99dad4de3633dbfb002a0bdbe0e0b052f389693ac342947cc"
+    },
+    {
+      "bytes": 6039,
+      "category": "scripts",
+      "path": "scripts/generate_all_figures.py",
+      "sha256": "67d5a3532a9c9792a3e1fb9c329eda0d757d818300b4d30aeb019de2cecd0300"
+    },
+    {
+      "bytes": 1173,
+      "category": "scripts",
+      "path": "src/vd_sv/__init__.py",
+      "sha256": "2164ec1148dffced984a3cf287a8b772b4b3e030bce449f2a530d37bf7d7cabd"
+    },
+    {
+      "bytes": 6935,
+      "category": "scripts",
+      "path": "src/vd_sv/coefficients.py",
+      "sha256": "75310809c9cd8a19799b275b70a791a4ac200da762694c1c90758d9f88f8cdef"
+    },
+    {
+      "bytes": 3999,
+      "category": "scripts",
+      "path": "src/vd_sv/crossing.py",
+      "sha256": "7eeb3bcdea4b26bcfa448941c8ce03a718c87c3c192b6720eaffea5496fc54b4"
+    },
+    {
+      "bytes": 5563,
+      "category": "scripts",
+      "path": "src/vd_sv/density_matrix.py",
+      "sha256": "4bd37b981a769ca04b59ea551fbcfd292a36ed6c257a395fc0aa6558c89a2970"
+    },
+    {
+      "bytes": 2206,
+      "category": "scripts",
+      "path": "src/vd_sv/estimators.py",
+      "sha256": "93041c1cb159fe3c877ec130131352462f660671bab09baee006666b58c121b5"
+    },
+    {
+      "bytes": 1444,
+      "category": "scripts",
+      "path": "src/vd_sv/lecam.py",
+      "sha256": "b1b61645d38d8aea1b0692e4deb777a2127fed22258f18ad7f02445f4ce3b687"
+    },
+    {
+      "bytes": 7261,
+      "category": "scripts",
+      "path": "src/vd_sv/noise.py",
+      "sha256": "cb56213b33c4369bfbfefe9eb9936524c07f5efeec3d404c53210edf3ad1eea6"
+    },
+    {
+      "bytes": 867,
+      "category": "scripts",
+      "path": "src/vd_sv/plotting.py",
+      "sha256": "5d88d894a09bd939d60329c75edc444eee1ad032a5d81457366955afbf6cb4cd"
+    },
+    {
+      "bytes": 7969,
+      "category": "scripts",
+      "path": "src/vd_sv/qaoa.py",
+      "sha256": "c33a1131a65cfb5e44745e22f1d2ce93f3c59832e3a60be3c8e9b9b27fef8103"
+    },
+    {
+      "bytes": 2265,
+      "category": "scripts",
+      "path": "src/vd_sv/sv.py",
+      "sha256": "a26e567b7479ef82b69c1a15a348bcf74f618328dd61a3d86f3c3cea1d83206d"
+    },
+    {
+      "bytes": 1610,
+      "category": "scripts",
+      "path": "src/vd_sv/vd.py",
+      "sha256": "8d38d4a55e677a08f4d4a2674bc52f2dced20602910fbf330f9f7c155003ca17"
+    },
+    {
+      "bytes": 6204,
+      "category": "tests",
+      "path": "tests/test_freeze_specs.py",
+      "sha256": "af5f153782272e6f58110d87da9df9ca1c5196d66bc2f91a1adca704f05a7efa"
+    },
+    {
+      "bytes": 3474,
+      "category": "tests",
+      "path": "tests/test_power_pilot.py",
+      "sha256": "59dc011a3909108b0bcb439fbd43d0032e0a15f9f6eb6c4bb42bc4531a25426d"
+    }
+  ]
+}
