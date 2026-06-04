@@ -1,0 +1,29 @@
+freeze_status: development_not_frozen
+scope: "Level 2/3 only; Level 1 assumes ideal measurement."
+
+primary_method:
+  name: local_assignment_matrix
+  description: "Per-qubit assignment matrices are estimated from calibration counts and applied before Hamming-sector postselection."
+  postselection_order: mitigation_before_sector_postselection
+
+sensitivity_methods:
+  - regularized_matrix_inversion
+  - iterative_bayes
+
+positivity_policy:
+  primary: project_negative_quasiprobabilities_to_simplex
+  report_negative_mass_before_projection: true
+
+uncertainty_policy:
+  bootstrap_counts_and_calibration_jointly: true
+  bootstrap_seed_source: reproducibility/config/rng_policy.yaml
+
+diagnostics:
+  required_columns:
+    - leakage_pre
+    - leakage_post
+    - delta_mu_sv
+    - delta_R_cross
+  sector_definition: fixed_hamming_weight
+
+reporting_rule: "Any material displacement of mu_SV or crossing location is reported as sensitivity, not hidden."

@@ -1,0 +1,7 @@
+# Level 3 hardware (IBM).  PHASE B -- analysis-from-archived-counts only.  The
+# quantum device is NEVER re-executed (REPRODUCIBILITY_PLAN hardware carve-out).
+
+level: 3
+status: not_implemented_phase_a
+reproduction: analysis_from_archived_counts_only
+experiments: [e5_denominator_concentration, e7_certified_crossing]

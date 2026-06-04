@@ -1,0 +1,37 @@
+# Level 1 white-box coefficient experiments (E1-E4).  No Qiskit dependency.
+# Grids are set in code (experiments/_common.py and each experiment module); this
+# file records the frozen-model spec and the scientific intent for auditability.
+
+level: 1
+qiskit_required: false
+
+frozen_model:        # provisional; replaced by results/frozen/ artifacts at PAP freeze
+  n_qubits: 6
+  sector_weight: 2                   # NOT n/2 (avoids particle-hole cancellation of delta)
+  instance: ring
+  ring_weights: [1.0, 1.3, 0.7, 1.1, 0.9, 1.2]
+  qaoa_depth: 1
+  qaoa_angle_seed: 0
+  qaoa_angle_restarts: 8
+  noise_channel: amplitude_damping_dephasing
+  noise_channel_seed: 1
+  c_pd_over_c_ad: 0.4
+
+experiments:
+  e1_quotient_decomposition:
+    predictions: [P1, P2]
+    anchor: vd_quotient_certified_v4
+    p_fixed: 0.15
+    copies_M: 2
+  e2_c_sv_zero:
+    predictions: [P3, P4]
+    anchor: [vd_c_v4, sv_quotient_bias_zero_v14]
+    p_grid: [0.12, 0.25, 3]
+  e3_delta_vd_generator:
+    predictions: [P5]
+    anchor: vd_delta_generator
+    p_grid: [0.01, 0.12, 8]
+  e4_delta_sv_firstorder:
+    predictions: [P6]
+    anchor: sv_delta_precise
+    p_grid: [0.01, 0.12, 8]

@@ -1,0 +1,32 @@
+# Level 1 white-box structural experiments (E5, E7, sensitivity). No Qiskit dependency.
+
+level: 1
+qiskit_required: false
+
+frozen_model: {from: level1_coefficients.yaml}
+
+experiments:
+  e5_denominator_concentration:
+    predictions: [P7]
+    anchor: denom_bernstein_v4
+    p_fixed: 0.20
+    copies_M: 3
+    B_over_Bden_grid: [0.125, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0]
+  e7_certified_crossing:
+    predictions: [P9]
+    anchor: certified_crossing
+    p_fixed: 0.15
+    copies_M: 2
+    resource_grid: [50, 8000, 12]
+    kappa: {vd: 2.0, sv: 1.0, unmitigated: 1.0}
+    # Finding (provisional): SV uniformly dominates VD at operational budgets for
+    # this instance family (selection_trichotomy_v10 regime II); the current
+    # diagnostic crossing demonstrated is VD vs unmitigated.
+    operational_method_pair: vd_vs_unmitigated
+  e7_resource_observable_sensitivity:
+    predictions: [robustness]
+    anchor: [resource_normalization_v13, EXPERIMENTAL_PLAN_sec_10]
+    p_fixed: 0.15
+    copies_M: 2
+    resource_definitions: [paired_sample, hadamard_call, two_qubit_gate_proxy, wall_clock_proxy]
+    observable_normalizations: [inf, sector_trace_zero_spectral]

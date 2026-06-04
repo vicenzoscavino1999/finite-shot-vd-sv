@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# Results / data / figures are regenerated; keep dirs (via .gitkeep) but not contents
+results/*
+!results/.gitkeep
+results/.partial/*
+!results/.partial/.gitkeep
+data/*
+!data/.gitkeep
+figures/*
+!figures/.gitkeep
+
+# LaTeX build artifacts
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.synctex.gz
+paper/*.bbl
+paper/*.blg
+paper/*.toc
+
+# Archived hardware counts are large primary data (Zenodo, not git)
+reproducibility/hardware/raw_counts/*
+!reproducibility/hardware/raw_counts/.gitkeep
+reproducibility/hardware/calibration_snapshots/*
+!reproducibility/hardware/calibration_snapshots/.gitkeep
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

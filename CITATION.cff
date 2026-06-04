@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you use this reproduction package, please cite the accompanying paper."
+title: "Finite-Shot Operating Windows for Virtual Distillation and Symmetry Verification — reproduction package"
+abstract: >-
+  Level 1 white-box reproduction package for the numerical experiments accompanying
+  the paper on finite-shot operating windows for virtual distillation (VD) and
+  symmetry verification (SV). Includes exact density-matrix coefficient validation
+  (delta_VD, delta_SV, c_SV = 0) and the certified crossing.
+authors:
+  - family-names: "Anonymous"
+    given-names: "Author"
+version: "0.1.0"
+license: MIT
+keywords:
+  - quantum error mitigation
+  - virtual distillation
+  - symmetry verification
+  - finite shots
+  - operating windows
+  - QAOA
+date-released: "2026-06-03"

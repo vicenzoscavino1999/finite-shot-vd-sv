@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "finite-shot-vd-sv"
+version = "0.1.0"
+description = "Finite-shot operating windows for virtual distillation (VD) and symmetry verification (SV): Level 1 white-box reproduction package."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Anonymous Author" }]
+keywords = [
+    "quantum error mitigation",
+    "virtual distillation",
+    "symmetry verification",
+    "finite shots",
+    "operating windows",
+    "QAOA",
+]
+
+# Level 1 white-box core depends only on the scientific Python stack.
+# Qiskit/Aer is NOT required for the coefficient-validation reproduction path.
+dependencies = [
+    "numpy>=1.26",
+    "scipy>=1.12",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.5",
+]
+figures = [
+    "matplotlib>=3.7",
+]
+# Level 2 device-simulation only (added in Phase B). Kept optional so that
+# `make reproduce-level1` and CI never require a quantum-cloud account.
+level2 = [
+    "qiskit>=1.0",
+    "qiskit-aer>=0.14",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"

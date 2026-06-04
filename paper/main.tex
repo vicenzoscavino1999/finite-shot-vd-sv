@@ -1,0 +1,2232 @@
+\documentclass[11pt]{article}
+
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb,amsthm,mathtools,bm}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage[nameinlink,capitalize,noabbrev]{cleveref}
+
+\allowdisplaybreaks
+
+\newtheorem{assumption}{Assumption}
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+\newtheorem{corollary}{Corollary}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+
+\crefname{assumption}{Assumption}{Assumptions}
+\Crefname{assumption}{Assumption}{Assumptions}
+
+\DeclareMathOperator{\Tr}{Tr}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator{\KL}{KL}
+\newcommand{\rhoid}{\rho_\star}
+\newcommand{\rhop}{\rho_p}
+\newcommand{\muid}{\mu_\star}
+\newcommand{\MSE}{\operatorname{MSE}}
+\newcommand{\Bias}{\operatorname{Bias}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\1}{\mathbf{1}}
+\newcommand{\OO}{\mathcal{O}}
+\newcommand{\Deltaop}{\Delta}
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+\newcommand{\abs}[1]{\left\lvert #1 \right\rvert}
+\newcommand{\ip}[2]{\left\langle #1\middle|#2\right\rangle}
+\newcommand{\bra}[1]{\left\langle #1\right|}
+\newcommand{\ket}[1]{\left|#1\right\rangle}
+
+\title{\bfseries Finite-Shot Operating Windows for\\ Virtual Distillation and Symmetry Verification}
+\author{Anonymous Author}
+\date{May 29, 2026}
+
+\begin{document}
+\maketitle
+
+
+\begin{abstract}
+Quantum error mitigation methods are often justified by infinite-shot bias reduction, while practical use is governed by finite sampling budgets and method-dependent resource costs.  This paper develops a theory-only operating-window analysis for virtual distillation (VD) and symmetry verification (SV).  The central result is a certified finite-shot mean-squared-error law for the VD quotient estimator \(\widehat\mu_{\mathrm{VD},M}=\widehat N_M/\widehat D_M\).  The law separates four effects: the population bias of \(\rho_p^M/\Tr(\rho_p^M)\), the dominant-eigenvector mismatch floor, the statistical \(B^{-1}\) bias of a random quotient, and denominator-driven variance inflation controlled by \(D_M=\Tr(\rho_p^M)\).  Unlike a purely asymptotic delta-method statement, the quotient law is accompanied by explicit Bernstein denominator concentration, a clipped-ratio regularization argument, and remainder constants expressed in bounded moments of the numerator-denominator one-shot estimator.  For VD implemented through independent controlled-derangement/Hadamard-test estimators, the numerator and denominator variances are computed explicitly, giving a concrete logarithmic copy-number scale.  For SV, the corresponding law is derived from a precise first-order projection formula: detectable noise is removed by postselection, while the undetectable component inside the symmetry sector determines the residual bias and the acceptance probability determines the sampling penalty.  These method-specific laws are converted into certified crossing rules: a leading indifference curve is accepted only when a remainder bound verifies that it lies in the regime where the local law is valid.  A closed one-qubit model gives finite-\(p\) two-sided boundary bounds, and a restricted Le Cam lower bound explains when finite sampling or non-identifiability imposes limits no selector can evade.  The paper also provides accepted-transcript efficiency statements, a certified selection trichotomy, explicit toy-model certificates, a generic three-level toy model with nonzero VD and SV first-order residual bias, an Efron--Stein total-variance certificate for the clipped VD quotient, an asymptotic second-order quotient-variance diagnostic, and a multiplicative implementation-noise baseline for controlled-derangement/Hadamard-test implementations.  No numerical or hardware experiments are claimed; the contribution is a mathematical finite-budget framework identifying when VD or SV is favored by certified operating windows and when the constants should be interpreted as conservative proof certificates rather than operational thresholds.
+\end{abstract}
+
+\section{Introduction}
+
+Quantum error mitigation (QEM) tries to improve observable estimates on noisy devices without implementing full fault tolerance.  Standard techniques include zero-noise extrapolation, probabilistic error cancellation, symmetry verification, Clifford-data regression, and multi-copy purification methods such as virtual distillation and error suppression by derangements \citep{Temme2017,LiBenjamin2017,Endo2018,BonetMonroig2018,McArdle2019,Czarnik2021,Lowe2021,Huggins2021,Koczor2021PRX,Bultrini2023,Ijaz2024}.  A common issue is that lower bias is not free.  Mitigation can increase shot noise, circuit count, circuit width, calibration cost, or all of these.
+
+This paper focuses on two methods with analyzable finite-shot structure.  Virtual distillation (VD) estimates an observable with respect to
+\begin{equation}
+    \frac{\rho_p^M}{\Tr(\rho_p^M)},
+\end{equation}
+where \(M\) noisy copies are combined \citep{Huggins2021,Koczor2021PRX}.  VD suppresses subdominant spectral components, but it cannot remove the mismatch between the dominant eigenvector of the noisy state and the ideal state \citep{Koczor2021NJP}.  Symmetry verification (SV) projects samples onto a valid symmetry sector and discards invalid samples \citep{BonetMonroig2018,McArdle2019,Kakkar2022}.  Its residual bias comes from symmetry-preserving errors that postselection cannot detect; its variance cost comes from the acceptance probability.  Cai's symmetry expansion framework already gives a broad bias-versus-sampling view for symmetry-based mitigation \citep{Cai2021}.  The present paper uses the narrower SV case as one component in an explicit operating-window theory.
+
+The main mathematical issue is that VD is a quotient estimator.  The population target is
+\begin{equation}
+    \mu_{\mathrm{VD},M}(p)=\frac{N_M(p)}{D_M(p)}
+    =\frac{\Tr(O\rho_p^M)}{\Tr(\rho_p^M)},
+\end{equation}
+while the finite-shot estimator is \(\widehat N_M/\widehat D_M\).  Therefore a VD MSE law must account not only for population bias and variance, but also for the statistical bias of a random quotient and for the probability that the estimated denominator approaches zero.  Prior VD analyses identify the population mechanism and noise floors \citep{Huggins2021,Koczor2021PRX,Koczor2021NJP}, while circuit-level work studies implementation noise and special cases \citep{Teo2022,Vikstal2024}.  The contribution here is to place these effects inside a finite-budget MSE boundary.
+
+The paper makes seven claims, all conditional and theory-level.
+\begin{enumerate}[leftmargin=2em]
+    \item It derives the VD quotient MSE law with explicit \(B^{-1}\) quotient bias and denominator-driven variance.
+    \item It connects the VD bias-floor coefficient \(\delta_{\mathrm{VD}}\) directly to the first-order noise generator \(\mathcal L\), the observable \(O\), and the ideal pure state \(\rho_\star\).
+    \item It proves a denominator concentration certificate showing when the quotient expansion is trustworthy.
+    \item It gives a precise first-order SV bias formula and separates variance-driven \(p/B\) dependence from quotient-bias terms, which vanish for Bernoulli postselection.
+    \item It adds a validity certificate for indifference curves, so a predicted crossing is accepted only when it falls inside the local-law regime.
+    \item It includes a restricted lower-bound sanity check: if two ideal targets induce statistically indistinguishable noisy transcripts at budget \(R\), no mitigation selector can estimate both below the corresponding two-point risk.
+    \item It adds two structural organizing results that do not depend on numerical experiments: an accepted-transcript efficiency proposition for postselected laws and a selection trichotomy that classifies all two-method comparisons into uniform dominance or a certified crossing.
+\end{enumerate}
+
+No empirical validation is included.  The goal is to build the mathematical core before choosing QAOA instances, derangement circuits, noise models, or hardware backends.
+
+\section{Problem setup and local laws}
+
+Let \(\rho_\star\) be the ideal output state and let \(O=O^\dagger\) be a bounded observable.  The target is
+\begin{equation}
+    \mu_\star=\Tr(O\rho_\star).
+\end{equation}
+The noisy output state at physical noise scale \(p\geq0\) is \(\rho_p\).  We assume the local expansion
+\begin{equation}
+    \rho_p=\rho_\star+p\Delta+\OO(p^2),
+    \qquad
+    \Delta=\mathcal L(\rho_\star),
+    \label{eq:noise_expansion}
+\end{equation}
+where \(\Delta=\Delta^\dagger\) and \(\Tr\Delta=0\).  The trace condition follows from \(\Tr\rho_p=1\).
+
+A mitigation method \(m\) produces an estimator \(\widehat\mu_m\).  Its performance is
+\begin{equation}
+    \MSE_m(p,B)=\E[(\widehat\mu_m-\mu_\star)^2]
+    =\Bias(\widehat\mu_m)^2+\Var(\widehat\mu_m),
+\end{equation}
+where \(B\) denotes the number of independent statistical samples for that method.
+
+\begin{definition}[Certified local finite-shot law]
+\label{def:certified_law}
+A method \(m\) has a certified local finite-shot law on a parameter set \(\mathcal P\) if there exist functions \(b_m(p)\), \(v_m(p)\), \(c_m(p)\), constants \(C_m(p)\), and a threshold \(B_{\min,m}(p)\) such that, for every \(p\in\mathcal P\) and \(B\geq B_{\min,m}(p)\),
+\begin{equation}
+    \MSE_m(p,B)=b_m(p)^2+\frac{v_m(p)+2b_m(p)c_m(p)}{B}+\rho_m(p,B),
+    \qquad
+    \abs{\rho_m(p,B)}\leq \frac{C_m(p)}{B^2}.
+    \label{eq:certified_law}
+\end{equation}
+We write \(\widetilde v_m(p)=v_m(p)+2b_m(p)c_m(p)\).  Some ratio estimators first produce a two-part bound
+\begin{equation}
+    \abs{\rho_m(p,B)}
+    \leq \frac{C_m(p)}{B^2}+C_m^{\exp}(p)e^{-\gamma_m(p)B},
+    \qquad \gamma_m(p)>0.
+    \label{eq:certified_law_with_exp}
+\end{equation}
+Such a statement is converted into \cref{eq:certified_law} by increasing the threshold to any
+\begin{equation}
+    B\geq B_{\exp,m}(p)
+    \quad\text{such that}\quad
+    C_m^{\exp}(p)e^{-\gamma_m(p)B}\leq \frac{C_{m,\mathrm{abs}}(p)}{B^2},
+    \label{eq:exponential_absorption_threshold}
+\end{equation}
+and replacing \(C_m\) by \(C_m+C_{m,\mathrm{abs}}\).  Thus exponential bad-denominator terms are not silently hidden in the local law; they are either displayed explicitly or absorbed after an explicit sample-size threshold.
+\end{definition}
+
+The cross-term \(2b_mc_m/B\) is retained because it is the leading interaction between population bias and statistical quotient bias.  When a method is a plain sample mean, \(c_m=0\).  When its variance coefficient depends smoothly on \(p\), the local expansion of \(\widetilde v_m(p)/B\) generally contains \(p/B\) terms.  Those terms should not be hidden inside \(\OO(p^2/B)\) unless the first derivative vanishes.
+
+For unmitigated estimation,
+\begin{equation}
+    \mu_0(p)=\Tr(O\rho_p),
+    \qquad
+    b_0(p)=\mu_0(p)-\mu_\star=\beta_0p+\OO(p^2),
+    \qquad
+    \beta_0=\Tr(O\Delta).
+    \label{eq:unmitigated_bias}
+\end{equation}
+If the one-shot variance is \(\sigma_0^2(p)\), then
+\begin{equation}
+    \MSE_0(p,B)=b_0(p)^2+\frac{\sigma_0^2(p)}{B}.
+\end{equation}
+
+\section{Virtual distillation: population law}
+
+For \(M\geq2\), idealized VD targets
+\begin{equation}
+    \mu_{\mathrm{VD},M}(p)=\frac{N_M(p)}{D_M(p)},
+    \qquad
+    N_M(p)=\Tr(O\rho_p^M),
+    \qquad
+    D_M(p)=\Tr(\rho_p^M).
+    \label{eq:vd_population_law}
+\end{equation}
+Assume the spectral decomposition
+\begin{equation}
+    \rho_p=\sum_{j\geq1}\lambda_j(p)\ket{\phi_j(p)}\bra{\phi_j(p)},
+    \qquad
+    \lambda_1(p)>\lambda_2(p)\geq\cdots\geq0.
+\end{equation}
+Then
+\begin{equation}
+    \mu_{\mathrm{VD},M}(p)=
+    \frac{\sum_j\lambda_j(p)^M O_{jj}(p)}{\sum_j\lambda_j(p)^M},
+    \qquad
+    O_{jj}(p)=\bra{\phi_j(p)}O\ket{\phi_j(p)}.
+\end{equation}
+VD suppresses the subdominant eigenvalues, but it converges to the observable expectation in the dominant eigenvector:
+\begin{equation}
+    \lim_{M\to\infty}\mu_{\mathrm{VD},M}(p)=O_{11}(p).
+\end{equation}
+The infinite-copy floor is therefore
+\begin{equation}
+    b_{\mathrm{VD},\infty}(p)=O_{11}(p)-\mu_\star.
+\end{equation}
+
+\begin{lemma}[Spectral leakage]
+\label{lem:spectral_leakage_v2}
+Let
+\begin{equation}
+    r_M(p)=\sum_{j>1}\left(\frac{\lambda_j(p)}{\lambda_1(p)}\right)^M.
+\end{equation}
+Then
+\begin{equation}
+    \abs{\mu_{\mathrm{VD},M}(p)-O_{11}(p)}
+    \leq \frac{2\norm{O}_\infty r_M(p)}{1+r_M(p)}
+    \leq2\norm{O}_\infty r_M(p).
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Divide numerator and denominator by \(\lambda_1^M\).  The difference from \(O_{11}\) is a weighted average of \(O_{jj}-O_{11}\) over \(j>1\), divided by \(1+r_M\).  Since \(\abs{O_{jj}-O_{11}}\leq2\norm O_\infty\), the bound follows.
+\end{proof}
+
+\subsection{First-order endpoint coefficient in terms of the noise generator}
+
+Assume now that \(\rho_\star=\ket{\psi_\star}\bra{\psi_\star}\) is pure.  Let
+\begin{equation}
+    Q_\star=I-\ket{\psi_\star}\bra{\psi_\star}.
+\end{equation}
+The eigenvalue \(1\) of \(\rho_\star\) is simple and separated from the zero eigenspace by a unit gap.  Standard non-degenerate eigenvector perturbation gives
+\begin{equation}
+    \ket{\phi_1(p)}=\ket{\psi_\star}+p\ket{\eta}+\OO(p^2),
+    \qquad
+    \ket{\eta}=Q_\star\Delta\ket{\psi_\star},
+    \qquad
+    \ip{\psi_\star}{\eta}=0.
+    \label{eq:eta_generator}
+\end{equation}
+
+\begin{proposition}[VD floor coefficient]
+\label{prop:vd_delta_generator}
+Under \cref{eq:noise_expansion} and \cref{eq:eta_generator},
+\begin{equation}
+    b_{\mathrm{VD},\infty}(p)=\delta_{\mathrm{VD}}p+\OO(p^2),
+\end{equation}
+with
+\begin{equation}
+    \delta_{\mathrm{VD}}
+    =2\operatorname{Re}\bra{\psi_\star}OQ_\star\Delta\ket{\psi_\star}
+    =2\operatorname{Re}\bra{\psi_\star}O(I-\ket{\psi_\star}\bra{\psi_\star})\mathcal L(\rho_\star)\ket{\psi_\star}.
+    \label{eq:delta_vd_explicit}
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+By expansion of the dominant eigenvector,
+\begin{align}
+    O_{11}(p)
+    &=\bra{\psi_\star+p\eta}O\ket{\psi_\star+p\eta}+\OO(p^2)\\
+    &=\mu_\star+2p\operatorname{Re}\bra{\psi_\star}O\ket{\eta}+\OO(p^2).
+\end{align}
+Substitute \(\ket\eta=Q_\star\Delta\ket{\psi_\star}\).
+\end{proof}
+
+This formula is important because it prevents \(\delta_{\mathrm{VD}}\) from being a free symbol.  It is an observable-dependent projection of the first-order noise perturbation onto the orthogonal subspace of the ideal state.
+
+
+\section{Virtual distillation: denominator concentration and quotient MSE}
+
+Let \((X_{M,s},Y_{M,s})_{s=1}^B\) be independent copies of a one-sample pair satisfying
+\begin{equation}
+    \E X_M=N_M(p),
+    \qquad
+    \E Y_M=D_M(p),
+\end{equation}
+and define
+\begin{equation}
+    \widehat N_M=\frac1B\sum_{s=1}^B X_{M,s},
+    \qquad
+    \widehat D_M=\frac1B\sum_{s=1}^B Y_{M,s},
+    \qquad
+    \widehat\mu_{\mathrm{VD},M}=\frac{\widehat N_M}{\widehat D_M}.
+\end{equation}
+Write
+\begin{equation}
+    \Sigma_M(p)=
+    \begin{pmatrix}
+        \sigma_{N,M}^2(p) & \sigma_{ND,M}(p)\\
+        \sigma_{ND,M}(p) & \sigma_{D,M}^2(p)
+    \end{pmatrix}.
+\end{equation}
+The ratio is meaningful only when the denominator is statistically separated from zero.  This point is part of the operating-window theory, not a technical nuisance.
+
+\begin{assumption}[Bounded one-shot VD estimator]
+\label{ass:bounded_vd_pair_v4}
+For fixed \((p,M)\), \(D_M(p)>0\), and the numerator-denominator one-shot pair satisfies
+\begin{equation}
+    \abs{X_M}\leq K_{N,M}(p),
+    \qquad
+    \abs{Y_M-D_M(p)}\leq K_{D,M}(p)
+\end{equation}
+almost surely.  Define centered variables \(\xi=X_M-N_M\) and \(\zeta=Y_M-D_M\), and bounded moment constants
+\begin{equation}
+    m_{ab,M}(p)=\E[\xi^a\zeta^b],
+    \qquad
+    \bar m_{ab,M}(p)=\E[\abs{\xi}^a\abs{\zeta}^b].
+\end{equation}
+\end{assumption}
+
+\begin{lemma}[Bernstein denominator certificate]
+\label{lem:denom_bernstein_v4}
+Under \cref{ass:bounded_vd_pair_v4},
+\begin{equation}
+    \Prob\!\left(\widehat D_M<\frac{D_M}{2}\right)
+    \leq
+    \exp\!\left[-\frac{B D_M(p)^2}{8\sigma_{D,M}^2(p)+\frac{4}{3}K_{D,M}(p)D_M(p)}\right].
+    \label{eq:bernstein_denominator_v4}
+\end{equation}
+Consequently, to make this probability at most \(\varepsilon\), it is sufficient that
+\begin{equation}
+    B\geq
+    B_{\mathrm{den},M}(p,\varepsilon)
+    :=
+    \left(\frac{8\sigma_{D,M}^2(p)}{D_M(p)^2}
+    +\frac{4K_{D,M}(p)}{3D_M(p)}\right)
+    \log\!\frac1\varepsilon.
+    \label{eq:denom_sample_threshold_v4}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Apply Bernstein's inequality to \(B^{-1}\sum_s(Y_{M,s}-D_M)\) with threshold \(D_M/2\) \citep{Boucheron2013}.
+\end{proof}
+
+The ratio \(\sigma_{D,M}^2/D_M^2\) in \cref{eq:denom_sample_threshold_v4} is the denominator-driven inflation parameter.  If \(D_M\) is small, VD may still have a favorable population bias but require many samples before the ratio estimator is stable.
+
+For a non-asymptotic statement define the clipped quotient
+\begin{equation}
+    \widehat\mu_{\mathrm{VD},M}^{\mathrm{clip}}
+    =\frac{\widehat N_M}{\max\{\widehat D_M,D_M/2\}}.
+    \label{eq:clipped_quotient_v4}
+\end{equation}
+It equals the ordinary quotient on the good event \(\widehat D_M\geq D_M/2\).  The clipping is a proof device; in practice it is also the natural regularization when a random denominator is used.
+
+
+\begin{definition}[Explicit quotient-remainder constants]
+\label{def:quotient_constants_v4}
+For fixed \((p,M)\), put \(\mu_M=N_M/D_M\).  For sample means
+\(\bar\xi=B^{-1}\sum_s \xi_s\) and \(\bar\zeta=B^{-1}\sum_s\zeta_s\), define finite moment envelopes
+\begin{align}
+    \mathfrak m_{12,M}(p)&=\sup_{B\ge1} B^2\abs{\E[\bar\xi\bar\zeta^2]},
+    &
+    \mathfrak m_{21,M}(p)&=\sup_{B\ge1} B^2\abs{\E[\bar\xi^2\bar\zeta]},\\
+    \mathfrak m_{03,M}(p)&=\sup_{B\ge1} B^2\abs{\E[\bar\zeta^3]},
+    &
+    \mathfrak m_{13,M}(p)&=\sup_{B\ge1} B^2\E[\abs{\bar\xi}\abs{\bar\zeta}^3],\\
+    \mathfrak m_{04,M}(p)&=\sup_{B\ge1} B^2\E[\abs{\bar\zeta}^4],
+    &
+    \mathfrak m_{40,M}(p)&=\sup_{B\ge1} B^2\E[\abs{\bar\xi}^4],\\
+    \mathfrak m_{22,M}(p)&=\sup_{B\ge1} B^2\E[\bar\xi^2\bar\zeta^2].
+\end{align}
+These constants are finite under \cref{ass:bounded_vd_pair_v4}.  A fully explicit admissible choice follows from standard fourth-moment estimates for bounded centered averages; for example
+\(\mathfrak m_{04,M}\le 3\sigma_{D,M}^4+K_{D,M}^4\),
+\(\mathfrak m_{40,M}\le 3\sigma_{N,M}^4+16K_{N,M}^4\),
+\(\mathfrak m_{22,M}\le (3\sigma_{N,M}^4+16K_{N,M}^4)^{1/2}(3\sigma_{D,M}^4+K_{D,M}^4)^{1/2}\), and analogous bounded third-moment estimates give finite \(\mathfrak m_{12,M},\mathfrak m_{21,M},\mathfrak m_{03,M}\).
+
+For the variance certificate define the linear and quadratic quotient terms
+\begin{equation}
+    L_M=\frac{\bar\xi-\mu_M\bar\zeta}{D_M},
+    \qquad
+    Q_M=\frac{\mu_M\bar\zeta^2-\bar\xi\bar\zeta}{D_M^2},
+\end{equation}
+and let \(T_M\) denote the signed sum of all third-and-higher good-event terms in the Neumann expansion after \(Q_M\), including the signed fourth-order tail.  The remaining finite variance-tail envelope is
+\begin{equation}
+    \mathfrak t^{(V)}_M(p)
+    :=\sup_{B\ge1}B^2
+    \abs{2\Cov(L_M,T_M)+2\Cov(Q_M,T_M)+\Var(T_M)}.
+    \label{eq:tail_variance_envelope_v14}
+\end{equation}
+It is finite under the boundedness assumption; if desired it can be expanded into sixth- and eighth-moment envelopes of \((\bar\xi,\bar\zeta)\).  Keeping it as \(\mathfrak t^{(V)}_M\) avoids hiding the \(\Cov(L_M,T_M)\) term inside an informal \(\OO(B^{-2})\).
+Define
+\begin{align}
+    A_{E,M}(p)
+    &=\frac{\mathfrak m_{12,M}(p)+\abs{\mu_M}\mathfrak m_{03,M}(p)}{D_M(p)^3}
+      +\frac{\mathfrak m_{13,M}(p)}{D_M(p)^4}
+      +\frac{2K_{N,M}(p)\mathfrak m_{04,M}(p)}{D_M(p)^5},
+       \label{eq:AE_constant_v4}\\
+    A_{Q,M}(p)
+    &=\frac{2}{D_M(p)^4}\left[
+      \abs{\mu_M}^2\mathfrak m_{04,M}(p)+\mathfrak m_{22,M}(p)
+      \right],
+      \label{eq:AQ_constant_v14}\\
+    A_{LQ,M}(p)
+    &=\frac{2}{D_M(p)^3}\left[
+      2\abs{\mu_M}\mathfrak m_{12,M}(p)+\mathfrak m_{21,M}(p)
+      +\abs{\mu_M}^2\mathfrak m_{03,M}(p)
+      \right],
+      \label{eq:ALQ_constant_v14}\\
+    A_{V,M}(p)
+    &=A_{Q,M}(p)+A_{LQ,M}(p)+\mathfrak t^{(V)}_M(p),
+      \label{eq:AV_constant_v4}\\
+    E_{\mathrm{bad},M}(p,B)
+    &=\frac{16K_{N,M}(p)^2}{D_M(p)^2}
+    \exp\!\left[-\frac{B D_M(p)^2}{8\sigma_{D,M}^2(p)+\frac{4}{3}K_{D,M}(p)D_M(p)}\right].
+\end{align}
+The constants are conservative, but they now account explicitly for the mixed covariance between the linear and quadratic quotient terms.  In particular, \cref{eq:ALQ_constant_v14} controls \(2\Cov(L_M,Q_M)\), the term that is not controlled by bounding \(\Var(Q_M)\) alone.
+\end{definition}
+
+\begin{remark}[Tightness of the certified constants]
+\label{rem:constant_tightness_v7}
+The constants in \cref{eq:AV_constant_v4} are proof certificates, not sharp estimates of the physical sampling penalty.  The largest inflation comes from bounding the square of the second-order remainder by the worst-case inequality \((a_1+\cdots+a_k)^2\le k\sum_i a_i^2\).  This Cauchy--Schwarz step is intentionally robust but can overestimate the true second moment by several orders of magnitude.  Consequently, the small numerical parameters used in the toy non-vacuity checks below should be read as artifacts of a loose variance certificate rather than physical thresholds.  The Efron--Stein certificate in \cref{lem:efron_stein_vd_v11} and the direct second-order calculation in \cref{prop:vd_second_order_variance_v11} are included precisely to separate what is needed for a rigorous certificate from what is expected to control the true sampling scale.
+\end{remark}
+
+\begin{theorem}[Non-asymptotic VD quotient law with explicit moment remainder]
+\label{thm:vd_quotient_certified_v4}
+Under \cref{ass:bounded_vd_pair_v4}, for every \(B\geq B_{\mathrm{den},M}(p,\varepsilon)\), the clipped VD estimator satisfies
+\begin{align}
+    \E[\widehat\mu_{\mathrm{VD},M}^{\mathrm{clip}}]
+    &=\mu_{\mathrm{VD},M}(p)+\frac{c_{\mathrm{VD},M}(p)}{B}+r^{(E)}_{M}(p,B),
+    \label{eq:vd_expectation_certified_v4}\\
+    \Var(\widehat\mu_{\mathrm{VD},M}^{\mathrm{clip}})
+    &=\frac{v_{\mathrm{VD},M}(p)}{B}+r^{(V)}_{M}(p,B),
+    \label{eq:vd_variance_certified_v4}
+\end{align}
+where
+\begin{align}
+    c_{\mathrm{VD},M}(p)
+    &=\frac{\mu_{\mathrm{VD},M}(p)\sigma_{D,M}^2(p)-\sigma_{ND,M}(p)}{D_M(p)^2},
+    \label{eq:vd_c_v4}\\
+    v_{\mathrm{VD},M}(p)
+    &=\frac{\sigma_{N,M}^2(p)+\mu_{\mathrm{VD},M}(p)^2\sigma_{D,M}^2(p)
+    -2\mu_{\mathrm{VD},M}(p)\sigma_{ND,M}(p)}{D_M(p)^2}
+    \label{eq:vd_v_v4}\\
+    &=\frac{\Var(X_M-\mu_{\mathrm{VD},M}(p)Y_M)}{D_M(p)^2}.
+\end{align}
+Moreover,
+\begin{align}
+    \abs{r^{(E)}_{M}(p,B)}
+    &\leq \frac{A_{E,M}(p)}{B^2}+\frac{4K_{N,M}(p)}{D_M(p)}
+    \exp\!\left[-\frac{B D_M(p)^2}{8\sigma_{D,M}^2(p)+\frac{4}{3}K_{D,M}(p)D_M(p)}\right],
+    \label{eq:explicit_E_remainder_v4}\\
+    \abs{r^{(V)}_{M}(p,B)}
+    &\leq \frac{A_{V,M}(p)}{B^2}+E_{\mathrm{bad},M}(p,B).
+    \label{eq:explicit_V_remainder_v4}
+\end{align}
+Therefore
+\begin{equation}
+    \MSE_{\mathrm{VD},M}(p,B)
+    =b_{\mathrm{VD},M}(p)^2
+    +\frac{v_{\mathrm{VD},M}(p)+2b_{\mathrm{VD},M}(p)c_{\mathrm{VD},M}(p)}{B}
+    +\rho_{\mathrm{VD},M}(p,B),
+    \label{eq:vd_mse_certified_v4}
+\end{equation}
+with
+\begin{equation}
+    \abs{\rho_{\mathrm{VD},M}(p,B)}
+    \leq
+    \frac{C_{\mathrm{VD},M}(p)}{B^2}
+    +C'_{\mathrm{VD},M}(p)
+    \exp\!\left[-\frac{B D_M(p)^2}{8\sigma_{D,M}^2(p)+\frac{4}{3}K_{D,M}(p)D_M(p)}\right],
+    \label{eq:vd_mse_remainder_v4}
+\end{equation}
+where, with
+\begin{equation}
+    B_{E,M}=\frac{4K_{N,M}}{D_M},
+    \qquad
+    B_{V,M}=\frac{16K_{N,M}^2}{D_M^2},
+\end{equation}
+one admissible explicit choice is
+\begin{align}
+    C_{\mathrm{VD},M}
+    &=A_{V,M}+c_{\mathrm{VD},M}^2
+      +2\abs{b_{\mathrm{VD},M}}A_{E,M}
+      +2\abs{c_{\mathrm{VD},M}}A_{E,M}
+      +2A_{E,M}^2,\\
+    C'_{\mathrm{VD},M}
+    &=B_{V,M}+2\abs{b_{\mathrm{VD},M}}B_{E,M}
+      +2\abs{c_{\mathrm{VD},M}}B_{E,M}+2B_{E,M}^2.
+\end{align}
+These constants are not optimized; they are written only to make the certificate reproducible.  In the strict sense of \cref{def:certified_law}, choose any \(B_{\exp,\mathrm{VD},M}\) satisfying \cref{eq:exponential_absorption_threshold} with
+\begin{equation}
+    \gamma_{\mathrm{VD},M}(p)=\frac{D_M(p)^2}{8\sigma_{D,M}^2(p)+\frac43 K_{D,M}(p)D_M(p)},
+    \qquad
+    C_{\mathrm{VD},M}^{\exp}(p)=C'_{\mathrm{VD},M}(p),
+\end{equation}
+and absorb the exponential contribution into the \(B^{-2}\) remainder whenever
+\[
+    B\geq\max\{B_{\mathrm{den},M},B_{\exp,\mathrm{VD},M}\}.
+\]
+\end{theorem}
+
+\begin{proof}
+Let \(G=\{\abs{\bar\zeta}\le D_M/2\}\).  On \(G\), clipping is inactive and \(\widehat D_M\ge D_M/2\).  The centered variables satisfy \(\abs{N_M+\bar\xi}=\abs{\widehat N_M}\le K_{N,M}\).  Since \(\abs{\bar\zeta/D_M}\le1/2\), the Neumann expansion is absolutely convergent and
+\begin{equation}
+    \frac{1}{D_M+\bar\zeta}
+    =\frac1{D_M}\left(1-\frac{\bar\zeta}{D_M}
+    +\frac{\bar\zeta^2}{D_M^2}-\frac{\bar\zeta^3}{D_M^3}\right)
+    +\frac1{D_M}\frac{(\bar\zeta/D_M)^4}{1+\bar\zeta/D_M}.
+\end{equation}
+Multiplying by \(N_M+\bar\xi=\mu_MD_M+\bar\xi\) gives the term-by-term identity
+\begin{align}
+    \frac{N_M+\bar\xi}{D_M+\bar\zeta}
+    &=\mu_M+\frac{\bar\xi-\mu_M\bar\zeta}{D_M}
+      +\frac{\mu_M\bar\zeta^2-\bar\xi\bar\zeta}{D_M^2}
+      +\frac{\bar\xi\bar\zeta^2-\mu_M\bar\zeta^3}{D_M^3}
+      -\frac{\bar\xi\bar\zeta^3}{D_M^4}
+      +\widetilde{\mathcal R}_4,
+      \label{eq:explicit_neumann_terms_v5}
+\end{align}
+where
+\begin{equation}
+    \widetilde{\mathcal R}_4
+    =\frac{N_M+\bar\xi}{D_M}\frac{(\bar\zeta/D_M)^4}{1+\bar\zeta/D_M}.
+\end{equation}
+The good-event tail is therefore explicitly bounded by
+\begin{equation}
+    \abs{\widetilde{\mathcal R}_4}
+    \le \frac{2K_{N,M}\abs{\bar\zeta}^4}{D_M^5}.
+    \label{eq:r4_tail_bound_v5}
+\end{equation}
+This is the missing geometric-tail control: the mixed cubic term \(-\bar\xi\bar\zeta^3/D_M^4\) is kept separate, and the remaining tail contains only powers \(\bar\zeta^4\) and higher.  Taking expectations in \cref{eq:explicit_neumann_terms_v5}, using \(\E\bar\xi=\E\bar\zeta=0\), \(\E\bar\zeta^2=\sigma_{D,M}^2/B\), \(\E\bar\xi\bar\zeta=\sigma_{ND,M}/B\), and the definitions of \(\mathfrak m_{12},\mathfrak m_{03},\mathfrak m_{13},\mathfrak m_{04}\), gives
+\begin{equation}
+    \left|\E\left[\widehat\mu^{\rm clip}_{\mathrm{VD},M}\mathbf 1_G\right]
+    -\mu_M-\frac{c_{\mathrm{VD},M}}{B}\right|
+    \le \frac{A_{E,M}}{B^2}.
+\end{equation}
+The displayed moment calculations use unrestricted moments.  Restricting them to \(G\) changes each bounded monomial expectation by at most its uniform bound times \(\Prob(G^c)\); these corrections are absorbed into the same exponential bad-event term.  On \(G^c\), the clipped estimator obeys \(\abs{\widehat\mu^{\rm clip}_{\mathrm{VD},M}}\le 2K_{N,M}/D_M\), and \cref{lem:denom_bernstein_v4} gives the exponential contribution in \cref{eq:explicit_E_remainder_v4}.  This proves the expectation claim.
+
+For the variance, write the good-event expansion as
+\begin{equation}
+    \widehat\mu^{\rm clip}_{\mathrm{VD},M}
+    =\mu_M+L_M+Q_M+T_M,
+    \qquad
+    L_M=\frac{\bar\xi-\mu_M\bar\zeta}{D_M},
+    \qquad
+    Q_M=\frac{\mu_M\bar\zeta^2-\bar\xi\bar\zeta}{D_M^2},
+\end{equation}
+where \(T_M\) collects the third-and-higher terms from \cref{eq:explicit_neumann_terms_v5,eq:r4_tail_bound_v5}.  Then \(B\Var(L_M)=v_{\mathrm{VD},M}\).  The quadratic variance term obeys
+\begin{equation}
+    B^2\Var(Q_M)
+    \le B^2\E[Q_M^2]
+    \le A_{Q,M}.
+\end{equation}
+The mixed linear-quadratic term is controlled explicitly by
+\begin{align}
+    2B^2\abs{\Cov(L_M,Q_M)}
+    &\le \frac{2B^2}{D_M^3}
+    \abs{\E\big[(\bar\xi-\mu_M\bar\zeta)(\mu_M\bar\zeta^2-\bar\xi\bar\zeta)\big]} \\
+    &\le \frac{2}{D_M^3}
+    \left[2\abs{\mu_M}\mathfrak m_{12,M}+\mathfrak m_{21,M}
+    +\abs{\mu_M}^2\mathfrak m_{03,M}\right]
+    =A_{LQ,M}.
+\end{align}
+Finally, the remaining third-and-higher contributions are exactly those collected in \(\mathfrak t^{(V)}_M\).  Therefore
+\begin{equation}
+    \abs{\Var(L_M+Q_M+T_M)-\Var(L_M)}
+    \le \frac{A_{Q,M}+A_{LQ,M}+\mathfrak t^{(V)}_M}{B^2},
+\end{equation}
+which is \cref{eq:explicit_V_remainder_v4} on the good event; the bad event is again bounded by \(E_{\mathrm{bad},M}\).  This explicitly repairs the covariance term that would be missed by controlling only the square of the remainder.  The MSE expansion follows by combining the variance bound with
+\begin{equation}
+    \left(b_{\mathrm{VD},M}+\frac{c_{\mathrm{VD},M}}{B}+r^{(E)}_M\right)^2
+    =b_{\mathrm{VD},M}^2+\frac{2b_{\mathrm{VD},M}c_{\mathrm{VD},M}}{B}+\OO(B^{-2}),
+\end{equation}
+where the \(\OO(B^{-2})\) term is replaced by the explicit bounds above in \cref{eq:vd_mse_remainder_v4}.
+\end{proof}
+
+\begin{remark}[Ordinary versus clipped quotient]
+If the implementation guarantees inverse-moment control for \(\widehat D_M^{-1}\), the same leading expansion applies to the ordinary quotient.  Without such a guarantee, the clipped quotient is the mathematically safe estimator.  Since the two estimators coincide except on an exponentially small event once \cref{eq:denom_sample_threshold_v4} holds, their leading operating-window laws are identical.
+\end{remark}
+
+
+\subsection{Sharper variance diagnostics for the VD quotient}
+\label{subsec:vd_sharper_variance_v11}
+
+The certified law above is intentionally worst-case.  This subsection adds two more precise diagnostics.  The first is a fully non-asymptotic Efron--Stein certificate for the total variance of the clipped quotient.  It does not recover the exact coefficient \(v_{\mathrm{VD},M}\), but it avoids the large second-order Cauchy--Schwarz envelope used in \(A_{V,M}\).  The second is an asymptotic second-order variance calculation.  It explains which moment combination controls the true \(B^{-2}\) correction; it is not used as a replacement for the non-asymptotic certificate unless its displayed remainder is separately bounded.
+
+\begin{lemma}[Efron--Stein total-variance certificate for clipped VD]
+\label{lem:efron_stein_vd_v11}
+Under \cref{ass:bounded_vd_pair_v4}, the clipped quotient in \cref{eq:clipped_quotient_v4} satisfies
+\begin{equation}
+    \Var\!\left(\widehat\mu_{\mathrm{VD},M}^{\mathrm{clip}}\right)
+    \le
+    \frac{8K_{N,M}^2\bigl(D_M+2K_{D,M}\bigr)^2}{D_M^4}\,\frac1B.
+    \label{eq:efron_stein_vd_bound_v11}
+\end{equation}
+Consequently, for \(D_M\ge1/2\) and bounded Hadamard-test signs \(K_{N,M},K_{D,M}=\OO(1)\), the clipped VD quotient has a non-asymptotic total-variance certificate with a constant often of order \(10^2\)--\(10^3\) in the bounded-sign cases considered below, rather than the much larger \(B^{-2}\)-remainder envelope in \cref{eq:AV_constant_v4}.
+\end{lemma}
+
+\begin{proof}
+Let \(f\) be the clipped quotient as a function of the \(B\) independent pairs \((X_s,Y_s)\).  Replace only the \(j\)-th pair and denote the resulting function by \(f^{(j)}\).  The sample numerator changes by at most \(2K_{N,M}/B\), while the sample denominator changes by at most \(2K_{D,M}/B\).  Since the clipped denominator is always at least \(D_M/2\), the map \((n,d)\mapsto n/\max\{d,D_M/2\}\) is Lipschitz with constants \(2/D_M\) in \(n\) and at most \(4K_{N,M}/D_M^2\) in \(d\), using \(\abs{\widehat N_M}\le K_{N,M}\).  Hence
+\begin{equation}
+    \abs{f-f^{(j)}}
+    \le
+    \frac{4K_{N,M}}{BD_M}
+    +\frac{8K_{N,M}K_{D,M}}{BD_M^2}
+    =
+    \frac{4K_{N,M}(D_M+2K_{D,M})}{BD_M^2}.
+\end{equation}
+Efron--Stein gives
+\begin{equation}
+    \Var(f)\le \frac12\sum_{j=1}^B \E\big[(f-f^{(j)})^2\big]
+    \le \frac{B}{2}\left(\frac{4K_{N,M}(D_M+2K_{D,M})}{BD_M^2}\right)^2,
+\end{equation}
+which is \cref{eq:efron_stein_vd_bound_v11}.
+\end{proof}
+
+\begin{proposition}[Second-order variance coefficient of the quotient]
+\label{prop:vd_second_order_variance_v11}
+Assume the centered one-shot variables have bounded sixth moments.  Let \(\mu_M=N_M/D_M\), \(\bar\xi=B^{-1}\sum_s\xi_s\), \(\bar\zeta=B^{-1}\sum_s\zeta_s\), and define the linear and quadratic quotient terms
+\begin{align}
+    L_M&=\frac{\bar\xi-\mu_M\bar\zeta}{D_M},\\
+    Q_M&=\frac{\mu_M\bar\zeta^2-\bar\xi\bar\zeta}{D_M^2}.
+\end{align}
+Then, on the good-denominator event and up to an exponentially small clipping correction,
+\begin{equation}
+    \Var\!\left(\widehat\mu_{\mathrm{VD},M}^{\mathrm{clip}}\right)
+    =\frac{v_{\mathrm{VD},M}}{B}
+     +\frac{W_{\mathrm{VD},M}^{(0)}}{B^2}
+     +\OO(B^{-3})+\OO(e^{-\gamma_M B}),
+    \label{eq:second_order_variance_expansion_v11}
+\end{equation}
+where the clean second-order coefficient is
+\begin{align}
+    W_{\mathrm{VD},M}^{(0)}
+    &=\Gamma_{\mathrm{VD},M}
+      +\frac{1}{D_M^4}\Big[
+      2\mu_M^2\sigma_{D,M}^4
+      +\sigma_{N,M}^2\sigma_{D,M}^2
+      +\sigma_{ND,M}^2
+      -4\mu_M\sigma_{D,M}^2\sigma_{ND,M}
+      \Big],                                      \label{eq:second_order_W0_v13}\\
+    2B^2\Cov(L_M,Q_M)
+    &=\Gamma_{\mathrm{VD},M}+\OO(B^{-1}),          \label{eq:third_moment_gamma_v13}\\
+    B^2\Var(Q_M)
+    &=\frac{1}{D_M^4}\Big[
+      2\mu_M^2\sigma_{D,M}^4
+      +\sigma_{N,M}^2\sigma_{D,M}^2
+      +\sigma_{ND,M}^2
+      -4\mu_M\sigma_{D,M}^2\sigma_{ND,M}
+      \Big]+\OO(B^{-1}).
+      \label{eq:second_order_Q_variance_v11}
+\end{align}
+The term \(\Gamma_{\mathrm{VD},M}\) is the third-moment contribution to the quotient variance.  In symmetric Hadamard-test implementations it often vanishes or is lower order, but no such cancellation is assumed in the non-asymptotic certificate.
+\end{proposition}
+
+\begin{proof}
+Use the Neumann expansion of \((D_M+\bar\zeta)^{-1}\) on the event \(\abs{\bar\zeta}\le D_M/2\):
+\begin{equation}
+    \frac{N_M+\bar\xi}{D_M+\bar\zeta}
+    =\mu_M+L_M+Q_M+\OO\!\left(\abs{\bar\xi}\abs{\bar\zeta}^2+\abs{\bar\zeta}^3\right).
+\end{equation}
+The leading term satisfies \(B\Var(L_M)=v_{\mathrm{VD},M}\).  For centered i.i.d.\ sample averages,
+\begin{align}
+    \Var(\bar\zeta^2)&=\frac{2\sigma_{D,M}^4}{B^2}+\OO(B^{-3}),\\
+    \Var(\bar\xi\bar\zeta)&=\frac{\sigma_{N,M}^2\sigma_{D,M}^2+\sigma_{ND,M}^2}{B^2}+\OO(B^{-3}),\\
+    \Cov(\bar\zeta^2,\bar\xi\bar\zeta)&=\frac{2\sigma_{D,M}^2\sigma_{ND,M}}{B^2}+\OO(B^{-3}).
+\end{align}
+Substituting these three identities into \(Q_M=(\mu_M\bar\zeta^2-\bar\xi\bar\zeta)/D_M^2\) gives \cref{eq:second_order_Q_variance_v11}.  The remaining covariance \(\Cov(L_M,Q_M)\) contains third moments and is kept explicit.  Cubic and higher Neumann terms are \(\OO(B^{-3})\) in variance under the sixth-moment assumption, while the complement of the good event contributes only the exponential clipping term already controlled in \cref{lem:denom_bernstein_v4}.
+\end{proof}
+
+\begin{remark}[How this changes the interpretation of the toy certificates]
+\label{rem:sharp_variance_interpretation_v11}
+\Cref{lem:efron_stein_vd_v11,prop:vd_second_order_variance_v11} do not change the leading operating-window law.  They explain why the explicit constants used in the certified toy examples are pessimistic: \(A_{V,M}\) is a worst-case certificate for a second-order remainder, whereas the actual \(B^{-2}\) variance correction is controlled by the moment combination in \cref{eq:second_order_Q_variance_v11}.  Thus the earlier extreme numerical choices demonstrate formal non-vacuity of the certificate; they should not be read as the physical scale at which VD or SV becomes useful.
+\end{remark}
+
+
+
+
+
+
+\section{Copy-number choice for VD}
+
+The copy number \(M\) is not a free improvement knob.  Increasing \(M\) suppresses subdominant spectral components, but it can also reduce \(D_M=\Tr(\rho_p^M)\), which increases the denominator-driven variance.
+
+\begin{lemma}[Denominator spectral bounds]
+\label{lem:denom_spectral_bounds_v4}
+Let \(r_M(p)=\sum_{j>1}(\lambda_j/\lambda_1)^M\).  Then
+\begin{equation}
+    D_M(p)=\lambda_1(p)^M\bigl(1+r_M(p)\bigr),
+    \qquad
+    \lambda_1(p)^M\leq D_M(p)\leq \lambda_1(p)^M(1+r_M(p)).
+    \label{eq:dm_spectral_bounds_v4}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Use \(D_M=\sum_j\lambda_j^M\) and factor out \(\lambda_1^M\).
+\end{proof}
+
+\subsection{Concrete independent derangement/Hadamard-test implementation}
+
+To make the variance constants non-aspirational, fix the following idealized implementation.  Let \(U_M\) be the cyclic derangement acting on \(M\) copies.  The denominator \(D_M=\Tr(\rho_p^M)\) is estimated by a controlled-\(U_M\) Hadamard test.  For a Pauli observable \(O\), the numerator \(N_M=\Tr(O\rho_p^M)\) is estimated by an independent controlled observable-derangement Hadamard test.  Each test returns a binary outcome in \(\{\pm1\}\).  We use \(B\) denominator shots and \(B\) numerator shots; hence the physical resource is proportional to \(R_M=2\kappa_M B\), where \(\kappa_M\) is the circuit resource per Hadamard test.
+
+For this implementation,
+\begin{equation}
+    X_M\in\{\pm1\},
+    \qquad
+    Y_M\in\{\pm1\},
+    \qquad
+    \E X_M=N_M,
+    \qquad
+    \E Y_M=D_M,
+\end{equation}
+and the two streams are independent.  Therefore
+\begin{equation}
+    \sigma_{N,M}^2=1-N_M^2,
+    \qquad
+    \sigma_{D,M}^2=1-D_M^2,
+    \qquad
+    \sigma_{ND,M}=0.
+    \label{eq:hadamard_variances_v4}
+\end{equation}
+The VD quotient constants become
+\begin{align}
+    c_{\mathrm{VD},M}^{\mathrm{Had}}(p)
+    &=\frac{\mu_{\mathrm{VD},M}(p)\bigl(1-D_M(p)^2\bigr)}{D_M(p)^2},
+    \label{eq:hadamard_c_v4}\\
+    v_{\mathrm{VD},M}^{\mathrm{Had}}(p)
+    &=\frac{1-N_M(p)^2+\mu_{\mathrm{VD},M}(p)^2\bigl(1-D_M(p)^2\bigr)}{D_M(p)^2}.
+    \label{eq:hadamard_v_v4}
+\end{align}
+For Pauli \(O\) with \(\|O\|_\infty\le1\), positivity of \(\rho_p^M\) gives \(\abs{N_M}\le \Tr(\rho_p^M)=D_M\), hence \(\abs{\mu_{\mathrm{VD},M}}\le1\).  The denominator certificate is explicit:
+\begin{equation}
+    B\geq
+    \left(
+    \frac{8(1-D_M^2)}{D_M^2}+\frac{8}{3D_M}
+    \right)\log\!\frac1\varepsilon
+    \label{eq:hadamard_Bmin_v4}
+\end{equation}
+is sufficient for \(\Prob(\widehat D_M<D_M/2)\leq\varepsilon\).
+
+\begin{proposition}[Implementation-level VD variance inflation]
+\label{prop:implementation_variance_inflation_v4}
+For the independent Hadamard-test implementation above,
+\begin{equation}
+    v_{\mathrm{VD},M}^{\mathrm{Had}}(p)
+    \leq \frac{2}{D_M(p)^2}
+    \leq 2\lambda_1(p)^{-2M}.
+    \label{eq:implementation_upper_v4}
+\end{equation}
+If, in addition, \(1-N_M(p)^2\geq v_->0\) on the considered parameter range, then
+\begin{equation}
+    v_{\mathrm{VD},M}^{\mathrm{Had}}(p)\geq v_-\lambda_1(p)^{-2M}(1+r_M(p))^{-2}.
+    \label{eq:implementation_lower_v4}
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+The upper bound follows from \cref{eq:hadamard_v_v4} and \(D_M\geq\lambda_1^M\).  The lower bound uses the numerator-variance term \((1-N_M^2)/D_M^2\) and \(D_M=\lambda_1^M(1+r_M)\).
+\end{proof}
+
+\begin{proposition}[Multiplicative implementation-noise shift of the VD law]
+\label{prop:impl_noise_shift_v11}
+\textnormal{\textit{Model-dependent refinement.}}
+\textnormal{\textit{This proposition is not a compiled-circuit noise theorem.}}
+Suppose the controlled-derangement/Hadamard tests used to estimate the population quantities are followed by effective sign contractions
+\begin{equation}
+    \widetilde N_M=\eta_{N,M}N_M,
+    \qquad
+    \widetilde D_M=\eta_{D,M}D_M,
+    \qquad
+    \eta_{N,M},\eta_{D,M}>0,
+\end{equation}
+with \(\theta_M^{\rm impl}:=\eta_{N,M}/\eta_{D,M}\).  Then the implemented population quotient is
+\begin{equation}
+    \mu_{\mathrm{VD},M}^{\rm impl}=\theta_M^{\rm impl}\frac{N_M}{D_M},
+\end{equation}
+so the implemented population bias is
+\begin{equation}
+    b_{\mathrm{VD},M}^{\rm impl}
+    =\left(\theta_M^{\rm impl}-1\right)\frac{N_M}{D_M}+b_{\mathrm{VD},M}.
+\end{equation}
+If the same contraction affects numerator and denominator, \(\theta_M^{\rm impl}=1\), the population quotient is unchanged and implementation noise appears first as sampling inflation.  In the independent sign model with one-shot variables in \(\{\pm1\}\),
+\begin{equation}
+    v_{\mathrm{VD},M}^{\rm impl}
+    =\frac{1-\eta_{N,M}^2N_M^2+\big(\theta_M^{\rm impl}N_M/D_M\big)^2(1-\eta_{D,M}^2D_M^2)}{\eta_{D,M}^2D_M^2}.
+    \label{eq:impl_noise_vd_variance_v11}
+\end{equation}
+Consequently, in the common-contraction case \(\eta_{N,M}=\eta_{D,M}=\eta_M\), the population quotient and hence the bias gap are unchanged.  The denominator part of the sampling coefficient carries an \(\eta_M^{-2}\)-type inflation, but the full coefficient is not generally a pure multiplicative rescaling of the ideal one because the Bernoulli variances are also replaced by \(1-\eta_M^2N_M^2\) and \(1-\eta_M^2D_M^2\).
+\end{proposition}
+
+\begin{proof}
+The first two displays follow by taking the ratio of the contracted means.  For the variance coefficient, substitute the contracted means into the quotient variance formula \cref{eq:vd_v_v4} with independent numerator and denominator signs, so the covariance term is zero.  The denominator in \cref{eq:vd_v_v4} becomes \((\eta_{D,M}D_M)^2\), giving \cref{eq:impl_noise_vd_variance_v11}.  If \(\eta_{N,M}=\eta_{D,M}=\eta_M\), then the population quotient and hence the bias gap are unchanged.  The denominator in the quotient-variance formula contributes an \(\eta_M^{-2}\)-type inflation, but \cref{eq:impl_noise_vd_variance_v11} also replaces the Bernoulli variance factors by \(1-\eta_M^2N_M^2\) and \(1-\eta_M^2D_M^2\).  Thus the leading crossing budget should be computed from the displayed coefficient rather than by applying a universal scalar multiplier to the ideal variance.
+\end{proof}
+
+\begin{remark}[Interpretation]
+\label{rem:impl_noise_interpretation_v11}
+This model records the algebraic effect of multiplicative readout or controlled-test contractions on a VD quotient.  It is deliberately narrower than a circuit-level noise analysis: a compiled derangement implementation may create correlated numerator-denominator errors, coherent control errors, or nonmultiplicative distortions.  The proposition should therefore be read as a falsifiable baseline for the experimental section: common multiplicative test noise cancels in the population ratio but modifies the sampling coefficient through \cref{eq:impl_noise_vd_variance_v11}; asymmetric test noise creates an additional first-order bias.
+\end{remark}
+
+
+\begin{theorem}[Logarithmic copy-number scale for implemented VD]
+\label{thm:mstar_log_scale_v4}
+Fix \(p\) and suppose that, for \(M\) in an admissible range before the dominant-eigenvector floor takes over,
+\begin{equation}
+    A_-^2q^{2M}
+    \leq
+    \bigl(b_{\mathrm{VD},M}(p)-b_{\mathrm{VD},\infty}(p)\bigr)^2
+    \leq
+    A_+^2q^{2M},
+    \qquad
+    q=\frac{\lambda_2(p)}{\lambda_1(p)}<1, \qquad 0<\lambda_2(p)<\lambda_1(p),
+    \label{eq:bias_two_sided_mstar_v4}
+\end{equation}
+and the Hadamard-test variance has the two-sided scaling in \cref{prop:implementation_variance_inflation_v4}.  Then every minimizer of the leading implemented VD objective
+\begin{equation}
+    \mathcal E_M(B)=A^2q^{2M}+\frac{V\lambda_1^{-2M}}{B}
+\end{equation}
+lies within an \(\OO(1)\) additive distance of
+\begin{equation}
+    M_B=\frac{\log B}{2\abs{\log\lambda_2(p)}}.
+    \label{eq:mstar_log_lambda2_v4}
+\end{equation}
+Since \(\lambda_1(p)=1+\OO(p)\) in the local pure-state regime,
+\begin{equation}
+    M_B=\Theta\!\left(\frac{\log B}{\abs{\log\!\bigl(\lambda_2(p)/\lambda_1(p)\bigr)}}\right)
+\end{equation}
+up to local \(\lambda_1\)-dependent constants.  Once \(\abs{b_{\mathrm{VD},\infty}}\) is comparable to the leakage term, the optimal copy number saturates because additional copies increase variance without reducing the floor.
+\end{theorem}
+
+\begin{proof}
+Balance the decreasing leakage term against the increasing denominator-driven variance term:
+\begin{equation}
+    q^{2M}\asymp B^{-1}\lambda_1^{-2M}.
+\end{equation}
+Equivalently, \((q\lambda_1)^{2M}\asymp B^{-1}\).  Since \(q\lambda_1=\lambda_2\), \cref{eq:mstar_log_lambda2_v4} follows.  The two-sided constants in \cref{eq:bias_two_sided_mstar_v4} and \cref{prop:implementation_variance_inflation_v4} shift the minimizer only by an additive constant independent of \(B\).  Integer rounding also changes \(M\) by at most a constant.
+\end{proof}
+
+\begin{remark}
+The exact logarithmic denominator contains \(\abs{\log\lambda_2}\), because the variance inflation is driven by \(D_M\sim\lambda_1^M\) while leakage is driven by \((\lambda_2/\lambda_1)^M\).  In the small-noise regime \(\lambda_1\approx1\), this is equivalent to the more informal \(\log B/\abs{\log\!\bigl(\lambda_2/\lambda_1\bigr)}\) scaling.  This distinction should be kept in the paper because it identifies which part of VD controls the cost.
+\end{remark}
+
+\section{Symmetry verification}
+
+Let \(P\) be the projector onto the valid symmetry sector and assume
+\begin{equation}
+    P\rho_\star P=\rho_\star.
+\end{equation}
+For a symmetry-compatible observable, SV estimates
+\begin{equation}
+    \mu_{\mathrm{SV}}(p)=\frac{\Tr(OP\rho_pP)}{a(p)},
+    \qquad
+    a(p)=\Tr(P\rho_p).
+    \label{eq:sv_population_v2}
+\end{equation}
+The first-order projected state is
+\begin{equation}
+    \frac{P\rho_pP}{\Tr(P\rho_p)}
+    =\rho_\star+p\left(P\Delta P-\rho_\star\Tr(P\Delta P)\right)+\OO(p^2).
+    \label{eq:sv_projected_state_expansion}
+\end{equation}
+
+A precise detectable-undetectable split can be defined by
+\begin{equation}
+    \Delta_{\mathrm{undet}}=P\Delta P,
+    \qquad
+    P\Delta_{\mathrm{det}}P=0,
+    \qquad
+    \Delta=\Delta_{\mathrm{undet}}+\Delta_{\mathrm{det}}
+\end{equation}
+with \(\Delta_{\mathrm{det}}=\Delta-P\Delta P\) for this first-order analysis.  This is a definition of the split, not a convention.  The detectable part is exactly the part that has no component inside the postselected block.
+
+\begin{proposition}[SV first-order bias]
+\label{prop:sv_delta_precise}
+Under \cref{eq:noise_expansion} and \(P\rho_\star P=\rho_\star\),
+\begin{equation}
+    a(p)=1+p\Tr(P\Delta)+\OO(p^2),
+\end{equation}
+and
+\begin{equation}
+    b_{\mathrm{SV}}(p)=\mu_{\mathrm{SV}}(p)-\mu_\star
+    =\delta_{\mathrm{SV}}p+\OO(p^2),
+\end{equation}
+where
+\begin{equation}
+    \delta_{\mathrm{SV}}
+    =\Tr(OP\Delta P)-\mu_\star\Tr(P\Delta P).
+    \label{eq:delta_sv_precise}
+\end{equation}
+If one writes \(a(p)=1-\alpha_{\mathrm{det}}p+\OO(p^2)\), then \(\alpha_{\mathrm{det}}=-\Tr(P\Delta)\).
+\end{proposition}
+
+\begin{proof}
+Use \(P\rho_pP=\rho_\star+pP\Delta P+\OO(p^2)\) and
+\begin{equation}
+    \frac{1}{1+p\Tr(P\Delta P)+\OO(p^2)}
+    =1-p\Tr(P\Delta P)+\OO(p^2).
+\end{equation}
+Substitute into \(\Tr(O\,P\rho_pP)/\Tr(P\rho_p)\) and subtract \(\mu_\star\).
+\end{proof}
+
+Let \(A_s\in\{0,1\}\) be the acceptance indicator and \(W_s\) the measured value when accepted.  Put \(Z_s=A_sW_s\).  Then
+\begin{equation}
+    \widehat\mu_{\mathrm{SV}}=\frac{\overline Z}{\overline A},
+    \qquad
+    \E A=a(p),
+    \qquad
+    \E Z=a(p)\mu_{\mathrm{SV}}(p).
+\end{equation}
+
+
+\begin{theorem}[Certified SV postselection quotient law]
+\label{thm:sv_quotient_law_v2}
+Assume \(a(p)>0\), \(A\in\{0,1\}\), and \(\abs{W}\le K_W\) on accepted shots.  Put \(Z=AW\), \(\mu_{\mathrm{SV}}=\E Z/a\), and define centered variables
+\begin{equation}
+    \xi_{\mathrm{SV}}=Z-a\mu_{\mathrm{SV}},
+    \qquad
+    \zeta_{\mathrm{SV}}=A-a.
+\end{equation}
+Let \(\widehat\mu_{\mathrm{SV}}^{\rm clip}=\overline Z/\max\{\overline A,a/2\}\).  Then
+\begin{equation}
+    \Prob\left(\overline A<a/2\right)
+    \le \exp\left[-\frac{B a(p)}{8}\right].
+    \label{eq:sv_acceptance_bernstein_v5}
+\end{equation}
+Moreover,
+\begin{align}
+    \E[\widehat\mu_{\mathrm{SV}}^{\rm clip}]
+    &=\mu_{\mathrm{SV}}(p)+\frac{c_{\mathrm{SV}}(p)}{B}+r^{(E)}_{\mathrm{SV}}(p,B),\\
+    \Var(\widehat\mu_{\mathrm{SV}}^{\rm clip})
+    &=\frac{v_{\mathrm{SV}}(p)}{B}+r^{(V)}_{\mathrm{SV}}(p,B),
+\end{align}
+where
+\begin{align}
+    c_{\mathrm{SV}}(p)
+    &=\frac{\mu_{\mathrm{SV}}(p)\Var(A)-\Cov(Z,A)}{a(p)^2}=0,
+    \label{eq:sv_quotient_bias_zero_v14}\\
+    v_{\mathrm{SV}}(p)
+    &=\frac{\Var(Z-\mu_{\mathrm{SV}}(p)A)}{a(p)^2}.
+\end{align}
+The equality \(c_{\mathrm{SV}}(p)=0\) is exact, because \(Z=AW\) and hence
+\(\Cov(Z,A)=\E[ZA]-\E Z\,\E A=a\mu_{\mathrm{SV}}(1-a)=\mu_{\mathrm{SV}}\Var(A)\).
+There are explicit bounded-moment constants \(A_{E,\mathrm{SV}}(p)\), \(A_{V,\mathrm{SV}}(p)\) obtained from \cref{def:quotient_constants_v4} by the replacement
+\begin{equation}
+    (N_M,D_M,X_M,Y_M,K_{N,M},K_{D,M})
+    \mapsto
+    (a\mu_{\mathrm{SV}},a,Z,A,K_W,1).
+\end{equation}
+Thus
+\begin{align}
+    \abs{r^{(E)}_{\mathrm{SV}}(p,B)}
+    &\le \frac{A_{E,\mathrm{SV}}(p)}{B^2}+\frac{4K_W}{a(p)}e^{-Ba(p)/8},\\
+    \abs{r^{(V)}_{\mathrm{SV}}(p,B)}
+    &\le \frac{A_{V,\mathrm{SV}}(p)}{B^2}+\frac{16K_W^2}{a(p)^2}e^{-Ba(p)/8}.
+\end{align}
+Consequently
+\begin{equation}
+    \MSE_{\mathrm{SV}}(p,B)
+    =b_{\mathrm{SV}}(p)^2+
+    \frac{v_{\mathrm{SV}}(p)}{B}
+    +\rho_{\mathrm{SV}}(p,B),
+    \label{eq:sv_certified_mse_v5}
+\end{equation}
+with \(\abs{\rho_{\mathrm{SV}}(p,B)}\le C_{\mathrm{SV}}(p)B^{-2}+C'_{\mathrm{SV}}(p)e^{-Ba(p)/8}\).  If \(\sigma_{\mathrm{acc}}^2(p)=\Var(W\mid A=1)\), then
+\begin{equation}
+    v_{\mathrm{SV}}(p)=\frac{\sigma_{\mathrm{acc}}^2(p)}{a(p)}.
+\end{equation}
+Therefore, if \(\sigma_{\mathrm{acc}}^2(p)=\sigma_\star^2+\sigma_1p+\OO(p^2)\) and \(a(p)=1-\alpha_{\mathrm{det}}p+\OO(p^2)\), then
+\begin{align}
+    \MSE_{\mathrm{SV}}(p,B)
+    &=\delta_{\mathrm{SV}}^2p^2
+    +\frac{\sigma_\star^2+(\sigma_1+\alpha_{\mathrm{det}}\sigma_\star^2)p}{B}
+    +\OO(p^2/B)+\mathcal R_{\mathrm{SV}}(p,B),
+\end{align}
+where no separate \(\OO(p/B)\) quotient-bias cross term appears: for Bernoulli postselection the coefficient \(c_{\mathrm{SV}}\) vanishes identically by \cref{eq:sv_quotient_bias_zero_v14}.  The certified theorem-level statement is \(\abs{\mathcal R_{\mathrm{SV}}(p,B)}\le C_{\mathrm{SV}}(p)B^{-2}+C'_{\mathrm{SV}}(p)e^{-Ba(p)/8}\).
+\end{theorem}
+
+\begin{proof}
+The acceptance denominator is Bernoulli.  The multiplicative Chernoff bound gives \(\Prob(\overline A\le (1-\delta)a)\le e^{-Ba\delta^2/2}\); taking \(\delta=1/2\) gives \cref{eq:sv_acceptance_bernstein_v5}.  Conditional on the good event \(\abs{\overline A-a}\le a/2\), apply the same explicit Neumann expansion used in \cref{thm:vd_quotient_certified_v4} to \(g(z,a)=z/a\).  Because \(A\in\{0,1\}\) and \(\abs Z\le K_W\), the moment envelopes are finite and the bad-event contribution is exponentially small.  The variance identity follows from
+\begin{equation}
+    Z-\mu_{\mathrm{SV}}A=A(W-\mu_{\mathrm{SV}}),
+\end{equation}
+so \(\Var(Z-\mu_{\mathrm{SV}}A)=a(p)\sigma_{\mathrm{acc}}^2(p)\).  The displayed local expansion follows from Taylor expansion of \(1/a(p)\) and from \cref{prop:sv_delta_precise}.
+\end{proof}
+
+\begin{remark}[Position relative to symmetry expansion]
+This SV section should be presented as derivative in mechanism from symmetry-based mitigation theory, especially \citet{Cai2021}.  The added value here is the operating-window boundary and the compatibility with the VD quotient law, not a new symmetry estimator.
+\end{remark}
+
+\section{PEC and CDR in the selector}
+
+The rigorous selector should include only methods whose local constants are specified.  PEC can be inserted cleanly under standard first-order cancellation assumptions.  Suppose the PEC estimator is unbiased through first order, so
+\begin{equation}
+    b_{\mathrm{PEC}}(p)=\OO(p^2),
+\end{equation}
+and let \(\gamma(p)=1+\gamma_1p+\OO(p^2)\) denote the quasiprobability one-norm overhead.  Then a local PEC law has the form
+\begin{equation}
+    \MSE_{\mathrm{PEC}}(p,B)=\OO(p^4)+\frac{\gamma(p)^2\sigma_{\mathrm{PEC}}^2(p)}{B}+\OO(B^{-2}).
+\end{equation}
+Thus PEC fits the selector with \(s_{\mathrm{PEC}}\approx\kappa_{\mathrm{PEC}}\gamma^2\sigma_{\mathrm{PEC}}^2\), where \(\kappa_{\mathrm{PEC}}\) accounts for resource normalization.
+
+CDR is different.  Its bias and variance depend on the training distribution, regression model, target observable, and allocation of shots between training and target circuits \citep{Czarnik2021,Lowe2021}.  Therefore CDR should not be included in the rigorous lower envelope unless a separate local law is proven for the chosen training model.  In this draft, CDR remains an admissible future component, not a theorem-level member of the selector.
+
+\section{Certified operating-window crossings}
+
+Let \(R\) be a common physical resource budget.  If method \(m\) consumes \(\kappa_m(p)\) resource units per effective statistical sample, then \(B_m=R/\kappa_m(p)\).  A certified law becomes
+\begin{equation}
+    \MSE_m(p,R)=b_m(p)^2+\frac{s_m(p)}{R}+\rho_m(p,R),
+    \qquad
+    \abs{\rho_m(p,R)}\leq\frac{C_m(p)}{R^2}
+\end{equation}
+for \(R\geq R_{\min,m}(p)\), where \(s_m=\kappa_m\widetilde v_m\).
+
+
+\begin{remark}[Resource normalization]
+\label{rem:resource_normalization_v13}
+Here \(R\) denotes the physical resource being charged in the comparison.  If an estimator uses an effective statistical sample count \(B_m\), all streams, copies, and circuit calls required to produce those samples must be included in \(\kappa_m\).  In particular, the independent VD Hadamard-test implementation of \cref{prop:implementation_variance_inflation_v4} uses one numerator stream and one denominator stream, so a paired VD sample budget \(B\) corresponds to physical cost \(R_{\mathrm{VD},M}=2\kappa_M B\).  Equivalently, when \(R\) counts physical Hadamard-test calls, \(\kappa_{\mathrm{VD},M}=2\kappa_M\).  Toy-model formulas below state explicitly when \(R\) is a paired-shot budget and when it is a physical call budget.
+\end{remark}
+
+
+\begin{theorem}[Certified crossing perturbation]
+\label{thm:certified_crossing}
+Consider two methods \(i,j\) at fixed \(p\).  Suppose
+\begin{equation}
+    \MSE_i=b_i^2+\frac{s_i}{R}+\rho_i(R),
+    \qquad
+    \MSE_j=b_j^2+\frac{s_j}{R}+\rho_j(R),
+    \qquad
+    \abs{\rho_m(R)}\leq\frac{C_m}{R^2}
+\end{equation}
+for \(R\geq R_{\min}\), and suppose the remainders are continuous.  Let
+\begin{equation}
+    g=b_j^2-b_i^2>0,
+    \qquad
+    \Delta s=s_i-s_j>0,
+    \qquad
+    R_0=\frac{\Delta s}{g},
+    \qquad
+    C=C_i+C_j.
+\end{equation}
+If \(R_0(1-\eta)\geq R_{\min}\) and
+\begin{equation}
+    \eta=\frac{4C}{gR_0^2}<\frac12,
+    \label{eq:eta_crossing_condition}
+\end{equation}
+then there exists at least one true crossing \(R^\star\) in
+\begin{equation}
+    R^\star\in[R_0(1-\eta),R_0(1+\eta)].
+    \label{eq:crossing_interval}
+\end{equation}
+In particular every certified crossing in this interval obeys
+\begin{equation}
+    \abs{R^\star-R_0}\leq \frac{4C}{gR_0}.
+    \label{eq:crossing_shift_bound}
+\end{equation}
+If, in addition, \(\rho_i-\rho_j\) is differentiable and
+\begin{equation}
+    \sup_{R\in[R_0(1-\eta),R_0(1+\eta)]}
+    \abs{(\rho_i-\rho_j)'(R)}
+    <\frac{\Delta s}{R_0^2(1+\eta)^2},
+    \label{eq:crossing_monotonicity_condition_v5}
+\end{equation}
+then the crossing in the interval is unique.
+\end{theorem}
+
+\begin{proof}
+The leading difference is
+\begin{equation}
+    F_0(R)=\left(b_i^2-b_j^2\right)+\frac{s_i-s_j}{R}
+    =-g+\frac{\Delta s}{R},
+\end{equation}
+with root \(R_0\).  At \(R_+=R_0(1+\eta)\),
+\begin{equation}
+    F_0(R_+)=-g\frac{\eta}{1+\eta},
+\end{equation}
+and at \(R_-=R_0(1-\eta)\),
+\begin{equation}
+    F_0(R_-)=g\frac{\eta}{1-\eta}.
+\end{equation}
+The remainder difference has magnitude at most \(C/R^2\).  Since \(\eta=4C/(gR_0^2)\) and \(\eta<1/2\), the signs at \(R_+\) and \(R_-\) are preserved.  Continuity then gives existence by the intermediate value theorem.  If \cref{eq:crossing_monotonicity_condition_v5} holds, then
+\begin{equation}
+    F'(R)=-\frac{\Delta s}{R^2}+(\rho_i-\rho_j)'(R)<0
+\end{equation}
+throughout the interval, so the crossing there is unique.
+\end{proof}
+
+The leading indifference formula
+\begin{equation}
+    R_{i\leftrightarrow j}(p)=\frac{s_i(p)-s_j(p)}{b_j(p)^2-b_i(p)^2}
+    \label{eq:leading_crossing_formula}
+\end{equation}
+is therefore not accepted automatically.  It must pass two checks: \(R_{i\leftrightarrow j}\geq R_{\min}\) and \(4C/[gR_{i\leftrightarrow j}^2]\ll1\).  This is the self-consistency condition missing from a purely formal crossing curve.
+
+
+\begin{theorem}[Certified selection trichotomy at fixed \(p\)]
+\label{thm:selection_trichotomy_v10}
+At fixed \(p\), suppose two methods \(i,j\) admit certified local laws
+\begin{equation}
+    \MSE_m(R)=b_m^2+\frac{s_m}{R}+\rho_m(R),
+    \qquad
+    \abs{\rho_m(R)}\le \frac{C_m}{R^2},
+    \qquad R\ge R_{\min},
+\end{equation}
+with continuous remainders.  Let
+\begin{equation}
+    g=b_j^2-b_i^2,
+    \qquad
+    \Delta s=s_i-s_j,
+    \qquad
+    C=C_i+C_j.
+\end{equation}
+Then exactly one of the following leading-order regimes applies, with the indicated certified interpretation.
+\begin{enumerate}[leftmargin=2.2em]
+\item[\textnormal{(0)}] \textbf{Degenerate leading tie.}  If \(g=0\) and \(\Delta s=0\), the two leading local laws are identical.  No leading-order dominance or crossing is certified; the comparison depends on the signed remainders, higher-order coefficients, or a sharper local expansion.
+\item[\textnormal{(I)}] \textbf{Uniform dominance of \(i\).}  If \(g>0\) and \(\Delta s\le0\), then method \(i\) has strictly smaller leading bias and no larger sampling coefficient, and \(i\) wins for all
+\begin{equation}
+    R\ge \max\left\{R_{\min},\sqrt{\frac{C}{g}}\right\}.
+\end{equation}
+If \(g=0\) and \(\Delta s<0\), then \(i\) has equal leading bias and strictly smaller sampling coefficient, and \(i\) wins for all
+\begin{equation}
+    R\ge \max\left\{R_{\min},\frac{C}{\abs{\Delta s}}\right\}.
+\end{equation}
+\item[\textnormal{(II)}] \textbf{Uniform dominance of \(j\).}  If \(g<0\) and \(\Delta s\ge0\), or if \(g=0\) and \(\Delta s>0\), the symmetric statement holds after swapping \(i\) and \(j\).
+\item[\textnormal{(III)}] \textbf{Genuine tradeoff with a certified crossing.}  If \(g\Delta s>0\), set
+\begin{equation}
+    R_0=\frac{\Delta s}{g}>0,
+    \qquad
+    \eta=\frac{4C}{\abs g R_0^2}.
+\end{equation}
+If \(\eta<1/2\) and \(R_0(1-\eta)\ge R_{\min}\), then at least one true crossing lies in
+\begin{equation}
+    [R_0(1-\eta),R_0(1+\eta)].
+\end{equation}
+If the monotonicity condition \cref{eq:crossing_monotonicity_condition_v5} also holds, that crossing is unique; the lower-bias method wins above it and the lower-sampling method wins below it.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+Write
+\begin{equation}
+    \Phi(R)=\MSE_i(R)-\MSE_j(R)=-g+\frac{\Delta s}{R}+\rho_i(R)-\rho_j(R),
+    \qquad
+    \abs{\rho_i(R)-\rho_j(R)}\le\frac{C}{R^2}.
+\end{equation}
+Case (0) is immediate from \(g=\Delta s=0\).  Cases (I) and (II) follow because the leading comparison has the same sign for all large enough \(R\), and the \(C/R^2\) remainder cannot overturn it once \(R\) exceeds the displayed threshold.  In case (III), the leading root is \(R_0=\Delta s/g\).  After relabelling if needed so that \(g>0\) and \(\Delta s>0\), the hypotheses reduce exactly to \cref{thm:certified_crossing}.  That theorem gives existence in the certified interval and uniqueness under \cref{eq:crossing_monotonicity_condition_v5}.
+\end{proof}
+
+\begin{corollary}[Local location of operating windows]
+\label{cor:window_location_v10}
+Suppose
+\begin{equation}
+    b_m(p)=\delta_m p+\OO(p^2),
+    \qquad
+    s_m(p)=\sigma_m^2+s_m^{(1)}p+\OO(p^2).
+\end{equation}
+If \(\sigma_i^2\ne\sigma_j^2\), a genuine bias--variance tradeoff has a leading window at scale \(R_0=\Theta(p^{-2})\).  If \(\sigma_i^2=\sigma_j^2\) but \(s_i^{(1)}\ne s_j^{(1)}\), the leading window is instead at scale \(R_0=\Theta(p^{-1})\).  Thus the \(1/p\) crossings in the closed toy models below are not accidental; they arise because the two compared laws have matched leading shot cost and differ first at order \(p\) in their sampling coefficients.
+\end{corollary}
+
+\begin{proof}
+Substitute the displayed expansions into \(g=b_j^2-b_i^2\) and \(\Delta s=s_i-s_j\).  If the constant term of \(\Delta s\) is nonzero, then \(R_0=\Delta s/g=\Theta(p^{-2})\).  If that constant term cancels, then \(\Delta s=\Theta(p)\) while \(g=\Theta(p^2)\), giving \(R_0=\Theta(p^{-1})\).
+\end{proof}
+
+\begin{corollary}[Uniform finite-interval sandwich]
+\label{cor:finite_interval_sandwich}
+Suppose on \(p\in[0,p_{\max}]\) one has computable bounds
+\begin{equation}
+    0<G_-(p)\leq b_j(p)^2-b_i(p)^2\leq G_+(p),
+    \qquad
+    0<S_-(p)\leq s_i(p)-s_j(p)\leq S_+(p).
+\end{equation}
+Then the leading crossing satisfies
+\begin{equation}
+    \frac{S_-(p)}{G_+(p)}\leq R_{i\leftrightarrow j}(p)\leq\frac{S_+(p)}{G_-(p)}.
+\end{equation}
+If the certified-remainder condition of \cref{thm:certified_crossing} holds uniformly on that interval, this becomes a two-sided finite-\(p\) operating-window certificate, not merely a Taylor expansion at \(p=0\).
+
+\end{corollary}
+
+\section{Restricted lower-bound sanity check}
+\label{sec:restricted_lower_bound}
+
+The selector constructed above compares concrete mitigation procedures.  It does not by itself prove that the selected method is globally optimal among all conceivable estimators.  A full optimality theorem would require specifying what information about the noise channel, ideal state family, measurements, and adaptive strategies is available.  This section adds a deliberately restricted lower bound.  Its role is modest but important: it identifies when an operating window is limited by statistical distinguishability, not merely by the chosen menu of methods.
+
+Consider a local two-point model indexed by \(\theta\in\{+,-\}\).  The ideal values are
+\begin{equation}
+    \mu_\theta^\star=\Tr(O\rho_\theta^\star),
+    \qquad
+    \abs{\mu_+^\star-\mu_-^\star}=2h.
+\end{equation}
+At physical noise level \(p\), a resource budget \(R\) and a fixed admissible measurement/mitigation protocol induce transcript distributions \(\mathbb P_+^{(R)}\) and \(\mathbb P_-^{(R)}\).  These transcript distributions include all random circuits, accepted or rejected shots, auxiliary calibration samples, and classical postprocessing randomness used by the protocol.
+
+\begin{theorem}[Two-point finite-budget lower bound]
+\label{thm:two_point_lower_bound}
+For any estimator \(\widehat\mu\) of the ideal value based on the transcript,
+\begin{equation}
+    \sup_{\theta\in\{+,-\}}
+    \mathbb E_\theta\left[(\widehat\mu-\mu_\theta^\star)^2\right]
+    \geq
+    \frac{h^2}{2}\left(1-\operatorname{TV}\left(\mathbb P_+^{(R)},\mathbb P_-^{(R)}\right)\right),
+    \label{eq:tv_lower_bound}
+\end{equation}
+where \(\operatorname{TV}\) denotes total variation distance.  Consequently, if
+\begin{equation}
+    \operatorname{KL}\left(\mathbb P_+^{(R)}\,\|\,\mathbb P_-^{(R)}\right)\leq R I_p h^2,
+    \label{eq:local_kl_condition}
+\end{equation}
+then
+\begin{equation}
+    \sup_{\theta}
+    \mathbb E_\theta\left[(\widehat\mu-\mu_\theta^\star)^2\right]
+    \geq
+    \frac{h^2}{2}\left(1-\sqrt{\frac{R I_p h^2}{2}}\right)_+.
+    \label{eq:kl_lower_bound}
+\end{equation}
+Choosing \(h=(2RI_p)^{-1/2}\), whenever this perturbation lies inside the local model, gives the sampling lower bound
+\begin{equation}
+    \sup_\theta
+    \mathbb E_\theta\left[(\widehat\mu-\mu_\theta^\star)^2\right]
+    \geq
+    \frac{1}{8RI_p}.
+    \label{eq:one_over_r_lower_bound}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+If an estimator has squared error less than \(h^2\) under both hypotheses, thresholding it halfway between \(\mu_-^\star\) and \(\mu_+^\star\) distinguishes the two hypotheses.  Le Cam's two-point testing argument gives \cref{eq:tv_lower_bound}.  Pinsker's inequality gives
+\begin{equation}
+    \operatorname{TV}(\mathbb P_+^{(R)},\mathbb P_-^{(R)})
+    \leq
+    \sqrt{\frac12\operatorname{KL}(\mathbb P_+^{(R)}\|\mathbb P_-^{(R)})},
+\end{equation}
+which yields \cref{eq:kl_lower_bound}.  The choice of \(h\) gives \cref{eq:one_over_r_lower_bound}.
+\end{proof}
+
+
+\begin{proposition}[Explicit \(I_p\) for a one-qubit Bernoulli transcript]
+\label{prop:explicit_ip_bernoulli_v5}
+Consider the restricted local model
+\begin{equation}
+    \rho_t^\star=\frac{I+tX}{2},
+    \qquad
+    \rho_{p,t}=\frac{I+(1-p)tX}{2},
+    \qquad
+    \mu_t^\star=t,
+\end{equation}
+with \(t\in[-t_0,t_0]\) and one resource unit equal to one noisy \(X\)-measurement.  For the two hypotheses \(t=\pm h\), the one-shot transcript distributions are Bernoulli distributions with means \(\pm(1-p)h\) on \(\{\pm1\}\), and for \(\abs{h}\le[2(1-p)]^{-1}\),
+\begin{equation}
+    \KL(P_{+h}\|P_{-h})
+    \le 4(1-p)^2h^2.
+\end{equation}
+Thus \cref{eq:local_kl_condition} holds with the explicit conservative per-resource information constant
+\begin{equation}
+    I_p^{\rm Bern}=4(1-p)^2.
+    \label{eq:explicit_ip_bernoulli_v5}
+\end{equation}
+Consequently every estimator based on \(R\) such shots obeys the concrete lower bound
+\begin{equation}
+    \sup_{t\in\{+h,-h\}}
+    \E_t[(\widehat\mu-t)^2]
+    \ge \frac{1}{32R(1-p)^2},
+\end{equation}
+provided the optimizing \(h=[2RI_p^{\rm Bern}]^{-1/2}\) lies in the local interval.
+\end{proposition}
+
+\begin{proof}
+For \(Y\in\{\pm1\}\), write
+\begin{equation}
+    q_+=\frac{1+a}{2},\qquad q_-=\frac{1-a}{2},\qquad a=(1-p)h.
+\end{equation}
+In this symmetric two-point model \(q_-=1-q_+\), which is the only reason the following simplification is valid.  The Bernoulli KL is
+\begin{align}
+    \KL(P_{+h}\|P_{-h})
+    &=q_+\log\frac{q_+}{q_-}+(1-q_+)\log\frac{1-q_+}{1-q_-}\\
+    &=(2q_+-1)\log\frac{q_+}{1-q_+}
+      =a\log\frac{1+a}{1-a}.
+      \label{eq:bernoulli_kl_corrected_v9}
+\end{align}
+For \(\abs a\le1/2\), \(\left|\log[(1+a)/(1-a)]\right|\le4\abs a\), hence \(a\log[(1+a)/(1-a)]\le4a^2\) and the KL is at most \(4a^2\).  This gives the conservative finite-interval value \(I_p^{\rm Bern}=4(1-p)^2\).  The same expression also gives the sharper local constant: since \(\log[(1+a)/(1-a)]=2a+O(a^3)\),
+\begin{equation}
+    \KL(P_{+h}\|P_{-h})=2(1-p)^2h^2+O(h^4),
+\end{equation}
+so the local two-point/Fisher normalization is
+\begin{equation}
+    I_{p,\mathrm{loc}}^{\rm Bern}=2(1-p)^2.
+    \label{eq:explicit_ip_fisher_local_v8}
+\end{equation}
+Equivalently, using \(\left|\log[(1+a)/(1-a)]\right|\le2\abs a/(1-a^2)\) gives \(I_p^{\rm Bern}=2(1-p)^2/(1-a^2)\), which tends to \cref{eq:explicit_ip_fisher_local_v8} as \(a\to0\).  Below we keep the conservative finite-interval value when a uniform certificate is needed and separately record the sharper local benchmark when comparing constants.
+\end{proof}
+
+\begin{corollary}[Structural non-identifiability floor]
+\label{cor:nonidentifiability_floor}
+If two distinct ideal values satisfy \(\abs{\mu_+^\star-\mu_-^\star}=2h\) but induce the same noisy transcript distribution for every budget \(R\), then every estimator obeys
+\begin{equation}
+    \sup_{\theta\in\{+,-\}}
+    \mathbb E_\theta\left[(\widehat\mu-\mu_\theta^\star)^2\right]
+    \geq \frac{h^2}{2}.
+\end{equation}
+Thus a budget-independent floor is unavoidable whenever the ideal functional is not identifiable from the noisy experiment and side information allowed to the protocol.
+\end{corollary}
+
+\begin{remark}[How this lower bound should be used]
+\label{rem:lower_bound_role}
+This is not a universal no-go theorem for QEM\@.  It is a restricted benchmark for a declared statistical model.  Its value is diagnostic.  If a VD/SV/PEC operating window lies far above \cref{eq:one_over_r_lower_bound}, the method menu or constants may be improvable.  If it approaches the two-point lower bound inside the same model, the selector is close to statistically optimal in that restricted sense.  The corollary also clarifies why bias floors matter: some floors are not artifacts of a mitigation method but consequences of information that the noisy transcript does not contain.
+\end{remark}
+
+
+
+\begin{proposition}[Accepted-transcript efficiency of the selected law]
+\label{prop:accepted_transcript_efficiency_v10}
+Fix \(p\) and suppose method \(m\) operates in a bias-negligible regime, meaning
+\(b_m(p)=o(R^{-1/2})\) on the budget range under consideration, so that
+\begin{equation}
+    \MSE_m(p,R)=\frac{s_m(p)}{R}+\OO(R^{-2}).
+\end{equation}
+Assume the per-resource transcript actually used by method \(m\) is a regular local statistical experiment with Fisher information \(J_m(p)\) for the corresponding population value.  Then
+\begin{equation}
+    s_m(p)\ge \frac{1}{J_m(p)}.
+    \label{eq:transcript_crb_v10}
+\end{equation}
+Equality holds when the method's estimator is locally efficient for that transcript.  In the Pauli/Bernoulli accepted transcript used in the SV toy models, where each accepted observation has conditional variance \(\sigma_{\rm acc}^2(p)\) for the local mean parameter and acceptance probability \(a(p)\),
+\begin{equation}
+    J_{\rm SV}(p)=\frac{a(p)}{\sigma_{\rm acc}^2(p)},
+    \qquad
+    s_{\rm SV}(p)=\frac{\sigma_{\rm acc}^2(p)}{a(p)}=\frac{1}{J_{\rm SV}(p)}.
+    \label{eq:sv_fisher_pauli_corrected_v13}
+\end{equation}
+For a non-Bernoulli or non-efficient accepted transcript, \cref{eq:sv_fisher_pauli_corrected_v13} should be read as an additional local-efficiency assumption, not as a universal identity.  Thus the constant-factor gaps in the two-point Le Cam comparisons below are artifacts of conservative two-point testing only after the transcript model has been fixed.
+\end{proposition}
+
+\begin{proof}
+Over \(R\) resource units the transcript has Fisher information \(R J_m(p)\).  The local Cramer--Rao inequality gives \(\Var(\widehat\mu_m)\ge 1/[R J_m(p)]\) for locally unbiased regular estimators, yielding \cref{eq:transcript_crb_v10}.  For the Pauli/Bernoulli SV transcript, the number of accepted samples is \(N_{\rm acc}=\sum_{r=1}^R A_r\) with \(A_r\sim\mathrm{Bernoulli}(a(p))\).  The same multiplicative Chernoff bound used in \cref{thm:sv_quotient_law_v2} gives, for every \(0<\delta<1\),
+\begin{equation}
+    \Pr\!\left(\abs{N_{\rm acc}-a(p)R}\ge \delta a(p)R\right)
+    \le 2\exp[-a(p)R\delta^2/3].
+\end{equation}
+Thus \(N_{\rm acc}=a(p)R+O_{\mathbb P}(\sqrt{R})\).  Conditional on acceptance, the accepted Pauli/mean transcript has local information \(1/\sigma_{\rm acc}^2(p)\) per accepted observation, and the sample mean over accepted observations is locally efficient in this one-dimensional mean experiment.  Hence the accepted transcript has Fisher information \(a(p)R/\sigma_{\rm acc}^2(p)+o(R)\), and its leading variance coefficient is \(\sigma_{\rm acc}^2(p)/a(p)\).  This proves \cref{eq:sv_fisher_pauli_corrected_v13} in the stated Pauli/Bernoulli setting and avoids asserting the identity for arbitrary accepted variables.
+\end{proof}
+
+\begin{remark}[Role relative to the Le Cam comparison]
+\label{rem:accepted_transcript_vs_lecam_v10}
+The lower bound in \cref{thm:two_point_lower_bound} is a deliberately restricted two-point benchmark.  \Cref{prop:accepted_transcript_efficiency_v10} is a sharper statement for the transcript actually used by SV in the bias-negligible regime.  Both are useful, but they answer different questions: Le Cam tests whether any estimator can distinguish two nearby ideal targets from noisy data, while accepted-transcript efficiency tests whether a chosen postselected estimator wastes information inside its declared transcript.
+\end{remark}
+
+\section{Toy model with closed constants and finite-\texorpdfstring{$p$}{p} boundary}
+\label{sec:toy_model_v4}
+
+This section gives a minimal analytic example.  It is not intended as a realistic benchmark; it demonstrates that the constants and validity certificates are computable on a finite interval, not only as formal Taylor coefficients.
+
+Let the ideal one-qubit state be \(\rho_\star=\ket0\bra0\), the observable be \(O=X\), so \(\mu_\star=0\), and let the noisy state have spectral form
+\begin{equation}
+    \rho_p=(1-\varepsilon p)\ket{\phi_1(p)}\bra{\phi_1(p)}+
+    \varepsilon p\ket{\phi_2(p)}\bra{\phi_2(p)},
+    \label{eq:toy_state_v4}
+\end{equation}
+where
+\begin{equation}
+    \ket{\phi_1(p)}=\cos(\theta p)\ket0+\sin(\theta p)\ket1,
+    \qquad
+    \ket{\phi_2(p)}=-\sin(\theta p)\ket0+\cos(\theta p)\ket1.
+\end{equation}
+Assume \(0<p\leq p_{\max}\), where
+\begin{equation}
+    p_{\max}\leq \min\left\{\frac{1}{4\varepsilon},\frac{1}{4\abs\theta}\right\}.
+    \label{eq:pmax_toy_v4}
+\end{equation}
+This keeps the spectrum ordered and the trigonometric expansions uniformly controlled.
+
+\paragraph{Unmitigated estimator.}
+Since \(\bra{\phi_1}X\ket{\phi_1}=\sin(2\theta p)\) and \(\bra{\phi_2}X\ket{\phi_2}=-\sin(2\theta p)\),
+\begin{equation}
+    \mu_0(p)=(1-2\varepsilon p)\sin(2\theta p).
+\end{equation}
+Using \(\abs{\sin x-x}\leq \abs{x}^3/6\), \(\abs{2\theta p}\le1/2\), and \(1-2\varepsilon p\ge1/2\), the unmitigated squared bias obeys the finite-interval bounds
+\begin{equation}
+    \frac12\theta^2p^2
+    \leq
+    b_0(p)^2
+    \leq
+    16\theta^2p^2
+    \qquad (0<p\leq p_{\max}).
+    \label{eq:toy_b0_bounds_v4}
+\end{equation}
+Indeed, the sharper lower constant \(529/576\) also follows from \(\abs{\sin x}\ge(23/24)\abs{x}\) on \(\abs{x}\le1/2\), but the displayed \(1/2\) is used below to keep the crossing certificate conservative.
+The one-shot variance for measuring \(X\) is
+\begin{equation}
+    \sigma_0^2(p)=1-\mu_0(p)^2,
+\end{equation}
+and hence
+\begin{equation}
+    1-16\theta^2p_{\max}^2\leq \sigma_0^2(p)\leq1.
+    \label{eq:toy_s0_bounds_v4}
+\end{equation}
+
+\paragraph{Virtual distillation.}
+For \(M\geq2\),
+\begin{equation}
+    \mu_{\mathrm{VD},M}(p)=
+    \frac{(1-\varepsilon p)^M-(\varepsilon p)^M}{(1-\varepsilon p)^M+(\varepsilon p)^M}\sin(2\theta p).
+\end{equation}
+The dominant-eigenvector floor is
+\begin{equation}
+    b_{\mathrm{VD},\infty}(p)=\sin(2\theta p)=2\theta p+\OO(p^3),
+\end{equation}
+so \(\delta_{\mathrm{VD}}=2\theta\).  VD cannot remove this coherent eigenvector mismatch.  The denominator is
+\begin{equation}
+    D_M(p)=(1-\varepsilon p)^M+(\varepsilon p)^M.
+\end{equation}
+For \(p\leq p_{\max}\),
+\begin{equation}
+    (1-\varepsilon p)^M\leq D_M(p)\leq (1-\varepsilon p)^M\left[1+\left(\frac{\varepsilon p}{1-\varepsilon p}\right)^M\right].
+\end{equation}
+The Hadamard denominator threshold \cref{eq:hadamard_Bmin_v4} is therefore explicit in \((\varepsilon,\theta,p,M)\).
+
+\paragraph{Symmetry verification.}
+Let \(P=\ket0\bra0\).  In this first toy, \(X\) is not a symmetry-compatible observable in the usual sense because \(XP\ne PX\).  The construction should therefore be read as an algebraic accepted-transcript quotient used to test the finite-shot crossing constants, not as a complete physical SV protocol.  The physically sector-compatible comparison is given in the next toy model.  Then
+\begin{equation}
+    a(p)=\Tr(P\rho_p)=
+    (1-\varepsilon p)\cos^2(\theta p)+\varepsilon p\sin^2(\theta p).
+\end{equation}
+For \(p\leq p_{\max}\),
+\begin{equation}
+    \frac{11}{16}\leq a(p)\leq1.
+    \label{eq:toy_acceptance_bounds_v4}
+\end{equation}
+Indeed, \(1-a(p)=\sin^2(\theta p)+\varepsilon p\cos(2\theta p)\le \theta^2p^2+\varepsilon p\le5/16\).
+Moreover,
+\begin{equation}
+    \mu_{\mathrm{SV}}(p)=\frac{\Tr(XP\rho_pP)}{a(p)}=0,
+\end{equation}
+so \(\delta_{\mathrm{SV}}=0\).  If the accepted conditional \(X\)-measurement variance is one, then
+\begin{equation}
+    s_{\mathrm{SV}}(p)=\frac1{a(p)},
+    \qquad
+    1\leq s_{\mathrm{SV}}(p)\leq2.
+    \label{eq:toy_sv_variance_bounds_v4}
+\end{equation}
+
+
+\paragraph{Toy remainder envelope.}
+For this first toy model, the unmitigated estimator is the ordinary sample mean of a \(\{\pm1\}\)-valued variable.  Hence its expectation and variance are exactly
+\begin{equation}
+    \E\widehat\mu_0=\mu_0,
+    \qquad
+    \Var(\widehat\mu_0)=\sigma_0^2/B,
+\end{equation}
+so the unmitigated \(R^{-2}\) coefficient is
+\begin{equation}
+    C_{0,\mathrm{toy}}=0.
+\end{equation}
+For SV, the worst-case constants obtained from the general quotient certificate are deliberately loose.  In this first toy one can compute the relevant second-order remainder directly.  Let
+\begin{equation}
+    Z_s=A_s X_s,
+    \qquad
+    A_s\in\{0,1\},
+    \qquad
+    \widehat\mu_{\mathrm{SV}}=\frac{\overline Z}{\overline A},
+\end{equation}
+where \(A_s\) is the symmetry-acceptance indicator and \(X_s\in\{\pm1\}\) is the accepted \(X\)-measurement sign.  In this toy \(\mu_{\mathrm{SV}}=0\), \(\E Z_s=0\), \(\E A_s=a\), and
+\begin{equation}
+    \sigma_Z^2=a,
+    \qquad
+    \sigma_A^2=a(1-a),
+    \qquad
+    \sigma_{ZA}=0.
+\end{equation}
+Writing \(\bar z=\overline Z\) and \(\bar\alpha=\overline A-a\), the Neumann expansion gives
+\begin{equation}
+    \frac{\overline Z}{\overline A}
+    =L_{\mathrm{SV}}+Q_{\mathrm{SV}}+\mathrm{higher\ order},
+    \qquad
+    L_{\mathrm{SV}}=\frac{\bar z}{a},
+    \qquad
+    Q_{\mathrm{SV}}=-\frac{\bar z\bar\alpha}{a^2}.
+\end{equation}
+A direct calculation of the sample-average moments gives the asymptotic second-order coefficient
+\begin{equation}
+    B^2\Var(Q_{\mathrm{SV}})=\frac{1-a}{a^2}+\OO(B^{-1}),
+    \qquad
+    2B^2\Cov(L_{\mathrm{SV}},Q_{\mathrm{SV}})=-\frac{2(1-a)}{a^2}.
+    \label{eq:toy_sv_second_order_exact_final}
+\end{equation}
+Thus the second-order asymptotic variance coefficient is
+\begin{equation}
+    W_{\mathrm{SV}}=-\frac{1-a}{a^2},
+    \qquad
+    |W_{\mathrm{SV}}|\le2
+    \quad\text{whenever }a\ge\frac12.
+    \label{eq:toy_sv_W_bound_final}
+\end{equation}
+Because \(Z\in\{-1,0,1\}\), \(A\in\{0,1\}\), and \(a\ge1/2\), the cubic and higher Neumann terms can be bounded directly rather than by the general worst-case SV quotient certificate.
+
+\begin{lemma}[Direct SV toy remainder envelope]
+\label{lem:sv_toy_direct_remainder_v13}
+In the first toy model, assume \(a\ge1/2\) and let \(R=B\) be the accepted-transcript shot budget.  On the good event
+\begin{equation}
+    \mathcal G=\{\abs{\overline A-a}\le a/2\},
+\end{equation}
+the Neumann remainder after the linear and quadratic terms satisfies
+\begin{equation}
+    \E\!\left[\1_{\mathcal G}\left(\frac{\overline Z}{\overline A}-L_{\mathrm{SV}}-Q_{\mathrm{SV}}\right)^2\right]
+    \le \frac{8}{R^2}.
+    \label{eq:sv_toy_good_remainder_v13}
+\end{equation}
+Moreover, by the acceptance Bernstein bound,
+\begin{equation}
+    \Pr(\mathcal G^c)\le 2e^{-R/16},
+\end{equation}
+and the clipped quotient is bounded by \(2\) on \(\mathcal G^c\).  Hence, once \(R\ge R_{\min,\mathrm{toy}}\) is chosen so that \(16e^{-R/16}\le 2/R^2\), the total additional contribution of the higher Neumann terms and the bad-denominator event is bounded by \(10/R^2\).
+\end{lemma}
+
+\begin{proof}
+On \(\mathcal G\),
+\begin{equation}
+    \frac{\overline Z}{\overline A}
+    =\frac{\bar z}{a}\sum_{k=0}^\infty\left(-\frac{\bar\alpha}{a}\right)^k,
+    \qquad
+    \abs{\bar\alpha/a}\le\frac12.
+\end{equation}
+Therefore the post-quadratic remainder is
+\begin{equation}
+    H_{\mathrm{SV}}
+    :=\frac{\overline Z}{\overline A}-L_{\mathrm{SV}}-Q_{\mathrm{SV}}
+    =\frac{\bar z\bar\alpha^2}{a^3}\frac{1}{1+\bar\alpha/a},
+\end{equation}
+and \(\abs{H_{\mathrm{SV}}}\le16\abs{\bar z}\bar\alpha^2\).  We now spell out the only contraction structure used in the displayed bound.  Since \(Z_sA_s=Z_s\), \(Z_s=0\) on rejection, and \(\E Z_s=0\), one has
+\begin{equation}
+    \E[Z_s(A_s-a)^r]=(1-a)^r\E Z_s=0,
+    \qquad r=0,1,2,3,4.
+    \label{eq:single_Z_block_v14}
+\end{equation}
+Thus any sample-index block containing a single \(Z\) and any number of \(\alpha=A-a\) factors vanishes.  In the expansion of \(\bar z^{\,2}\bar\alpha^4\), the two \(Z\)-indices must therefore coincide; after this identification, every remaining sample index carrying only \(\alpha\)-factors must occur with multiplicity at least two, because \(\E(A_s-a)=0\).  The surviving partitions are consequently only \(\{ZZ\}\{\alpha\alpha\}\{\alpha\alpha\}\), \(\{ZZ\alpha\}\{\alpha\alpha\alpha\}\), \(\{ZZ\alpha\alpha\}\{\alpha\alpha\}\), and \(\{ZZ\alpha\alpha\alpha\alpha\}\), together with index coincidences among these blocks.  Using \(Z_s^2\le A_s\), \(\abs{A_s-a}\le1\), and \(a\ge1/2\), this finite enumeration gives
+\begin{equation}
+    \E[\bar z^{\,2}\bar\alpha^{4}]
+    \le \frac{1}{32R^2}.
+    \label{eq:sv_toy_contraction_bound_v13}
+\end{equation}
+Combining the previous two displays gives \cref{eq:sv_toy_good_remainder_v13}.  Finally, on \(\mathcal G^c\) the clipped quotient contribution is bounded by \(4\Pr(\mathcal G^c)\le8e^{-R/16}\); the stated slightly looser absorption \(16e^{-R/16}\le2/R^2\) leaves room for the corresponding expectation/variance cross terms.  Thus \(8/R^2+2/R^2=10/R^2\), proving the claimed envelope.
+\end{proof}
+
+Consequently, for the certified toy crossing on budgets \(R\ge R_{\min,\mathrm{toy}}\), an admissible direct remainder envelope is
+\begin{equation}
+    C_{\mathrm{SV},\mathrm{toy}}^{\mathrm{op}}:=10.
+    \label{eq:Ctoy_operational_final}
+\end{equation}
+This replaces the earlier worst-case envelope of order \(10^7\) in this specific toy.  The large general constant remains a valid universal certificate, but it is not the operational constant governing this closed model.
+
+\begin{proposition}[Two-sided finite-\(p\) SV/no-mitigation boundary]
+\label{prop:toy_two_sided_boundary_v4}
+For the toy model above, assume \(p\in(0,p_{\max}]\), \(16\theta^2p_{\max}^2\leq1/2\), resources are restricted to \(R\ge R_{\min,\mathrm{toy}}\), and resource normalization \(\kappa_0=\kappa_{\mathrm{SV}}=1\).  The leading SV/no-mitigation crossing
+\begin{equation}
+    R_{\mathrm{SV}\leftrightarrow0}(p)
+    =\frac{s_{\mathrm{SV}}(p)-s_0(p)}{b_0(p)^2-b_{\mathrm{SV}}(p)^2}
+\end{equation}
+satisfies the finite-interval sandwich
+\begin{equation}
+    \frac{\varepsilon}{64\theta^2}\frac1p
+    \leq
+    R_{\mathrm{SV}\leftrightarrow0}(p)
+    \leq
+    \frac{8\varepsilon+64\theta^2p_{\max}}{\theta^2}\frac1p.
+    \label{eq:toy_boundary_sandwich_v4}
+\end{equation}
+In particular the boundary scales as \(1/p\) uniformly on the declared interval.
+\end{proposition}
+
+\begin{proof}
+The denominator of the crossing is \(b_0(p)^2\), because \(b_{\mathrm{SV}}=0\).  The two-sided bias control is \cref{eq:toy_b0_bounds_v4}.  For the numerator,
+\begin{equation}
+    s_{\mathrm{SV}}(p)-s_0(p)
+    =\frac1{a(p)}-\bigl(1-\mu_0(p)^2\bigr)
+    =\frac{1-a(p)}{a(p)}+\mu_0(p)^2.
+\end{equation}
+Furthermore,
+\begin{equation}
+    1-a(p)
+    =\sin^2(\theta p)+\varepsilon p\cos(2\theta p).
+\end{equation}
+Since \(p\leq1/(4|\theta|)\), \(\cos(2\theta p)\geq1/2\).  Hence
+\begin{equation}
+    s_{\mathrm{SV}}(p)-s_0(p)\geq 1-a(p)\geq \frac{\varepsilon p}{2}.
+    \label{eq:toy_numerator_lower_fixed}
+\end{equation}
+For the upper bound, \(a(p)\geq1/2\), \(\mu_0(p)^2\leq16\theta^2p^2\), and
+\[
+    1-a(p)\leq \varepsilon p+\theta^2p^2
+\]
+give the conservative estimate
+\begin{equation}
+    s_{\mathrm{SV}}(p)-s_0(p)
+    \leq 4\varepsilon p+32\theta^2p_{\max}p.
+    \label{eq:toy_numerator_upper_fixed}
+\end{equation}
+The constants in the last display are intentionally loose but uniform on the declared interval.  Dividing \cref{eq:toy_numerator_lower_fixed,eq:toy_numerator_upper_fixed} by the upper and lower bounds on \(b_0(p)^2\), respectively, and adding one harmless factor-two slack to the lower side, gives \cref{eq:toy_boundary_sandwich_v4}.  In particular, the \(p\)-linear acceptance penalty divided by the \(p^2\)-bias gap gives the \(1/p\) boundary.
+\end{proof}
+
+
+\begin{proposition}[Operationally non-empty certified regime for the first toy crossing]
+\label{prop:toy_certified_nonempty_v5}
+Under the assumptions of \cref{prop:toy_two_sided_boundary_v4}, use the direct SV toy remainder envelope \(C_{\mathrm{SV},\mathrm{toy}}^{\mathrm{op}}=10\) from \cref{eq:Ctoy_operational_final}.  The certified crossing theorem applies whenever
+\begin{equation}
+    \eta_{\mathrm{toy}}
+    :=\frac{4C_{\mathrm{SV},\mathrm{toy}}^{\mathrm{op}}}{g(p)R_{\mathrm{SV}\leftrightarrow0}(p)^2}<\frac12,
+    \qquad
+    g(p)=b_0(p)^2.
+    \label{eq:toy_eta_verified_condition_v5}
+\end{equation}
+A sufficient parameter-level condition, using the finite-interval sandwich of \cref{prop:toy_two_sided_boundary_v4}, is
+\begin{equation}
+    \frac{32768\,C_{\mathrm{SV},\mathrm{toy}}^{\mathrm{op}}\theta^2}{\varepsilon^2}<\frac12.
+    \label{eq:toy_explicit_nonempty_condition_v5}
+\end{equation}
+For example,
+\begin{equation}
+    \varepsilon=1,
+    \qquad
+    |\theta|=10^{-3},
+    \qquad
+    p_{\max}=10^{-1}
+\end{equation}
+satisfy the small-angle assumptions and the certified-crossing condition, because
+\begin{equation}
+    32768\cdot 10\cdot10^{-6}=3.2768\times10^{-1}<\frac12.
+\end{equation}
+At the worst endpoint \(p=p_{\max}\), the lower sandwich gives \(R_{\mathrm{SV}\leftrightarrow0}\ge1/(64\cdot10^{-6}\cdot10^{-1})>1.5\times10^5\), which is safely above the fixed exponential-absorption threshold \(R_{\min,\mathrm{toy}}\).  Thus the certified region is non-empty at ordinary small-noise parameters.  The improvement over the earlier \(\theta\sim10^{-6}\) check comes from using the direct second-order quotient remainder in this closed toy, not from the Efron--Stein total-variance bound.
+\end{proposition}
+
+\begin{proof}
+For this toy crossing, \(g(p)=b_0(p)^2-b_{\mathrm{SV}}(p)^2=b_0(p)^2\) and \(R_0=R_{\mathrm{SV}\leftrightarrow0}(p)\).  The certified-crossing parameter in \cref{thm:certified_crossing} is \(4C/[g(p)R_0^2]\).  The sandwich bounds give \(g(p)\ge\theta^2p^2/2\) and
+\begin{equation}
+    R_0\ge\frac{\varepsilon}{64\theta^2p}.
+\end{equation}
+Therefore
+\begin{equation}
+    g(p)R_0^2
+    \ge
+    \frac{\theta^2p^2}{2}\frac{\varepsilon^2}{4096\theta^4p^2}
+    =\frac{\varepsilon^2}{8192\theta^2},
+\end{equation}
+and hence
+\begin{equation}
+    \eta_{\mathrm{toy}}
+    \le
+    \frac{4C\cdot8192\theta^2}{\varepsilon^2}
+    =\frac{32768C\theta^2}{\varepsilon^2}.
+\end{equation}
+Substituting \(C=C_{\mathrm{SV},\mathrm{toy}}^{\mathrm{op}}=10\), \(\varepsilon=1\), and \(|\theta|=10^{-3}\) proves the displayed numerical certificate.  Finally, \(p_{\max}=10^{-1}\) obeys \(p_{\max}\le1/(4\varepsilon)\) and \(16\theta^2p_{\max}^2\ll1/2\), so the assumptions of the finite-interval sandwich are satisfied.
+\end{proof}
+
+
+
+\begin{proposition}[Selector versus Le Cam/Fisher benchmarks in the one-qubit transcript]
+\label{prop:selector_lecam_constant_factor_v8}
+\textup{(Conservative and sharpened versions.)}
+View the first toy model through the same one-qubit accepted-\(X\)-measurement transcript used in \cref{prop:explicit_ip_bernoulli_v5}.  Assume the certified crossing regime of \cref{prop:toy_certified_nonempty_v5}, and restrict to the SV side of that certified crossing, i.e.\ budgets \(R\) larger than the certified SV/no-mitigation crossing.  Then the selected leading law is
+\begin{equation}
+    \MSE_{\rm sel}^{\rm lead}(p,R)=\frac{s_{\mathrm{SV}}(p)}{R}=\frac{1}{a(p)R}.
+\end{equation}
+Against the corrected conservative finite-interval Le Cam lower bound
+\begin{equation}
+    L_{\rm LC}^{\rm cons}(p,R)=\frac{1}{32R(1-p)^2},
+\end{equation}
+one has
+\begin{equation}
+    \frac{\MSE_{\rm sel}^{\rm lead}(p,R)}{L_{\rm LC}^{\rm cons}(p,R)}
+    =\frac{32(1-p)^2}{a(p)}\le64.
+    \label{eq:selector_lecam_ratio_v7}
+\end{equation}
+Using instead the local Fisher/two-point constant \(I_{p,\mathrm{loc}}^{\rm Bern}=2(1-p)^2\) from \cref{eq:explicit_ip_fisher_local_v8}, the corresponding local Le Cam scale is
+\begin{equation}
+    L_{\rm LC}^{\rm loc}(p,R)=\frac{1}{16R(1-p)^2},
+\end{equation}
+and therefore
+\begin{equation}
+    \frac{\MSE_{\rm sel}^{\rm lead}(p,R)}{L_{\rm LC}^{\rm loc}(p,R)}
+    =\frac{16(1-p)^2}{a(p)}\le32.
+    \label{eq:selector_lecam_ratio_local_v8}
+\end{equation}
+Finally, if the same accepted transcript is benchmarked by its regular local asymptotic Fisher information \(J_{\rm acc}(p)=a(p)\) for the accepted ideal \(X\)-mean in this deliberately unbiased SV toy, then the Cramer--Rao/LAN scale is
+\begin{equation}
+    L_{\rm LAN}^{\rm acc}(p,R)=\frac{1}{a(p)R},
+\end{equation}
+and the selected SV law saturates this accepted-transcript Fisher scale exactly.  Thus the factors \(64\) and \(32\) in \cref{eq:selector_lecam_ratio_v7,eq:selector_lecam_ratio_local_v8} are conservative two-point artifacts, not physical evidence that the selector is far from the relevant sampling scale.
+\end{proposition}
+
+\begin{proof}
+In the first toy, \(\mu_{\mathrm{SV}}(p)=\mu_\star=0\), so the leading SV MSE is purely sampling and equals \(s_{\mathrm{SV}}(p)/R=1/[a(p)R]\).  The phrase ``selected'' is justified only on the SV side of the certified crossing supplied by \cref{prop:toy_certified_nonempty_v5}; outside that regime the statement is only a comparison of the SV estimator, not of the selector.  Dividing \(1/[a(p)R]\) by the corrected conservative and local Le Cam scales gives \cref{eq:selector_lecam_ratio_v7,eq:selector_lecam_ratio_local_v8}; \(a(p)\ge1/2\) follows from \cref{eq:toy_acceptance_bounds_v4}.  The number of accepted samples concentrates around \(a(p)R\) by the same multiplicative Chernoff bound used in \cref{thm:sv_quotient_law_v2}; hence the phrase \(a(p)R\) effective observations can be made high-probability rather than merely heuristic.  The final LAN statement is the ordinary Fisher benchmark for those accepted unit-variance observations.  It is included only to show what part of the constant factor comes from deliberately conservative two-point bounds.
+\end{proof}
+
+\begin{remark}[Role of the first toy model]
+The first toy model is deliberately favorable to SV: \(\delta_{\mathrm{SV}}=0\) because the rank-one projector kills the \(X\)-expectation inside the accepted block.  Its purpose is not to prove a generic VD--SV comparison; its purpose is to show that the finite-shot crossing certificate can be checked on a finite interval with explicit constants.  The next toy model gives the promised nontrivial VD--SV comparison with \(\delta_{\mathrm{SV}}\ne0\).
+\end{remark}
+
+
+
+\subsection{A sector toy model with \texorpdfstring{$\delta_{\mathrm{SV}}\ne0$}{deltaSV nonzero}}
+\label{subsec:sector_toy_delta_sv_nonzero_v5}
+The previous example has a rank-one symmetry sector, so SV has zero residual first-order bias.  The present sector model is the complementary clean limit: it has nonzero SV residual bias but no dominant-eigenvector rotation, so \(\delta_{\mathrm{VD}}=0\) at first order.  These examples are deliberately diagnostic, not generic; a fully generic toy model can have both \(\delta_{\mathrm{VD}}\ne0\) and \(\delta_{\mathrm{SV}}\ne0\).  To exhibit a genuine VD--SV boundary, consider a three-dimensional Hilbert space with orthonormal vectors \(\ket g,\ket e,\ket\ell\).  The valid sector is \(P=\ket g\bra g+\ket e\bra e\), the ideal state is \(\rho_\star=\ket g\bra g\), and the observable is
+\begin{equation}
+    O=\ket g\bra g-\ket e\bra e,
+    \qquad O\ket\ell=0,
+    \qquad \mu_\star=1.
+\end{equation}
+Let
+\begin{equation}
+    \rho_p=\alpha(p)\ket g\bra g+\beta(p)\ket e\bra e+\lambda(p)\ket\ell\bra\ell,
+    \label{eq:sector_toy_state_v5}
+\end{equation}
+with
+\begin{equation}
+    \alpha(p)=1-(u+\ell)p,
+    \qquad
+    \beta(p)=up,
+    \qquad
+    \lambda(p)=\ell p,
+\end{equation}
+where \(u,\ell>0\) and \(0<p\le p_{\max}\le[4(u+\ell)]^{-1}\).  Here \(up\) is undetectable in-sector error and \(\ell p\) is detectable leakage.
+
+\paragraph{SV constants.}
+The acceptance probability and SV population value are
+\begin{equation}
+    a(p)=\alpha(p)+\beta(p)=1-\ell p,
+    \qquad
+    \mu_{\mathrm{SV}}(p)=\frac{\alpha(p)-\beta(p)}{\alpha(p)+\beta(p)}
+    =1-\frac{2up}{1-\ell p}.
+\end{equation}
+Therefore
+\begin{equation}
+    b_{\mathrm{SV}}(p)=-\frac{2up}{1-\ell p},
+    \qquad
+    \delta_{\mathrm{SV}}=-2u\ne0.
+    \label{eq:sector_toy_delta_sv_v5}
+\end{equation}
+The accepted-shot variance coefficient is
+\begin{equation}
+    v_{\mathrm{SV}}(p)=\frac{1-\mu_{\mathrm{SV}}(p)^2}{a(p)}
+    =\frac{4up(1-(u+\ell)p)}{(1-\ell p)^3}
+    =4up+\OO(p^2).
+    \label{eq:sector_toy_vsv_v5}
+\end{equation}
+
+\paragraph{VD constants.}
+For VD with copy number \(M\),
+\begin{equation}
+    D_M(p)=\alpha(p)^M+\beta(p)^M+\lambda(p)^M,
+    \qquad
+    N_M(p)=\alpha(p)^M-\beta(p)^M,
+\end{equation}
+so
+\begin{equation}
+    \mu_{\mathrm{VD},M}(p)=\frac{\alpha(p)^M-\beta(p)^M}{\alpha(p)^M+\beta(p)^M+\lambda(p)^M}.
+\end{equation}
+For \(M=2\),
+\begin{align}
+    D_2(p)&=\alpha^2+\beta^2+\lambda^2
+    =1-2(u+\ell)p+\OO(p^2),\label{eq:sector_D2_expansion_v6}\\
+    N_2(p)&=\alpha^2-\beta^2
+    =1-2(u+\ell)p+\OO(p^2).\label{eq:sector_N2_expansion_v6}
+\end{align}
+A direct subtraction gives
+\begin{equation}
+    b_{\mathrm{VD},2}(p)
+    =\frac{N_2(p)}{D_2(p)}-1
+    =-\frac{2\beta(p)^2+\lambda(p)^2}{D_2(p)}
+    =-\frac{(2u^2+\ell^2)p^2}{D_2(p)}
+    =-(2u^2+\ell^2)p^2+\OO(p^3),
+    \label{eq:sector_toy_bvd2_v5}
+\end{equation}
+so VD removes the first-order in-sector error by spectral amplification.  Under the independent Hadamard-test implementation of \cref{prop:implementation_variance_inflation_v4},
+\begin{equation}
+    v_{\mathrm{VD},2}(p)
+    =\frac{1-N_2(p)^2+\mu_{\mathrm{VD},2}(p)^2(1-D_2(p)^2)}{D_2(p)^2},
+    \label{eq:sector_toy_vvd2_formula_v6}
+\end{equation}
+where the covariance term is zero because the numerator and denominator Hadamard tests are independent.  Since \(\mu_{\mathrm{VD},2}(p)=1+\OO(p^2)\), \cref{eq:sector_D2_expansion_v6,eq:sector_N2_expansion_v6} imply
+\begin{equation}
+    1-D_2(p)^2=4(u+\ell)p+\OO(p^2),
+    \qquad
+    1-N_2(p)^2=4(u+\ell)p+\OO(p^2),
+\end{equation}
+and therefore
+\begin{equation}
+    v_{\mathrm{VD},2}(p)
+    =8(u+\ell)p+\OO(p^2).
+    \label{eq:sector_toy_vvd2_v5}
+\end{equation}
+
+
+\paragraph{Sector remainder and denominator certificates.}
+On \(0<p\le p_{\max}\le[4(u+\ell)]^{-1}\), one has \(\alpha(p)\ge3/4\) and hence
+\begin{equation}
+    D_2(p)=\alpha^2+\beta^2+\lambda^2\ge \frac{9}{16},
+    \qquad
+    a(p)=1-\ell p\ge\frac34.
+    \label{eq:sector_D_a_lower_v6}
+\end{equation}
+For the independent Hadamard-test VD implementation with \(M=2\), take \(K_{N,2}=1\), \(K_{D,2}=2\), and the bounded-moment envelopes
+\begin{equation}
+    \mathfrak m_{12},\mathfrak m_{21},\mathfrak m_{03}\le 8,
+    \qquad
+    \mathfrak m_{13},\mathfrak m_{04},\mathfrak m_{22},\mathfrak m_{40}\le 64,
+    \qquad
+    \mathfrak t^{(V)}\le 10^6.
+\end{equation}
+The final bound on \(\mathfrak t^{(V)}\) is a direct bounded-sign envelope for the third-and-higher quotient terms in this finite sector toy; it is deliberately loose and remains far below the already conservative crossing constant used below.
+The finite-interval constant is assembled explicitly as follows.  Let
+\(\Delta=(9/16)^{-1}=16/9\).  Since \(D_2^{-1}\le\Delta\) and
+\(|\mu_{\mathrm{VD},2}|\le1\), \cref{eq:AE_constant_v4} gives
+\begin{align}
+    A_{E,\mathrm{VD},2}^{\mathrm{sector}}
+    &\le (8+8)\Delta^3+64\Delta^4+2\cdot1\cdot64\Delta^5 \\
+    &<3.1\times10^3.
+    \label{eq:sector_AE_arithmetic_v7}
+\end{align}
+Using the same envelopes in \cref{eq:AQ_constant_v14,eq:ALQ_constant_v14,eq:AV_constant_v4},
+\begin{align}
+    A_{V,\mathrm{VD},2}^{\mathrm{sector}}
+    &\le 2\Delta^4(64+64)
+      +2\Delta^3(2\cdot8+8+8)+10^6\\
+    &<1.1\times10^6<2.5\times10^8.
+    \label{eq:sector_AV_arithmetic_v7}
+\end{align}
+This is the advertised conservative finite-interval bound
+\begin{equation}
+    C_{\mathrm{VD},2}^{\mathrm{sector}}\le 2.5\times10^8.
+    \label{eq:Cvd_sector_v6}
+\end{equation}
+For SV in the sector toy, \(a\ge3/4\), \(K_W=1\), and the Bernoulli quotient constants give
+\begin{equation}
+    C_{\mathrm{SV}}^{\mathrm{sector}}\le 5.0\times10^7.
+    \label{eq:Csv_sector_v6}
+\end{equation}
+We therefore use the explicit envelope
+\begin{equation}
+    C_{\mathrm{sector}}:=3.0\times10^8.
+    \label{eq:Csector_numeric_v6}
+\end{equation}
+The internal VD denominator certificate is also explicit.  Since \(\sigma_{D,2}^2\le1\), \(K_{D,2}=2\), and \(D_2\ge9/16\), \cref{eq:denom_sample_threshold_v4} gives
+\begin{equation}
+    B_{\mathrm{den},2}(p,\varepsilon_{\rm fail})
+    \le 31\log\frac1{\varepsilon_{\rm fail}}.
+    \label{eq:sector_Bden_bound_v6}
+\end{equation}
+Thus the VD law used inside the crossing is certified whenever the VD sample budget at the predicted crossing is at least the right-hand side of \cref{eq:sector_Bden_bound_v6}.
+
+\begin{proposition}[Nontrivial VD--SV crossing in the sector toy]
+\label{prop:sector_toy_vd_sv_crossing_v5}
+In the sector toy, with \(M=2\), the leading VD--SV crossing satisfies
+\begin{equation}
+    R_{\mathrm{VD},2\leftrightarrow\mathrm{SV}}(p)
+    =\frac{v_{\mathrm{VD},2}(p)-v_{\mathrm{SV}}(p)}{b_{\mathrm{SV}}(p)^2-b_{\mathrm{VD},2}(p)^2}
+    =\frac{u+2\ell}{u^2}\frac1p+\OO(1).
+    \label{eq:sector_toy_vd_sv_crossing_v5}
+\end{equation}
+Moreover, using the explicit envelope \(C_{\mathrm{sector}}=3.0\times10^8\), the crossing is certified whenever
+\begin{equation}
+    \eta_{\mathrm{sector}}
+    =\frac{4C_{\mathrm{sector}}}{(b_{\mathrm{SV}}^2-b_{\mathrm{VD},2}^2)R_{\mathrm{VD},2\leftrightarrow\mathrm{SV}}(p)^2}<\frac12.
+\end{equation}
+Using the first-order bounds above, a sufficient non-empty condition is
+\begin{equation}
+    \frac{8C_{\mathrm{sector}}u^2}{(u+2\ell)^2}<\frac12.
+    \label{eq:sector_toy_certificate_condition_v5}
+\end{equation}
+The internal VD quotient certificate is simultaneously valid if, with the chosen resource normalization,
+\begin{equation}
+    \frac{u+2\ell}{u^2p_{\max}}
+    \ge 31\log\frac1{\varepsilon_{\rm fail}}.
+    \label{eq:sector_internal_vd_certificate_v6}
+\end{equation}
+For example, \(u=1\), \(\ell=10^6\), \(p_{\max}=10^{-8}\), and \(\varepsilon_{\rm fail}=10^{-6}\) satisfy both \cref{eq:sector_toy_certificate_condition_v5,eq:sector_internal_vd_certificate_v6}.  This numerical point is deliberately extreme: \(\ell/u=10^6\) and \(p_{\max}=10^{-8}\) should not be read as a realistic device regime.  They only demonstrate that the nested certificates are jointly non-empty under the intentionally loose constants of \cref{rem:constant_tightness_v7}.  Sharper variance remainders would move the certified example toward much less extreme parameter ratios.  Hence the VD--SV crossing certificate and the internal VD denominator certificate are jointly non-empty.
+\end{proposition}
+
+\begin{proof}
+Equations \cref{eq:sector_toy_delta_sv_v5,eq:sector_toy_bvd2_v5} give
+\(b_{\mathrm{SV}}(p)^2-b_{\mathrm{VD},2}(p)^2=4u^2p^2+\OO(p^3)\).  Equations \cref{eq:sector_toy_vsv_v5,eq:sector_toy_vvd2_v5} give
+\(v_{\mathrm{VD},2}(p)-v_{\mathrm{SV}}(p)=(4u+8\ell)p+\OO(p^2)\).  Dividing proves \cref{eq:sector_toy_vd_sv_crossing_v5}.  The certified condition is exactly \cref{eq:eta_crossing_condition} with the explicit sector-toy constants from \cref{eq:Csector_numeric_v6}.  Substituting the leading lower bound \(b_{\mathrm{SV}}^2-b_{\mathrm{VD},2}^2\ge 2u^2p^2\) and the crossing lower bound \(R_{\mathrm{VD},2\leftrightarrow\mathrm{SV}}\ge (u+2\ell)/(2u^2p)\) for small enough \(p_{\max}\) yields \cref{eq:sector_toy_certificate_condition_v5}.  The separate lower bound \cref{eq:sector_internal_vd_certificate_v6} is just \(R_{\mathrm{cross}}(p_{\max})\ge B_{\mathrm{den},2}\), using \cref{eq:sector_Bden_bound_v6}.  The displayed numerical choice verifies both inequalities directly.
+\end{proof}
+
+
+\begin{proposition}[Efron--Stein total-MSE dominance check at physical noise]
+\label{prop:sector_es_operational_certificate_v12}
+The extreme numerical point in \cref{prop:sector_toy_vd_sv_crossing_v5} is not needed to obtain an operationally meaningful dominance certificate.  In the sector toy with
+\begin{equation}
+    u=1,\qquad \ell=1,\qquad p=10^{-2},\qquad M=2,
+\end{equation}
+and unit Hadamard-test call costs, let \(R\) denote the physical call budget.  Since the independent VD implementation uses one numerator and one denominator stream, its paired-shot budget is \(B=R/2\).  The clipped VD estimator is certified to beat SV at any physical budget
+\begin{equation}
+    R\ge 2\times10^6.
+    \label{eq:sector_es_budget_v12}
+\end{equation}
+More precisely, the Efron--Stein total-variance certificate gives
+\begin{equation}
+    \Var(\widehat\mu_{\mathrm{VD},2}^{\rm clip})
+    \le \frac{472}{R},
+    \label{eq:sector_es_236_v12}
+\end{equation}
+while the VD population bias satisfies
+\begin{equation}
+    \abs{b_{\mathrm{VD},2}(p)}\le 4p^2,
+    \label{eq:sector_es_bvd_v12}
+\end{equation}
+and the SV residual floor satisfies
+\begin{equation}
+    \MSE_{\mathrm{SV}}(p,R)\ge b_{\mathrm{SV}}(p)^2\ge 4p^2.
+    \label{eq:sector_es_sv_floor_v12}
+\end{equation}
+Consequently, at \(p=10^{-2}\) and \(R=2\times10^6\),
+\begin{equation}
+    \MSE_{\mathrm{VD},2}^{\rm cert}(p,R)
+    \le (4p^2+4/R)^2+\frac{472}{R}+10^{-8}
+    <2.4\times10^{-4}
+    <4.0\times10^{-4}
+    \le \MSE_{\mathrm{SV}}(p,R).
+    \label{eq:sector_es_numeric_v12}
+\end{equation}
+Thus VD can be certified to beat SV in total MSE at a physical noise scale using modest sector ratios.  This is not a replacement for the crossing-remainder certificate in \cref{thm:certified_crossing}: Efron--Stein controls the total variance of the clipped quotient, not the difference between the exact MSE and its leading local law.  It is included only as a robust dominance check showing that the extreme constants in the formal crossing certificate are not physical thresholds.
+\end{proposition}
+
+\begin{proof}
+For \(u=\ell=1\) and \(p=10^{-2}\),
+\begin{equation}
+    D_2=(1-2p)^2+p^2+p^2=0.9606>0.96.
+\end{equation}
+With \(K_{N,2}=1\) and \(K_{D,2}=2\), \cref{eq:efron_stein_vd_bound_v11} gives
+\begin{equation}
+    \frac{8K_{N,2}^2(D_2+2K_{D,2})^2}{D_2^4}
+    \le \frac{8(1+4)^2}{0.96^4}<236,
+\end{equation}
+which gives \(\Var(\widehat\mu_{\mathrm{VD},2}^{\rm clip})\le236/B=472/R\) because \(B=R/2\).  This proves \cref{eq:sector_es_236_v12}.  The exact VD population bias in the sector toy is
+\begin{equation}
+    b_{\mathrm{VD},2}(p)=-\frac{(2u^2+\ell^2)p^2}{D_2(p)},
+\end{equation}
+so \(\abs{b_{\mathrm{VD},2}}\le 3p^2/0.96<4p^2\).  The SV bias is
+\begin{equation}
+    b_{\mathrm{SV}}(p)=-\frac{2up}{1-\ell p}.
+\end{equation}
+Here \(u=\ell=1\) and \(p=10^{-2}<1\), so \(0<1-\ell p<1\).  Hence
+\begin{equation}
+    b_{\mathrm{SV}}(p)^2
+    =\frac{4p^2}{(1-p)^2}
+    >4p^2.
+    \label{eq:sector_sv_floor_margin_v14}
+\end{equation}
+Numerically this is \(4.0812\ldots\times10^{-4}\), safely above \(4.0\times10^{-4}\); the inequality follows from the denominator \(1-p<1\), not from rounding.  It remains to justify the displayed \(4/R\) finite-sample quotient-bias allowance.  In this independent Hadamard-test implementation \(\sigma_{ND}=0\) and the denominator sign has variance \(\sigma_D^2=1-D_2^2\).  Hence
+\begin{equation}
+    \frac{\abs{c_{\mathrm{VD},2}}}{B}
+    =\frac{\abs{\mu_{\mathrm{VD},2}}\sigma_D^2}{D_2^2B}
+    \le \frac{1-D_2^2}{D_2^2B}<\frac{0.09}{B}<\frac{4}{R}.
+\end{equation}
+The remaining expectation remainder is controlled by \cref{eq:sector_AE_arithmetic_v7}:
+\begin{equation}
+    \frac{A_{E,\mathrm{VD},2}^{\mathrm{sector}}}{B^2}
+    <\frac{3.1\times10^3}{(10^6)^2}<3.1\times10^{-9}.
+\end{equation}
+For the denominator event, \cref{eq:sector_Bden_bound_v6} gives \(B_{\mathrm{den},2}\le31\log(10^6)<4.3\times10^2\) at failure probability \(10^{-6}\), while here \(B=10^6\); hence the exponentially small denominator contribution is also absorbed below \(10^{-8}\).  Substituting \(p=10^{-2}\) and \(R=2\times10^6\) yields \cref{eq:sector_es_numeric_v12}.
+\end{proof}
+
+\begin{proposition}[Sector residual-bias floor and a structural two-point benchmark]
+\label{prop:sector_structural_floor_v8}
+In the sector toy, SV has residual first-order bias
+\begin{equation}
+    b_{\mathrm{SV}}(p)=-2up+O(p^2),
+    \qquad
+    b_{\mathrm{SV}}(p)^2=4u^2p^2+O(p^3).
+\end{equation}
+Consider the restricted ambiguity model in which the same full noisy state \(\rho_p\) can be generated either from the ideal state \(\rho_+^\star=\ket g\bra g\) with an undetectable in-sector error of mass \(up\), or from an alternative ideal state \(\rho_-^\star=(1-up)\ket g\bra g+up\ket e\bra e\) with that in-sector mass treated as ideal population, with the remaining channel adjusted so that the transcript distribution is identical.  The two ideal values differ by
+\begin{equation}
+    \mu_+^\star-\mu_-^\star=2up.
+\end{equation}
+Hence \cref{cor:nonidentifiability_floor} gives the structural lower bound
+\begin{equation}
+    L_{\rm str}^{\rm sector}(p)=\frac{u^2p^2}{2}.
+    \label{eq:sector_structural_floor_v8}
+\end{equation}
+Consequently the SV residual bias floor is within a constant factor of this restricted non-identifiability floor:
+\begin{equation}
+    \frac{b_{\mathrm{SV}}(p)^2}{L_{\rm str}^{\rm sector}(p)}
+    =8+O(p).
+    \label{eq:sector_sv_floor_ratio_v8}
+\end{equation}
+This does not say that VD cannot beat SV in the declared known-channel sector model; VD does beat SV on the high-budget side of \cref{prop:sector_toy_vd_sv_crossing_v5}.  It says something narrower: if the in-sector population error is not identifiable from side information, then the same order of bias floor is information-theoretic rather than merely a defect of SV\@.
+\end{proposition}
+
+\begin{proof}
+The expansion of \(b_{\mathrm{SV}}\) is \cref{eq:sector_toy_delta_sv_v5}.  The two hypotheses described in the statement induce the same noisy transcript distribution by construction, while their ideal \(O=\ket g\bra g-\ket e\bra e\) values are \(1\) and \(1-2up\).  Applying \cref{cor:nonidentifiability_floor} with \(h=up\) gives \cref{eq:sector_structural_floor_v8}.  Dividing the SV squared bias by this floor gives \cref{eq:sector_sv_floor_ratio_v8}.
+\end{proof}
+
+\begin{remark}[Role of the sector toy model]
+The sector toy is deliberately favorable to VD in a different way than the first toy is favorable to SV\@.  Because \(\rho_p\) remains diagonal in the fixed basis \(\{\ket g,\ket e,\ket\ell\}\), the dominant eigenvector does not rotate and \(\delta_{\mathrm{VD}}=0\).  Its purpose is to isolate the spectral-amplification advantage of VD against a nonzero SV residual bias.  The generic operating-window theory above allows both \(\delta_{\mathrm{VD}}\ne0\) and \(\delta_{\mathrm{SV}}\ne0\); these two closed models are diagnostic boundary cases used to check constants, not a claim that either favorable limit is typical.
+\end{remark}
+
+
+\subsection{A generic toy with simultaneous VD and SV first-order bias}
+\label{subsec:generic_toy_v10}
+
+The two closed toy models above deliberately isolate clean limiting mechanisms.  The first makes SV unbiased at first order; the sector model removes dominant-eigenvector rotation and therefore gives \(\delta_{\mathrm{VD}}=0\).  The following minimal model records the generic situation in which both first-order floors can be nonzero.  It is included as a structural diagnostic only.  The direct trace expansion and the formal VD--SV crossing are displayed below; only the sharp variance constants and a full certified-boundary check for this generic non-diagonal toy are left for a later version.
+
+\begin{proposition}[A toy with simultaneous VD and SV first-order bias]
+\label{prop:generic_toy_v10}
+Work in \(\mathbb C^3\) with basis \(\{\ket0,\ket1,\ket2\}\), valid sector
+\begin{equation}
+    P=\ket0\bra0+\ket1\bra1,
+\end{equation}
+ideal state \(\rho_\star=\ket0\bra0\), and observable
+\begin{equation}
+    O=\ket0\bra0-\ket1\bra1+c\big(\ket0\bra1+\ket1\bra0\big),
+    \qquad \mu_\star=1.
+\end{equation}
+Let
+\begin{equation}
+    \Delta
+    =u(\ket1\bra1-\ket0\bra0)
+    +\ell(\ket2\bra2-\ket0\bra0)
+    +\kappa(\ket0\bra1+\ket1\bra0),
+    \qquad u,\ell,\kappa>0 ,
+\end{equation}
+and set \(\rho_p=\rho_\star+p\Delta\) for
+\begin{equation}
+    0<p\leq p_0,
+    \qquad
+    p_0:=\frac12\min\left\{\frac1{u+\ell},\frac{u}{\kappa^2}\right\}.
+    \label{eq:generic_toy_positivity_p0_v13}
+\end{equation}
+Then \(\rho_p\) is a density matrix on this interval: the \(\{\ket0,\ket1\}\) block has nonnegative determinant and the \(\ket2\) weight is \(\ell p\ge0\).  Here \(up\) is an undetectable in-sector population error, \(\ell p\) is detectable leakage, and \(\kappa p\) is an in-sector coherence that tilts the dominant eigenvector.  Then
+\begin{equation}
+    a(p)=1-\ell p+\OO(p^2),
+    \qquad
+    \delta_{\mathrm{SV}}=2(c\kappa-u),
+    \qquad
+    \delta_{\mathrm{VD}}=2c\kappa.
+\end{equation}
+Thus, whenever \(c\kappa\ne0\) and \(c\kappa\ne u\), both VD and SV have nonzero first-order residual bias.  For \(M=2\), direct trace expansion gives
+\begin{align}
+    D_2(p)&=\Tr(\rho_p^2)=1-2(u+\ell)p+\OO(p^2),
+    \label{eq:generic_toy_D2_v12}\\
+    N_2(p)&=\Tr(O\rho_p^2)=1+2(c\kappa-u-\ell)p+\OO(p^2),
+    \label{eq:generic_toy_N2_v12}
+\end{align}
+and hence
+\begin{equation}
+    b_{\mathrm{VD},2}(p)=2c\kappa p+\OO(p^2),
+    \qquad
+    b_{\mathrm{SV}}(p)=2(c\kappa-u)p+\OO(p^2).
+    \label{eq:generic_toy_biases_v12}
+\end{equation}
+Writing the leading variance coefficients as
+\begin{equation}
+    s_{\mathrm{VD},2}(p)=\nu_{\mathrm{VD},0}+\OO(p),
+    \qquad
+    s_{\mathrm{SV}}(p)=\nu_{\mathrm{SV},0}+\OO(p),
+\end{equation}
+the formal VD--SV crossing in the generic toy is
+\begin{equation}
+    R_{\mathrm{VD},2\leftrightarrow\mathrm{SV}}(p)
+    =
+    \frac{\nu_{\mathrm{VD},0}-\nu_{\mathrm{SV},0}+\OO(p)}
+    {4[(c\kappa-u)^2-c^2\kappa^2]p^2+\OO(p^3)},
+    \label{eq:generic_toy_crossing_v12}
+\end{equation}
+whenever the denominator is nonzero and the numerator has the sign required for a positive crossing.  Thus the generic simultaneous-bias case has the usual \(p^{-2}\) finite-shot scale, unlike the cleaner sector example where VD removes the first-order floor.
+\end{proposition}
+
+\begin{proof}
+Since \(\Tr(P\Delta P)=\Delta_{00}+\Delta_{11}=-(u+\ell)+u=-\ell\), the acceptance probability is \(a(p)=1-\ell p+\OO(p^2)\).  Also
+\begin{equation}
+    \Tr(OP\Delta P)=O_{00}\Delta_{00}+O_{11}\Delta_{11}+2c\Delta_{01}=-(u+\ell)-u+2c\kappa.
+\end{equation}
+Using the first-order SV formula gives
+\begin{equation}
+    \delta_{\mathrm{SV}}
+    =\Tr(OP\Delta P)-\mu_\star\Tr(P\Delta P)
+    =-(2u+\ell)+2c\kappa+\ell
+    =2(c\kappa-u).
+\end{equation}
+For VD, let \(Q_\star=I-\ket0\bra0\).  Then \(\Delta\ket0=-(u+\ell)\ket0+\kappa\ket1\), so \(Q_\star\Delta\ket0=\kappa\ket1\).  By \cref{prop:vd_delta_generator},
+\begin{equation}
+    \delta_{\mathrm{VD}}
+    =2\Re\bra0 OQ_\star\Delta\ket0
+    =2c\kappa.
+\end{equation}
+Finally, \(\rho_p=\rho_\star+p\Delta\) on the declared positivity interval gives
+\begin{equation}
+    \rho_p^2=\rho_\star+p(\rho_\star\Delta+\Delta\rho_\star)+\OO(p^2).
+\end{equation}
+Since \(\Tr(\rho_\star\Delta+\Delta\rho_\star)=2\Delta_{00}=-2(u+\ell)\), \cref{eq:generic_toy_D2_v12} follows.  Also
+\begin{equation}
+    \Tr\!\left[O(\rho_\star\Delta+\Delta\rho_\star)\right]
+    =-2(u+\ell)+2c\kappa,
+\end{equation}
+which gives \cref{eq:generic_toy_N2_v12}.  Dividing \(N_2/D_2\) yields \(b_{\mathrm{VD},2}=2c\kappa p+\OO(p^2)\).  Combining this with the SV expansion above and equating the two leading MSE laws gives \cref{eq:generic_toy_crossing_v12}.
+\end{proof}
+
+\begin{remark}[Why the previous clean toys were special]
+The first toy is SV-favourable because the postselected observable has zero residual first-order bias.  The sector toy is VD-favourable because the noisy state is diagonal in a fixed basis, so the dominant eigenvector does not rotate at first order.  \Cref{prop:generic_toy_v10} shows that neither simplification is generic: an in-sector coherence can make \(\delta_{\mathrm{VD}}\ne0\), and an undetectable in-sector population error can make \(\delta_{\mathrm{SV}}\ne0\).  In particular, a diagonal observable in the ideal eigenbasis has \(\delta_{\mathrm{VD}}=0\) because it cannot see the orthogonal first-order tilt direction \(Q_\star\Delta\ket{\psi_\star}\); off-diagonal observables generally can.
+\end{remark}
+
+\section{Scope and limitations}
+
+This draft proves conditional local laws, explicit quotient certificates, implementation-level VD variance constants for an idealized Hadamard/derangement estimator, a sharper Efron--Stein total-variance diagnostic, an asymptotic second-order quotient-variance diagnostic, finite-interval toy boundaries, a multiplicative implementation-noise baseline, and a restricted Le Cam lower bound.  The general toy certificates are numerically conservative; their large constants certify non-vacuity but are not intended as tight physical thresholds.  In the first closed toy, however, the direct SV second-order quotient calculation gives an operational remainder of order one and certifies the crossing at ordinary small-noise parameters.  It still does not prove a global optimality theorem over all possible QEM protocols.  Such a theorem would require a fully specified statistical decision model for estimating an ideal functional \(\mu_\star\) from noisy states \(\rho_p\), including what is known about the noise channel and which adaptive measurements are admissible.
+
+The following items are intentionally left for the next version.
+\begin{enumerate}[leftmargin=2em]
+    \item Replace the multiplicative implementation-noise baseline with the exact compiled circuit family intended for numerical validation, including correlated numerator-denominator errors and its own circuit noise.
+    \item Instantiate the SV projector and acceptance law for a concrete QAOA symmetry.
+    \item Decide whether CDR is excluded from the theorem-level selector or included under a proved training-model law.
+    \item Add numerical validation only after choosing the concrete QAOA instances and circuit implementation.
+\end{enumerate}
+
+\section{Conclusion}
+
+The strengthened mathematical core is this: VD and SV can be compared by finite-shot operating windows only after their residual bias floors, sampling coefficients, quotient corrections, and remainder regimes are all explicit.  In the closed one-qubit transcript, the selector can also be compared directly with conservative Le Cam and sharper local Fisher benchmarks; in the sector toy, the residual SV bias floor is compared with a restricted structural non-identifiability floor.  For VD, the key object is the quotient law plus the denominator certificate.  For SV, the key object is the projected first-order perturbation \(P\Delta P-\rho_\star\Tr(P\Delta P)\).  Once each method has a certified law
+\begin{equation}
+    \MSE_m(p,R)=b_m(p)^2+\frac{s_m(p)}{R}+\rho_m(p,R),
+    \qquad
+    \abs{\rho_m(p,R)}\leq \frac{C_m(p)}{R^2},
+\end{equation}
+method selection becomes a lower-envelope problem with a self-consistency test for every crossing.  This moves the paper from a purely formal Taylor framework toward a mathematically defensible finite-budget theory.
+
+\appendix
+
+\section{Quotient delta-method template}
+
+Let \((U_s,V_s)_{s=1}^B\) be i.i.d.\ with means \((u,v)\), \(v>0\), and covariance matrix
+\begin{equation}
+    \Sigma=\begin{pmatrix}\sigma_U^2&\sigma_{UV}\\\sigma_{UV}&\sigma_V^2\end{pmatrix}.
+\end{equation}
+Let \(\widehat u=B^{-1}\sum_sU_s\), \(\widehat v=B^{-1}\sum_sV_s\), and \(\widehat\theta=\widehat u/\widehat v\).  With \(\theta=u/v\),
+\begin{align}
+    \E\widehat\theta
+    &=\theta+\frac{\theta\sigma_V^2-\sigma_{UV}}{Bv^2}+\mathcal R_E(B),\\
+    \Var(\widehat\theta)
+    &=\frac{\sigma_U^2+\theta^2\sigma_V^2-2\theta\sigma_{UV}}{Bv^2}+\mathcal R_V(B),
+\end{align}
+where, under the bounded-denominator conditions used in the body, \(\abs{\mathcal R_E(B)}\le A_E/B^2+E_{\rm bad}(B)\) and \(\abs{\mathcal R_V(B)}\le A_V/B^2+V_{\rm bad}(B)\).  This is only the algebraic template behind VD and SV; it is the standard delta-method quotient expansion \citep{VanDerVaart1998}.  The certified versions in \cref{thm:vd_quotient_certified_v4,thm:sv_quotient_law_v2} add denominator concentration and clipping to make the expansion non-asymptotically meaningful.
+
+\section{Notation map}
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Symbol & Meaning\\
+\midrule
+\(p\) & Physical noise scale\\
+\(B\) & Statistical sample count for one method\\
+\(R\) & Common physical resource budget after method-specific cost normalization\\
+\(\rho_\star\) & Ideal output state\\
+\(\rho_p\) & Noisy output state\\
+\(\Delta=\mathcal L(\rho_\star)\) & First-order noise perturbation\\
+\(O\) & Observable\\
+\(\mu_\star\) & Ideal expectation value\\
+\(D_M\) & VD denominator \(\Tr(\rho_p^M)\)\\
+\(b_m(p)\) & Population residual bias of method \(m\)\\
+\(c_m(p)\) & Statistical quotient-bias coefficient\\
+\(s_m(p)\) & Resource-normalized sampling coefficient\\
+\(a(p)\) & SV acceptance probability\\
+\(\delta_{\mathrm{VD}}\) & VD dominant-eigenvector mismatch coefficient\\
+\(\delta_{\mathrm{SV}}\) & SV undetectable-sector bias coefficient\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+
+\begin{thebibliography}{99}
+
+\bibitem[Temme et~al.(2017)]{Temme2017}
+K. Temme, S. Bravyi, and J. M. Gambetta.
+\newblock Error mitigation for short-depth quantum circuits.
+\newblock \emph{Physical Review Letters}, 119:180509, 2017.
+
+\bibitem[Li and Benjamin(2017)]{LiBenjamin2017}
+Y. Li and S. C. Benjamin.
+\newblock Efficient variational quantum simulator incorporating active error minimization.
+\newblock \emph{Physical Review X}, 7:021050, 2017.
+
+\bibitem[Endo et~al.(2018)]{Endo2018}
+S. Endo, S. C. Benjamin, and Y. Li.
+\newblock Practical quantum error mitigation for near-future applications.
+\newblock \emph{Physical Review X}, 8:031027, 2018.
+
+\bibitem[Bonet-Monroig et~al.(2018)]{BonetMonroig2018}
+X. Bonet-Monroig, R. Sagastizabal, M. Singh, and T. E. O'Brien.
+\newblock Low-cost error mitigation by symmetry verification.
+\newblock \emph{Physical Review A}, 98:062339, 2018.
+
+\bibitem[McArdle et~al.(2019)]{McArdle2019}
+S. McArdle, X. Yuan, and S. Benjamin.
+\newblock Error-mitigated digital quantum simulation.
+\newblock \emph{Physical Review Letters}, 122:180501, 2019.
+
+\bibitem[Cai(2021)]{Cai2021}
+Z. Cai.
+\newblock Quantum error mitigation using symmetry expansion.
+\newblock \emph{Quantum}, 5:548, 2021.
+
+\bibitem[Huggins et~al.(2021)]{Huggins2021}
+W. J. Huggins, S. McArdle, T. E. O'Brien, J. Lee, N. C. Rubin, S. Boixo, K. B. Whaley, R. Babbush, and J. R. McClean.
+\newblock Virtual distillation for quantum error mitigation.
+\newblock \emph{Physical Review X}, 11:041036, 2021.
+
+\bibitem[Koczor(2021a)]{Koczor2021PRX}
+B. Koczor.
+\newblock Exponential error suppression for near-term quantum devices.
+\newblock \emph{Physical Review X}, 11:031057, 2021.
+
+\bibitem[Koczor(2021b)]{Koczor2021NJP}
+B. Koczor.
+\newblock The dominant eigenvector of a noisy quantum state.
+\newblock \emph{New Journal of Physics}, 23:123047, 2021.
+
+\bibitem[Czarnik et~al.(2021)]{Czarnik2021}
+P. Czarnik, A. Arrasmith, P. J. Coles, and L. Cincio.
+\newblock Error mitigation with Clifford quantum-circuit data.
+\newblock \emph{Quantum}, 5:592, 2021.
+
+\bibitem[Lowe et~al.(2021)]{Lowe2021}
+A. Lowe, M. H. Gordon, P. Czarnik, A. Arrasmith, P. J. Coles, and L. Cincio.
+\newblock Unified approach to data-driven quantum error mitigation.
+\newblock \emph{Physical Review Research}, 3:033098, 2021.
+
+\bibitem[Kakkar et~al.(2022)]{Kakkar2022}
+A. Kakkar, J. Larson, A. Galda, and R. Shaydulin.
+\newblock Characterizing error mitigation by symmetry verification in QAOA.
+\newblock In \emph{2022 IEEE International Conference on Quantum Computing and Engineering (QCE)}, pages 306--316, 2022.
+
+\bibitem[Bultrini et~al.(2023)]{Bultrini2023}
+D. Bultrini, M. H. Gordon, P. Czarnik, A. Arrasmith, M. Cerezo, P. J. Coles, and L. Cincio.
+\newblock Unifying and benchmarking state-of-the-art quantum error mitigation techniques.
+\newblock \emph{Quantum}, 7:1034, 2023.
+
+\bibitem[Vikstal et~al.(2024)]{Vikstal2024}
+P. Vikstal, G. Ferrini, and S. Puri.
+\newblock Study of noise in virtual distillation circuits for quantum error mitigation.
+\newblock \emph{Quantum}, 8:1441, 2024.
+
+\bibitem[Teo et~al.(2022)]{Teo2022}
+Y. S. Teo, S. Shin, H. Kwon, S.-H. Lee, and H. Jeong.
+\newblock Virtual distillation with noise dilution.
+\newblock arXiv:2210.14753, 2022.
+
+\bibitem[Ijaz et~al.(2024)]{Ijaz2024}
+A. Ijaz, C. Huerta Alderete, F. Sauvage, L. Cincio, M. Cerezo, and M. L. Goh.
+\newblock More buck-per-shot: Why learning trumps mitigation in noisy quantum sensing.
+\newblock arXiv:2410.00197, 2024.
+
+\bibitem[van der Vaart(1998)]{VanDerVaart1998}
+A. W. van der Vaart.
+\newblock \emph{Asymptotic Statistics}.
+\newblock Cambridge University Press, 1998.
+
+\bibitem[Boucheron et~al.(2013)]{Boucheron2013}
+S. Boucheron, G. Lugosi, and P. Massart.
+\newblock \emph{Concentration Inequalities: A Nonasymptotic Theory of Independence}.
+\newblock Oxford University Press, 2013.
+
+\end{thebibliography}
+
+
+\end{document}

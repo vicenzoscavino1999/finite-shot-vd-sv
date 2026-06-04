@@ -1,0 +1,122 @@
+# Canonical output schemas for the Level 1 experiments (imported from EXPERIMENTAL_PLAN
+# experiment sections E1-E4, E7).  verify.py validates generated outputs against these.
+
+e1_quotient_decomposition.csv:
+  format: csv
+  level: 1
+  row_matching_key: [noise_strength, B, method]
+  columns:
+    noise_strength: {type: float, min: 0.0, max: 1.0}
+    B: {type: int, min: 1}
+    method: {type: string, allowed: [vd, unmitigated]}
+    mse: {type: float, min: 0.0}
+    mse_se: {type: float, min: 0.0}
+    beta0: {type: float}
+    beta1: {type: float}
+    beta2: {type: float}
+    b2_closed_form: {type: float}
+    vtilde_closed_form: {type: float}
+    delta_aic: {type: float}
+
+e2_c_sv_zero.csv:
+  format: csv
+  level: 1
+  row_matching_key: [noise_strength, B, method]
+  columns:
+    noise_strength: {type: float, min: 0.0, max: 1.0}
+    B: {type: int, min: 1}
+    method: {type: string, allowed: [vd, sv]}
+    bias_minus_pop: {type: float}
+    c_slope_estimate: {type: float}
+    c_slope_ci_lower: {type: float}
+    c_slope_ci_upper: {type: float}
+
+e3_delta_vd_generator.csv:
+  format: csv
+  level: 1
+  row_matching_key: [noise_strength]
+  columns:
+    noise_strength: {type: float, min: 0.0, max: 1.0}
+    b_vd_inf: {type: float}
+    delta_vd_measured: {type: float}
+    delta_vd_closed_form: {type: float}
+
+e4_delta_sv_firstorder.csv:
+  format: csv
+  level: 1
+  row_matching_key: [noise_strength]
+  columns:
+    noise_strength: {type: float, min: 0.0, max: 1.0}
+    b_sv: {type: float}
+    delta_sv_measured: {type: float}
+    delta_sv_closed_form: {type: float}
+
+e5_denominator_concentration.csv:
+  format: csv
+  level: 1
+  row_matching_key: [noise_strength, copies_M, method, B]
+  columns:
+    noise_strength: {type: float, min: 0.0, max: 1.0}
+    copies_M: {type: int, min: 1}
+    method: {type: string, allowed: [vd]}
+    B: {type: int, min: 1}
+    B_over_Bden: {type: float, min: 0.0}
+    D_M: {type: float, min: 0.0, max: 1.0}
+    B_den: {type: float, min: 0.0}
+    bernstein_bound: {type: float, min: 0.0, max: 1.0}
+    bad_denominator_prob_exact: {type: float, min: 0.0, max: 1.0}
+    bad_denominator_prob_empirical: {type: float, min: 0.0, max: 1.0}
+    clip_activation_rate: {type: float, min: 0.0, max: 1.0}
+    mse_clipped: {type: float, min: 0.0}
+    mse_ordinary_finite: {type: float, min: 0.0}
+    ordinary_nonfinite_rate: {type: float, min: 0.0, max: 1.0}
+    p1_leading_mse: {type: float, min: 0.0}
+    relative_deviation_clipped: {type: float}
+    relative_deviation_ordinary_finite: {type: float}
+    excess_kurtosis_clipped: {type: float}
+    excess_kurtosis_ordinary_finite: {type: float}
+
+e7_certified_crossing.csv:
+  format: csv
+  level: 1
+  row_matching_key: [noise_strength, resource_R]
+  columns:
+    noise_strength: {type: float, min: 0.0, max: 1.0}
+    resource_R: {type: float, min: 0.0}
+    mse_vd: {type: float, min: 0.0}
+    mse_sv: {type: float, min: 0.0}
+    mse_unmit: {type: float, min: 0.0}
+    crossing_R_empirical: {type: float}
+    crossing_R0_leading: {type: float}
+    eta_operational: {type: float, min: 0.0}
+    remainder_C_vd_operational: {type: float, min: 0.0}
+    remainder_C_unmit_operational: {type: float, min: 0.0}
+    remainder_source: {type: string, allowed: [fit_from_sampled_mse]}
+    method_pair: {type: string, allowed: [vd_vs_unmitigated]}
+
+e7_resource_observable_sensitivity.csv:
+  format: csv
+  level: 1
+  row_matching_key: [noise_strength, copies_M, observable_normalization, resource_definition, method_pair]
+  columns:
+    noise_strength: {type: float, min: 0.0, max: 1.0}
+    copies_M: {type: int, min: 1}
+    observable_normalization: {type: string, allowed: [inf, sector_trace_zero_spectral]}
+    resource_definition: {type: string, allowed: [paired_sample, hadamard_call, two_qubit_gate_proxy, wall_clock_proxy]}
+    method_pair: {type: string, allowed: [vd_vs_unmitigated, vd_vs_sv, sv_vs_unmitigated]}
+    method_a: {type: string, allowed: [vd, sv, unmitigated]}
+    method_b: {type: string, allowed: [vd, sv, unmitigated]}
+    kappa_vd: {type: float, min: 0.0}
+    kappa_sv: {type: float, min: 0.0}
+    kappa_unmitigated: {type: float, min: 0.0}
+    b2_a: {type: float, min: 0.0}
+    s_a: {type: float, min: 0.0}
+    b2_b: {type: float, min: 0.0}
+    s_b: {type: float, min: 0.0}
+    lower_bias_method: {type: string, allowed: [vd, sv, unmitigated]}
+    g_bias_gap: {type: float, min: 0.0}
+    delta_s_lower_minus_other: {type: float}
+    has_leading_crossing: {type: int, min: 0, max: 1}
+    leading_R0: {type: float, min: 0.0}
+    leading_regime: {type: string, allowed: [leading_crossing, uniform_dominance, degenerate_tie]}
+    winner_large_R: {type: string, allowed: [vd, sv, unmitigated, none]}

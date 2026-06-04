@@ -1,0 +1,5 @@
+experiment,grid_name,n_points,B_min,B_max,raw_condition,column_scaled_condition,threshold,status
+e1_quotient_decomposition,B_fast,9,200,8000,470033.8216471619,10.502506864503383,25.0,PASS
+e1_quotient_decomposition,B_full,12,200,30000,486730.53752831946,8.915963772064877,25.0,PASS
+e2_c_sv_zero,B_fast,8,500,12000,2958283.6884488687,11.631962205159084,25.0,PASS
+e2_c_sv_zero,B_full,11,500,40000,2994126.2279017894,9.449811660291024,25.0,PASS

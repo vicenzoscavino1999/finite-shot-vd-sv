@@ -1,0 +1,81 @@
+# Level 1 numerical tolerances.  verify.py checks |gen - ref| <= atol + rtol*|ref|.
+#
+# Closed-form / deterministic white-box columns use machine-tight tolerances.
+# Finite-shot columns are deterministic given the seed and the numpy bit-stream
+# (PCG64 binomial/multinomial draws are platform-independent), so they are also
+# tight here; Phase B recalibrates them from >=3 container runs and may relax
+# them for cross-BLAS ULP drift (REPRODUCIBILITY_PLAN tolerance registration).
+
+_defaults: {atol: 1.0e-10, rtol: 1.0e-8}
+
+e1_quotient_decomposition.csv:
+  columns:
+    mse: {atol: 1.0e-9, rtol: 1.0e-6}
+    mse_se: {atol: 1.0e-9, rtol: 1.0e-6}
+    beta0: {atol: 1.0e-9, rtol: 1.0e-6}
+    beta1: {atol: 1.0e-8, rtol: 1.0e-6}
+    beta2: {atol: 1.0e-6, rtol: 1.0e-6}
+    b2_closed_form: {atol: 1.0e-12, rtol: 0.0}
+    vtilde_closed_form: {atol: 1.0e-12, rtol: 0.0}
+    delta_aic: {atol: 1.0e-6, rtol: 1.0e-6}
+
+e2_c_sv_zero.csv:
+  columns:
+    bias_minus_pop: {atol: 1.0e-9, rtol: 1.0e-6}
+    c_slope_estimate: {atol: 1.0e-7, rtol: 1.0e-6}
+    c_slope_ci_lower: {atol: 1.0e-7, rtol: 1.0e-6}
+    c_slope_ci_upper: {atol: 1.0e-7, rtol: 1.0e-6}
+
+e3_delta_vd_generator.csv:
+  columns:
+    b_vd_inf: {atol: 1.0e-12, rtol: 0.0}
+    delta_vd_measured: {atol: 1.0e-10, rtol: 1.0e-9}
+    delta_vd_closed_form: {atol: 1.0e-12, rtol: 0.0}
+
+e4_delta_sv_firstorder.csv:
+  columns:
+    b_sv: {atol: 1.0e-12, rtol: 0.0}
+    delta_sv_measured: {atol: 1.0e-10, rtol: 1.0e-9}
+    delta_sv_closed_form: {atol: 1.0e-12, rtol: 0.0}
+
+e5_denominator_concentration.csv:
+  columns:
+    B_over_Bden: {atol: 1.0e-12, rtol: 1.0e-9}
+    D_M: {atol: 1.0e-12, rtol: 0.0}
+    B_den: {atol: 1.0e-9, rtol: 1.0e-9}
+    bernstein_bound: {atol: 1.0e-12, rtol: 1.0e-9}
+    bad_denominator_prob_exact: {atol: 1.0e-12, rtol: 1.0e-9}
+    bad_denominator_prob_empirical: {atol: 1.0e-9, rtol: 1.0e-6}
+    clip_activation_rate: {atol: 1.0e-9, rtol: 1.0e-6}
+    mse_clipped: {atol: 1.0e-9, rtol: 1.0e-6}
+    mse_ordinary_finite: {atol: 1.0e-9, rtol: 1.0e-6}
+    ordinary_nonfinite_rate: {atol: 1.0e-12, rtol: 0.0}
+    p1_leading_mse: {atol: 1.0e-12, rtol: 1.0e-9}
+    relative_deviation_clipped: {atol: 1.0e-9, rtol: 1.0e-6}
+    relative_deviation_ordinary_finite: {atol: 1.0e-9, rtol: 1.0e-6}
+    excess_kurtosis_clipped: {atol: 1.0e-8, rtol: 1.0e-6}
+    excess_kurtosis_ordinary_finite: {atol: 1.0e-7, rtol: 1.0e-6}
+
+e7_certified_crossing.csv:
+  columns:
+    mse_vd: {atol: 1.0e-9, rtol: 1.0e-6}
+    mse_sv: {atol: 1.0e-9, rtol: 1.0e-6}
+    mse_unmit: {atol: 1.0e-9, rtol: 1.0e-6}
+    crossing_R_empirical: {atol: 1.0e-6, rtol: 1.0e-6}
+    crossing_R0_leading: {atol: 1.0e-9, rtol: 1.0e-7}
+    eta_operational: {atol: 1.0e-9, rtol: 1.0e-7}
+    remainder_C_vd_operational: {atol: 1.0e-9, rtol: 1.0e-7}
+    remainder_C_unmit_operational: {atol: 1.0e-9, rtol: 1.0e-7}
+
+e7_resource_observable_sensitivity.csv:
+  columns:
+    kappa_vd: {atol: 1.0e-12, rtol: 0.0}
+    kappa_sv: {atol: 1.0e-12, rtol: 0.0}
+    kappa_unmitigated: {atol: 1.0e-12, rtol: 0.0}
+    b2_a: {atol: 1.0e-12, rtol: 1.0e-9}
+    s_a: {atol: 1.0e-12, rtol: 1.0e-9}
+    b2_b: {atol: 1.0e-12, rtol: 1.0e-9}
+    s_b: {atol: 1.0e-12, rtol: 1.0e-9}
+    g_bias_gap: {atol: 1.0e-12, rtol: 1.0e-9}
+    delta_s_lower_minus_other: {atol: 1.0e-12, rtol: 1.0e-9}
+    leading_R0: {atol: 1.0e-9, rtol: 1.0e-9}

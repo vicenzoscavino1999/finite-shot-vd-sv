@@ -1,0 +1,85 @@
+freeze_status: development_not_frozen
+description: "Declarative Level-1 grids used by pre-freeze diagnostics and fast reproduction."
+
+determinism:
+  pythonhashseed: 0
+  omp_num_threads: 1
+  mkl_num_threads: 1
+  openblas_num_threads: 1
+
+model:
+  n_qubits: 6
+  sector_weight: 2
+  qaoa_depth: 1
+  qaoa_angle_seed: 0
+  qaoa_angle_restarts: 8
+  noise_channel_seed: 1
+
+wls_condition:
+  design: [1, inv_B, inv_B_squared]
+  max_column_scaled_condition: 25.0
+
+lambda2_gap:
+  min_relative_gap: 0.1
+
+instance_selection:
+  master_seed: 20260604
+  sizes: [6, 8]
+  sector_weight_rule: n_over_2_minus_1
+  n_target_per_size: 5
+  graph_family: random_connected_weighted
+  weight_distribution:
+    dist: uniform
+    low: 0.5
+    high: 1.5
+  extra_edge_prob: 0.3
+  max_candidates_per_size: 50
+  min_entanglement_entropy_bits: 0.5
+
+experiments:
+  e1_quotient_decomposition:
+    p_fixed: 0.15
+    copies_M: 2
+    B_fast: [200, 317, 503, 798, 1265, 2006, 3181, 5045, 8000]
+    B_full: [200, 315, 497, 784, 1237, 1951, 3076, 4851, 7650, 12063, 19024, 30000]
+    T_fast: 2000
+    T_full: 20000
+  e2_c_sv_zero:
+    p_grid: [0.12, 0.173205, 0.25]
+    B_fast: [500, 787, 1240, 1952, 3074, 4840, 7621, 12000]
+    B_full: [500, 775, 1201, 1862, 2885, 4472, 6931, 10743, 16651, 25808, 40000]
+    T_fast: 4000
+    T_full: 40000
+  e3_delta_vd_generator:
+    p_grid_fast: [0.01, 0.014262, 0.020339, 0.029007, 0.041369, 0.058999, 0.084142, 0.12]
+    p_grid_full: [0.01, 0.012106, 0.014656, 0.017744, 0.021481, 0.026006, 0.031484, 0.038115, 0.046144, 0.055863, 0.06763, 0.081875, 0.099121, 0.12]
+  e4_delta_sv_firstorder:
+    p_grid_fast: [0.01, 0.014262, 0.020339, 0.029007, 0.041369, 0.058999, 0.084142, 0.12]
+    p_grid_full: [0.01, 0.012106, 0.014656, 0.017744, 0.021481, 0.026006, 0.031484, 0.038115, 0.046144, 0.055863, 0.06763, 0.081875, 0.099121, 0.12]
+  e5_denominator_concentration:
+    p_fixed: 0.20
+    copies_M: 3
+    B_over_Bden_fast: [0.125, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0]
+    B_over_Bden_full: [0.125, 0.177, 0.25, 0.354, 0.5, 0.707, 1.0, 1.414, 2.0, 4.0, 8.0]
+    T_fast: 20000
+    T_full: 100000
+  e7_certified_crossing:
+    p_fixed: 0.15
+    copies_M: 2
+    R_fast: [50, 79, 126, 200, 317, 502, 797, 1264, 2004, 3179, 5043, 8000]
+    R_full: [50, 67, 91, 122, 165, 222, 300, 404, 545, 734, 990, 1334, 1798, 2424, 3267, 4403, 5935, 8000]
+    T_fast: 4000
+    T_full: 20000
+    primary_method_pair: vd_vs_unmitigated
+  e7_resource_observable_sensitivity:
+    p_fixed: 0.15
+    copies_M: 2
+    resource_definitions: [paired_sample, hadamard_call, two_qubit_gate_proxy, wall_clock_proxy]
+    observable_normalizations: [inf, sector_trace_zero_spectral]
+    method_pairs: [vd_vs_unmitigated, vd_vs_sv, sv_vs_unmitigated]
+
+adjudication:
+  primary_family: [P1, P2, P3, P4, P5, P6]
+  secondary_family: [P7, P8, P9, P10, P11, P12, P13]
+  delta_aic_threshold: 2.0
+  tost_margin_fraction_of_c_vd: 0.1

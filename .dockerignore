@@ -1,0 +1,15 @@
+.git
+data/
+results/
+figures/
+paper/
+reproducibility/hardware/raw_counts/
+reproducibility/hardware/calibration_snapshots/
+*.pdf
+__pycache__/
+*.pyc
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.venv/
+venv/

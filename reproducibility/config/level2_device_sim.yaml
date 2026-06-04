@@ -1,0 +1,10 @@
+# Level 2 device-simulation (Aer noise model).  PHASE B -- not implemented in the
+# Phase A MVP.  Requires the [level2] optional dependencies (qiskit, qiskit-aer).
+# Validates laws in *form* (P1, P7, P8, P9, P13); coefficient claims stay at Level 1.
+
+level: 2
+qiskit_required: true
+status: not_implemented_phase_a
+experiments: [e5_denominator_concentration, e6_copy_log_scale, e7_certified_crossing,
+              e8_window_location_scaling, e12_efron_stein_operational]
+aer_noise_model_seed: 20260603

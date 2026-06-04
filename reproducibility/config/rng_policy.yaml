@@ -1,0 +1,26 @@
+# Randomness policy (REPRODUCIBILITY_PLAN randomness section).
+# All finite-shot and bootstrap randomness uses numpy.random.Generator(PCG64(seed)).
+# Seeds are arbitrary fixed constants, not tuned parameters.
+
+generator: "numpy.random.Generator(numpy.random.PCG64(seed))"
+
+per_experiment_seed:
+  e1_quotient_decomposition: 101
+  e2_c_sv_zero: 202
+  e3_delta_vd_generator: 303      # white-box only; seed unused but recorded
+  e4_delta_sv_firstorder: 404     # white-box only; seed unused but recorded
+  e5_denominator_concentration: 505
+  e7_certified_crossing: 707
+  e7_resource_observable_sensitivity: 808  # white-box only; seed unused but recorded
+
+bootstrap:
+  method: "resample T estimator replicas"
+  e1_mse_se_n_boot: 200
+
+model_freeze_seeds:
+  qaoa_angle_seed: 0        # optimize_angles restart seed
+  qaoa_angle_restarts: 8
+  noise_channel_seed: 1     # heterogeneous_ad_pd per-qubit rate draw
+
+# Level 2 (Aer) noise-model RNG seed is added in Phase B (not used at Level 1).
+aer_noise_model_seed: null

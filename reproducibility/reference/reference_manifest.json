@@ -1,0 +1,14 @@
+﻿{
+    "git_tag":  "v0.1.0-dev-mvp",
+    "pap_hash":  "PAP freeze status: NOT_FROZEN",
+    "created_utc":  "2026-06-04T04:31:50Z",
+    "files":  {
+                  "e1_quotient_decomposition.csv":  "sha256:28b48eb0cfbcfeaa7405c6e54f889e2481d912bbaebc1fd60b83f46e420904ac",
+                  "e2_c_sv_zero.csv":  "sha256:002727cbdf0afdccf1ef1f5b589f81efb46d005bc72036176fd411bd24ca791e",
+                  "e3_delta_vd_generator.csv":  "sha256:d1b38fb3de1f98111d88d74686a89e89879531e632ccd415ae99cb2ddd23417a",
+                  "e4_delta_sv_firstorder.csv":  "sha256:1feae29fa08d9b2d12ae7f415457099c299150de6eceed8da12736091019dcfd",
+                  "e5_denominator_concentration.csv":  "sha256:463f2f0eadcc0e827fa3962d4a0e62ec4a8db35daaee89a51cd774fab518148b",
+                  "e7_certified_crossing.csv":  "sha256:9f22e18c489408d8cd4eb9b2980be837f734895c36aa6a5ce36c2a3a405e38fd",
+                  "e7_resource_observable_sensitivity.csv":  "sha256:d94cd3eda711ea4be2afa9cfdd65b0b35bea84269d86f4e5b418a27d4a6f647e"
+              }
+}

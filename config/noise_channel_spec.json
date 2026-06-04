@@ -1,0 +1,60 @@
+{
+  "freeze_status": "development_not_frozen",
+  "level1_channel_rule": {
+    "name": "heterogeneous_amplitude_damping_plus_dephasing",
+    "constructor": "vd_sv.noise.heterogeneous_ad_pd",
+    "seed": 1,
+    "c_ad_range": [0.4, 1.3],
+    "c_pd_ratio": 0.4,
+    "p_range_used_by_level1": [0.01, 0.25],
+    "generator_check": "noise.assert_delta_consistency compares closed-form Delta with Richardson finite differences"
+  },
+  "level1_channels_by_size": {
+    "6": {
+      "n_qubits": 6,
+      "c_ad": [
+        0.8606394622302311,
+        1.2554173266933417,
+        0.5297436514476703,
+        1.2537845024235195,
+        0.6806483068094369,
+        0.7809938040753182
+      ],
+      "c_pd": [
+        0.34425578489209246,
+        0.5021669306773368,
+        0.21189746057906814,
+        0.5015138009694078,
+        0.2722593227237748,
+        0.3123975216301273
+      ]
+    },
+    "8": {
+      "n_qubits": 8,
+      "c_ad": [
+        0.8606394622302311,
+        1.2554173266933417,
+        0.5297436514476703,
+        1.2537845024235195,
+        0.6806483068094369,
+        0.7809938040753182,
+        1.1449323344383977,
+        0.7682792227322452
+      ],
+      "c_pd": [
+        0.34425578489209246,
+        0.5021669306773368,
+        0.21189746057906814,
+        0.5015138009694078,
+        0.2722593227237748,
+        0.3123975216301273,
+        0.4579729337753591,
+        0.30731168909289813
+      ]
+    }
+  },
+  "level2_backend_calibration": {
+    "status": "not_in_phase_a_scope",
+    "rule": "At PAP freeze, replace this section with backend snapshot metadata and rates calibrated by EXPERIMENTAL_PLAN section 5.5.3."
+  }
+}

@@ -1,0 +1,30 @@
+name: Reproducibility Check
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  reproduce:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/build-push-action@v5
+        with:
+          context: .
+          load: true
+          tags: vd-sv:test
+      - name: Level 1 fast reproduction + tests (no quantum-cloud account)
+        run: >
+          docker run --rm
+          -v ${{ github.workspace }}/ci-results:/app/results
+          vd-sv:test
+          bash -c "make reproduce-fast && make test"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ci-results
+          path: ci-results/
+      - name: Advisory dependency audit
+        run: docker run --rm vd-sv:test pip-audit || true
+        continue-on-error: true

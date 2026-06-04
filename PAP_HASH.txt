@@ -1,0 +1,16 @@
+PAP freeze status: NOT_FROZEN
+
+The pre-analysis plan (EXPERIMENTAL_PLAN.md) has NOT yet been frozen. No
+confirmatory adjudication of P1-P13 may be claimed until this file records the
+SHA-256 hash and UTC timestamp of the frozen PAP, together with the frozen
+[PRE-CONGELADO] artifacts required by EXPERIMENTAL_PLAN.md (power pilot,
+lambda_2 gap table, WLS condition number, compute budget, instance list, QAOA
+angles, channel constants).
+
+Until then, all generated outputs are development / exploratory only.
+
+When the PAP is frozen, replace this file with:
+
+  pap_sha256: <hex digest of EXPERIMENTAL_PLAN.md>
+  frozen_utc: <ISO-8601 UTC timestamp>
+  git_commit: <frozen commit SHA>
