@@ -2080,6 +2080,19 @@ The following items are intentionally left for the next version.
     \item Add numerical validation only after choosing the concrete QAOA instances and circuit implementation.
 \end{enumerate}
 
+\section{Code and data availability}
+
+The Phase A reproduction package contains a frozen pre-analysis plan, the
+Level~1 white-box NumPy/SciPy implementation, the pre-freeze artifacts, reference
+outputs, and verification scripts.  The frozen PAP hash is recorded in
+\texttt{PAP\_HASH.txt} and the corresponding target checksums are recorded in
+\texttt{freeze\_manifest.json}.  The Level~1 coefficient-validation and crossing
+checks are reproducible without a quantum-cloud account.  Level~2
+device-simulation and Level~3 hardware analyses are deferred to the archival
+Phase~B release; Level~3 is analysis-from-archived-counts only and does not
+require re-executing a quantum device.  The final public release will cite the
+version-specific archive DOI.
+
 \section{Conclusion}
 
 The strengthened mathematical core is this: VD and SV can be compared by finite-shot operating windows only after their residual bias floors, sampling coefficients, quotient corrections, and remainder regimes are all explicit.  In the closed one-qubit transcript, the selector can also be compared directly with conservative Le Cam and sharper local Fisher benchmarks; in the sector toy, the residual SV bias floor is compared with a restricted structural non-identifiability floor.  For VD, the key object is the quotient law plus the denominator certificate.  For SV, the key object is the projected first-order perturbation \(P\Delta P-\rho_\star\Tr(P\Delta P)\).  Once each method has a certified law

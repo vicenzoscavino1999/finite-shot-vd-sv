@@ -7,10 +7,11 @@ density-matrix core that carries the paper's coefficient-validation claims
 (`delta_VD`, `delta_SV`, `c_SV = 0`) and the certified crossing.
 
 > **Pre-analysis-plan status.** `EXPERIMENTAL_PLAN.md` is a pre-registered
-> pre-analysis plan (PAP). It is **NOT yet frozen** (see `PAP_HASH.txt`), so all
-> outputs here are *development / exploratory*, not confirmatory. Confirmatory
-> adjudication of P1–P13 begins only after the PAP is SHA-256 frozen together
-> with the `[PRE-CONGELADO]` artifacts.
+> pre-analysis plan (PAP). It is frozen under the SHA-256 value recorded in
+> `PAP_HASH.txt`, together with the required `[PRE-CONGELADO]` artifacts in
+> `freeze_manifest.json`. Confirmatory adjudication of P1-P13 starts from this
+> frozen design; reference outputs already in the repository are reproduction
+> fixtures unless explicitly promoted through the adjudication table.
 
 ## What this reproduces
 
@@ -49,14 +50,14 @@ The official environment is the Docker image (`Dockerfile`, `linux/amd64`) with
 pinned BLAS/OpenMP thread counts for tight numerical tolerances. Native
 Windows/macOS is fine for development.
 
-## Key scientific results (provisional, fast mode)
+## Key scientific results (fast reference mode)
 
 - **E1/P1–P2** — VD MSE intercept `beta0 ≈ b^2`; `beta1 ≈ v + 2bc`; the `1/B^2`
   curvature is needed for VD (ΔAIC ≈ 19 > 2) but not for the unmitigated control
   (ΔAIC < 0). `beta2` is **not** claimed to equal the certified remainder `C`.
-- **E2/P3–P4** — `c_SV = 0` exactly; `c_VD` matches `mu_VD (1-D^2)/D^2`. In
-  fast mode the VD CI excludes 0 only at the largest reported point (`p=0.25`);
-  the smaller points are development/power diagnostics.
+- **E2/P3–P4** — `c_SV = 0` exactly; `c_VD` matches `mu_VD (1-D^2)/D^2`. The
+  confirmatory full run uses the frozen `T_full=70000` setting fixed by the
+  pre-freeze pilot; fast-mode outputs are compact reference checks.
 - **E3/P5, E4/P6** — measured `delta_VD`, `delta_SV` slopes match the closed-form
   generators to ~2–4 % (O(p^2) slope-fit truncation).
 - **E5/P7** — for the VD cell `(p=0.20, M=3)`, the exact and empirical

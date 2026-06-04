@@ -1,6 +1,8 @@
 {
   "git_tag": "v0.1.0-dev-ensemble",
-  "pap_hash": "See repository root PAP_HASH.txt after PAP freeze",
+  "pap_hash": "31e92d21e0faf32ded9aad84a189fa7ae447afa1fdd9d835f16b74fb8bc443bd",
+  "frozen_commit_sha": "0814ba796b7d8819e709780ffa01e9f94be7a727",
+  "freeze_manifest": "freeze_manifest.json",
   "created_utc": "2026-06-04T06:19:34Z",
   "files": {
     "e1_quotient_decomposition.csv": "sha256:d3f99d8ddd1b3080368bdc1d1f60bf166222184961c8bf71b21c93d7dd934af6",
