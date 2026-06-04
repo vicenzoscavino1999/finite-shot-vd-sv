@@ -17,6 +17,9 @@
     "failure_protocol": [
       "pap/failure_protocol.md"
     ],
+    "hardware": [
+      "results/frozen/hardware_feasibility_note.md"
+    ],
     "instances": [
       "results/frozen/frozen_instances.csv"
     ],
@@ -35,10 +38,10 @@
       "results/frozen/wls_condition_report.csv"
     ]
   },
-  "created_utc": "2026-06-04T13:24:22Z",
-  "frozen_commit_sha": "945afabf85c2023dba359849d79313b68a7905d1",
+  "created_utc": "2026-06-04T13:56:13Z",
+  "frozen_commit_sha": "0814ba796b7d8819e709780ffa01e9f94be7a727",
   "hash_algorithm": "sha256",
-  "pap_hash": "8fe9f95848d12e202dcc94090b53b8d44c935a1ad63c4f3fa912e536b3294d7c",
+  "pap_hash": "31e92d21e0faf32ded9aad84a189fa7ae447afa1fdd9d835f16b74fb8bc443bd",
   "repo_root_name": "finite-shot-vd-sv",
   "schema_version": 1,
   "targets": [
@@ -65,6 +68,12 @@
       "category": "artifacts_pinned",
       "path": "results/frozen/frozen_qaoa_angles.csv",
       "sha256": "66b1037f29519038bf21a93c88d30e80735fc72f315dd91bce978d45a7a38ff5"
+    },
+    {
+      "bytes": 1053,
+      "category": "artifacts_pinned",
+      "path": "results/frozen/hardware_feasibility_note.md",
+      "sha256": "98716a4b2b53338a4d0775109307d08e975be76d1ed1e0a42100d94d6b8f0747"
     },
     {
       "bytes": 599,
@@ -157,10 +166,10 @@
       "sha256": "7dd4dc6fd1e86714fdec3f4d7fed87e0079775d472df51d719e5f97ad0e399ad"
     },
     {
-      "bytes": 9028,
+      "bytes": 9166,
       "category": "hashing",
       "path": "pap/hash_pap.py",
-      "sha256": "ac49d9bda23e597a871f7fdfa02040ece348a64eed09665421bd7d35c2b16589"
+      "sha256": "b47108dee7b730175e776a80b94903a17db69f653a2bb093d0fa592ba084ad7a"
     },
     {
       "bytes": 73621,
