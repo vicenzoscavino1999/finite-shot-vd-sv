@@ -3,7 +3,7 @@
 level: 1
 qiskit_required: false
 
-frozen_model: {from: level1_coefficients.yaml}
+frozen_ensemble: {from: level1_coefficients.yaml}
 
 experiments:
   e5_denominator_concentration:
@@ -19,9 +19,8 @@ experiments:
     copies_M: 2
     resource_grid: [50, 8000, 12]
     kappa: {vd: 2.0, sv: 1.0, unmitigated: 1.0}
-    # Finding (provisional): SV uniformly dominates VD at operational budgets for
-    # this instance family (selection_trichotomy_v10 regime II); the current
-    # diagnostic crossing demonstrated is VD vs unmitigated.
+    # Design note: E7 reports the registered VD vs unmitigated crossing; VD vs SV
+    # is retained in the resource/observable sensitivity output.
     operational_method_pair: vd_vs_unmitigated
   e7_resource_observable_sensitivity:
     predictions: [robustness]

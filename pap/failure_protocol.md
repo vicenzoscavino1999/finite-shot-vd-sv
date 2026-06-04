@@ -1,6 +1,6 @@
 # Failure Protocol
 
-Status: development_not_frozen. This file is a pre-freeze artifact required by
+Status: pap_freeze_ready. This file is a pre-freeze artifact required by
 `EXPERIMENTAL_PLAN.md` section 0.1. It defines actions before any confirmatory
 adjudication is allowed.
 

@@ -5,11 +5,12 @@
 level: 1
 qiskit_required: false
 
-frozen_model:        # provisional; replaced by results/frozen/ artifacts at PAP freeze
-  n_qubits: 6
-  sector_weight: 2                   # NOT n/2 (avoids particle-hole cancellation of delta)
-  instance: ring
-  ring_weights: [1.0, 1.3, 0.7, 1.1, 0.9, 1.2]
+frozen_ensemble:
+  instances_csv: results/frozen/frozen_instances.csv
+  qaoa_angles_csv: results/frozen/frozen_qaoa_angles.csv
+  sizes: [6, 8]
+  sector_weight_rule: n_over_2_minus_1
+  included_per_size: 5
   qaoa_depth: 1
   qaoa_angle_seed: 0
   qaoa_angle_restarts: 8

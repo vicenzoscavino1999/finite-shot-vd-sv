@@ -1,14 +1,14 @@
-﻿{
-    "git_tag":  "v0.1.0-dev-mvp",
-    "pap_hash":  "PAP freeze status: NOT_FROZEN",
-    "created_utc":  "2026-06-04T04:31:50Z",
-    "files":  {
-                  "e1_quotient_decomposition.csv":  "sha256:28b48eb0cfbcfeaa7405c6e54f889e2481d912bbaebc1fd60b83f46e420904ac",
-                  "e2_c_sv_zero.csv":  "sha256:002727cbdf0afdccf1ef1f5b589f81efb46d005bc72036176fd411bd24ca791e",
-                  "e3_delta_vd_generator.csv":  "sha256:d1b38fb3de1f98111d88d74686a89e89879531e632ccd415ae99cb2ddd23417a",
-                  "e4_delta_sv_firstorder.csv":  "sha256:1feae29fa08d9b2d12ae7f415457099c299150de6eceed8da12736091019dcfd",
-                  "e5_denominator_concentration.csv":  "sha256:463f2f0eadcc0e827fa3962d4a0e62ec4a8db35daaee89a51cd774fab518148b",
-                  "e7_certified_crossing.csv":  "sha256:9f22e18c489408d8cd4eb9b2980be837f734895c36aa6a5ce36c2a3a405e38fd",
-                  "e7_resource_observable_sensitivity.csv":  "sha256:d94cd3eda711ea4be2afa9cfdd65b0b35bea84269d86f4e5b418a27d4a6f647e"
-              }
+{
+  "git_tag": "v0.1.0-dev-ensemble",
+  "pap_hash": "See repository root PAP_HASH.txt after PAP freeze",
+  "created_utc": "2026-06-04T06:19:34Z",
+  "files": {
+    "e1_quotient_decomposition.csv": "sha256:d3f99d8ddd1b3080368bdc1d1f60bf166222184961c8bf71b21c93d7dd934af6",
+    "e2_c_sv_zero.csv": "sha256:e56e4d3d019a2ad60b9b78d42c60adde1aecc4641312c6079ff0397085f3e8f8",
+    "e3_delta_vd_generator.csv": "sha256:bf00081f7fba29bca96bc250c05a85a86d619381e4804afe48ec9430e1a1add4",
+    "e4_delta_sv_firstorder.csv": "sha256:e382a8196719b55be9cc4201196798dbb03a28b6fb282652656a818bc7362db1",
+    "e5_denominator_concentration.csv": "sha256:e528f331247b4bccea473a77b478e34b6c3e987a032e10dc816b4e0745ff70a7",
+    "e7_certified_crossing.csv": "sha256:ea93908438b9ab8cd85b8e78857434808053d9dbb8b93b2fb3fc56d78524f26a",
+    "e7_resource_observable_sensitivity.csv": "sha256:183dd450c6b4d588c28b9c1112c6e9e75b1e70efe4ebab283d5eff5baa2e8362"
+  }
 }

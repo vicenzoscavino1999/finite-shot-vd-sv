@@ -11,6 +11,7 @@ import numpy as np
 import yaml
 
 from experiments._common import log_grid, p_grid
+from experiments import e2_c_sv_zero
 from ground_truth import compute_lambda2_gaps
 from ground_truth import compute_frozen_model_specs as frozen_specs
 from ground_truth.instance_ensemble import sector_weight_for_size
@@ -47,6 +48,8 @@ def test_declared_grids_match_executable_helpers():
     np.testing.assert_allclose(
         exps["e2_c_sv_zero"]["p_grid"], p_grid(0.12, 0.25, 3), rtol=0, atol=0
     )
+    assert exps["e2_c_sv_zero"]["T_fast"] == e2_c_sv_zero.T_BY_MODE["fast"]
+    assert exps["e2_c_sv_zero"]["T_full"] == e2_c_sv_zero.T_BY_MODE["full"]
 
     for name in ("e3_delta_vd_generator", "e4_delta_sv_firstorder"):
         np.testing.assert_allclose(exps[name]["p_grid_fast"], p_grid(0.01, 0.12, 8), rtol=0, atol=0)

@@ -14,28 +14,61 @@ from pathlib import Path
 
 import numpy as np
 
-from ._common import default_model, p_grid, write_csv
+from ._common import frozen_models, p_grid, write_csv
 
-FIELDS = ["noise_strength", "b_vd_inf", "delta_vd_measured", "delta_vd_closed_form"]
+FIELDS = [
+    "instance_id",
+    "noise_strength",
+    "b_vd_inf",
+    "delta_vd_measured",
+    "delta_vd_closed_form",
+    "ensemble_delta_vd_measured_mean",
+    "ensemble_delta_vd_measured_std",
+    "ensemble_delta_vd_closed_form_mean",
+    "ensemble_delta_vd_closed_form_std",
+]
 
 
 def run(outdir: str | Path, mode: str = "fast", seed: int = 303) -> Path:
     npts = 8 if mode == "fast" else 14
     ps = p_grid(0.01, 0.12, npts)
-    m = default_model()
-    delta_closed = m.delta_vd()
+    rows = []
+    for m in frozen_models():
+        delta_closed = m.delta_vd()
+        b_inf = np.array([m.vd_floor(float(p))["b_VD_inf"] for p in ps])
+        # slope through origin: b(p) ~ delta*p + kappa*p^2
+        X = np.column_stack([ps, ps**2])
+        coeffs, *_ = np.linalg.lstsq(X, b_inf, rcond=None)
+        delta_measured = float(coeffs[0])
 
-    b_inf = np.array([m.vd_floor(float(p))["b_VD_inf"] for p in ps])
-    # slope through origin: b(p) ~ delta*p + kappa*p^2
-    X = np.column_stack([ps, ps**2])
-    coeffs, *_ = np.linalg.lstsq(X, b_inf, rcond=None)
-    delta_measured = float(coeffs[0])
-
-    rows = [{
-        "noise_strength": float(p), "b_vd_inf": float(bi),
-        "delta_vd_measured": delta_measured, "delta_vd_closed_form": delta_closed,
-    } for p, bi in zip(ps, b_inf)]
+        rows.extend({
+            "instance_id": m.inst.name,
+            "noise_strength": float(p),
+            "b_vd_inf": float(bi),
+            "delta_vd_measured": delta_measured,
+            "delta_vd_closed_form": delta_closed,
+        } for p, bi in zip(ps, b_inf))
+    _add_ensemble_stats(rows)
     return write_csv(Path(outdir) / "e3_delta_vd_generator.csv", FIELDS, rows)
+
+
+def _add_ensemble_stats(rows: list[dict]) -> None:
+    by_instance = {}
+    for row in rows:
+        by_instance[row["instance_id"]] = (
+            float(row["delta_vd_measured"]),
+            float(row["delta_vd_closed_form"]),
+        )
+    measured = np.array([vals[0] for vals in by_instance.values()], dtype=np.float64)
+    closed = np.array([vals[1] for vals in by_instance.values()], dtype=np.float64)
+    stats = {
+        "ensemble_delta_vd_measured_mean": float(np.mean(measured)),
+        "ensemble_delta_vd_measured_std": float(np.std(measured, ddof=1)) if measured.size > 1 else 0.0,
+        "ensemble_delta_vd_closed_form_mean": float(np.mean(closed)),
+        "ensemble_delta_vd_closed_form_std": float(np.std(closed, ddof=1)) if closed.size > 1 else 0.0,
+    }
+    for row in rows:
+        row.update(stats)
 
 
 if __name__ == "__main__":

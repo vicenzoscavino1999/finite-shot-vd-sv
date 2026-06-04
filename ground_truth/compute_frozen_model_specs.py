@@ -337,7 +337,7 @@ def _diagnostics_markdown(config: dict, rows: list[dict]) -> str:
     lines = [
         "# Instance selection diagnostics",
         "",
-        "Status: development_not_frozen.",
+        "Status: pap_freeze_ready.",
         "",
         f"Entropy threshold I2: {threshold} bits.",
         f"Included target per size: {target}.",

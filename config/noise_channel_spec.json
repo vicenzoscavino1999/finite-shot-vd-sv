@@ -1,5 +1,5 @@
 {
-  "freeze_status": "development_not_frozen",
+  "freeze_status": "pap_freeze_ready",
   "level1_channel_rule": {
     "name": "heterogeneous_amplitude_damping_plus_dephasing",
     "constructor": "vd_sv.noise.heterogeneous_ad_pd",
@@ -54,7 +54,7 @@
     }
   },
   "level2_backend_calibration": {
-    "status": "not_in_phase_a_scope",
-    "rule": "At PAP freeze, replace this section with backend snapshot metadata and rates calibrated by EXPERIMENTAL_PLAN section 5.5.3."
+    "status": "phase_a_deferred_by_design",
+    "rule": "Level 2 backend calibration is deferred to Phase B and requires a new frozen backend snapshot before any device-simulation confirmatory claim."
   }
 }

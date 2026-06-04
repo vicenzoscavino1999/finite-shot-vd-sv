@@ -1,4 +1,4 @@
-freeze_status: development_not_frozen
+freeze_status: pap_freeze_ready
 description: "Declarative Level-1 grids used by pre-freeze diagnostics and fast reproduction."
 
 determinism:
@@ -49,7 +49,7 @@ experiments:
     B_fast: [500, 787, 1240, 1952, 3074, 4840, 7621, 12000]
     B_full: [500, 775, 1201, 1862, 2885, 4472, 6931, 10743, 16651, 25808, 40000]
     T_fast: 4000
-    T_full: 40000
+    T_full: 70000
   e3_delta_vd_generator:
     p_grid_fast: [0.01, 0.014262, 0.020339, 0.029007, 0.041369, 0.058999, 0.084142, 0.12]
     p_grid_full: [0.01, 0.012106, 0.014656, 0.017744, 0.021481, 0.026006, 0.031484, 0.038115, 0.046144, 0.055863, 0.06763, 0.081875, 0.099121, 0.12]
@@ -83,3 +83,14 @@ adjudication:
   secondary_family: [P7, P8, P9, P10, P11, P12, P13]
   delta_aic_threshold: 2.0
   tost_margin_fraction_of_c_vd: 0.1
+
+pilot_power:
+  mode: full
+  seed: 11001
+  precision_safety_factor: 1.25
+  min_primary_power: 0.9
+  delta_abs_floor_min: 0.01
+  delta_consistency_abs_tol: 0.01
+  delta_near_zero_policy: inconclusive_by_design
+  kurtosis_warn_threshold: 50.0
+  shots_per_second_estimate: 75000000

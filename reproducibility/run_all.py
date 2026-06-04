@@ -86,8 +86,8 @@ def preflight(level: int, output: Path) -> list[str]:
     output.mkdir(parents=True, exist_ok=True)
     if not os.access(output, os.W_OK):
         raise SystemExit(f"output directory not writable: {output}")
-    if "NOT_FROZEN" in _pap_hash():
-        warnings.append("PAP is NOT_FROZEN: outputs are development/exploratory, not confirmatory")
+    if _pap_hash() == "absent":
+        warnings.append("PAP hash absent: outputs are development/exploratory, not confirmatory")
     LOG.info("numpy %s, scipy %s, python %s", np.__version__, scipy.__version__,
              platform.python_version())
     for w in warnings:

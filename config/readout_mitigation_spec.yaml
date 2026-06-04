@@ -1,4 +1,4 @@
-freeze_status: development_not_frozen
+freeze_status: pap_freeze_ready
 scope: "Level 2/3 only; Level 1 assumes ideal measurement."
 
 primary_method:

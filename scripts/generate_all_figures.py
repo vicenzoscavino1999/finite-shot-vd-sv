@@ -18,7 +18,7 @@ from vd_sv.plotting import _col, _require_mpl, load_csv  # noqa: E402
 
 
 def fig_e1(plt):
-    rows = load_csv(RESULTS / "e1_quotient_decomposition.csv")
+    rows = _primary_rows(load_csv(RESULTS / "e1_quotient_decomposition.csv"))
     fig, ax = plt.subplots(figsize=(5, 4))
     for method, mk in (("vd", "o"), ("unmitigated", "s")):
         sub = [r for r in rows if r["method"] == method]
@@ -30,7 +30,7 @@ def fig_e1(plt):
 
 
 def fig_e2(plt):
-    rows = load_csv(RESULTS / "e2_c_sv_zero.csv")
+    rows = _primary_rows(load_csv(RESULTS / "e2_c_sv_zero.csv"))
     p0 = sorted({float(r["noise_strength"]) for r in rows})[-1]
     fig, ax = plt.subplots(figsize=(5, 4))
     for method, mk in (("vd", "o"), ("sv", "s")):
@@ -44,7 +44,7 @@ def fig_e2(plt):
 
 
 def fig_delta(plt, name, fname, title):
-    rows = load_csv(RESULTS / name)
+    rows = _primary_rows(load_csv(RESULTS / name))
     bcol = "b_vd_inf" if "vd" in name else "b_sv"
     mcol = "delta_vd_measured" if "vd" in name else "delta_sv_measured"
     ccol = "delta_vd_closed_form" if "vd" in name else "delta_sv_closed_form"
@@ -59,7 +59,7 @@ def fig_delta(plt, name, fname, title):
 
 
 def fig_e5(plt):
-    rows = load_csv(RESULTS / "e5_denominator_concentration.csv")
+    rows = _primary_rows(load_csv(RESULTS / "e5_denominator_concentration.csv"))
     x = _col(rows, "B_over_Bden")
     fig, ax = plt.subplots(figsize=(5, 4))
     ax.loglog(x, _col(rows, "bernstein_bound"), "-o", ms=3, label="Bernstein bound")
@@ -73,7 +73,7 @@ def fig_e5(plt):
 
 
 def fig_e7(plt):
-    rows = load_csv(RESULTS / "e7_certified_crossing.csv")
+    rows = _primary_rows(load_csv(RESULTS / "e7_certified_crossing.csv"))
     R = _col(rows, "resource_R")
     fig, ax = plt.subplots(figsize=(5, 4))
     for col, lab in (("mse_vd", "VD"), ("mse_sv", "SV"), ("mse_unmit", "unmitigated")):
@@ -88,7 +88,7 @@ def fig_e7(plt):
 
 def fig_e7_sensitivity(plt):
     rows = [
-        r for r in load_csv(RESULTS / "e7_resource_observable_sensitivity.csv")
+        r for r in _primary_rows(load_csv(RESULTS / "e7_resource_observable_sensitivity.csv"))
         if r["method_pair"] == "vd_vs_unmitigated"
     ]
     resource_defs = list(dict.fromkeys(r["resource_definition"] for r in rows))
@@ -122,6 +122,14 @@ def main() -> int:
     fig_e7_sensitivity(plt)
     print(f"wrote figures to {FIGURES}")
     return 0
+
+
+def _primary_rows(rows):
+    instance_ids = sorted({r.get("instance_id", "") for r in rows if r.get("instance_id")})
+    if not instance_ids:
+        return rows
+    primary = instance_ids[0]
+    return [r for r in rows if r.get("instance_id") == primary]
 
 
 if __name__ == "__main__":

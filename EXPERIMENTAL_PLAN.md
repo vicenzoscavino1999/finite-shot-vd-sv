@@ -83,7 +83,7 @@ La siguiente tabla es el control maestro del PAP. Ningún análisis confirmatori
 | Fallos | Protocolo de fallo | `pap/failure_protocol.md` | Acciones predefinidas para fallos primarios/secundarios |
 | Reproducibilidad | Manifest de congelado | `freeze_manifest.json` | SHA-256 de PAP, configs, scripts, outputs pre-congelados y commit |
 
-**Regla de bloqueo.** Si cualquiera de estos artefactos falta, el estado del proyecto es `NO_FREEZE`. Si existe pero contiene campos `TBD`, `provisional`, `to be decided`, `p.ej.`, `example`, o valores confirmatorios no numéricos, el estado sigue siendo `NO_FREEZE`.
+**Regla de bloqueo.** Si cualquiera de estos artefactos falta, el estado del proyecto es `NO_FREEZE`. Si existe pero contiene marcadores de decisión pendiente, valores ilustrativos en lugar de números congelados, o valores confirmatorios no numéricos, el estado sigue siendo `NO_FREEZE`.
 
 ## 0.2 Frontera entre diseño, pilot y corrida final
 
@@ -289,6 +289,7 @@ Es el gap más grave de v2 ("≥5 distintas, congeladas" sin ensemble, semilla n
 Cada tolerancia se **deriva** de un anclaje declarado; no se elige:
 
 - **`τ_δ`, `τ`, semiancho de exponentes — anclaje (i) precisión-pilot.** Se fijan al semiancho de CI que el pilot (§11) demuestre alcanzable con el diseño congelado, **más un margen pre-registrado**. No se elige 0.15 a priori: el pilot reporta el alcanzable y se congela `τ_δ` como ese valor + margen. Si el alcanzable no bate el target de relevancia física, se ajusta `T`/rejilla antes del hash o se degrada la predicción a inconclusa-por-diseño (declarándolo). *(P, `[PRE-CONGELADO]`.)*
+- **Regla de `δ` cerca de cero.** P5/P6 no usan error relativo puro cuando el denominador físico es casi nulo. En la ruta determinista actual, el chequeo P5/P6 es consistencia white-box: se reporta `delta_fit_abs_error` y debe cumplir `delta_fit_abs_error <= delta_consistency_abs_tol`, con `delta_consistency_abs_tol` pre-registrado en `config/grids.yaml` como escala de relevancia física. Separadamente, `delta_abs_floor = max(tau_delta_value, delta_abs_floor_min)` define cuándo el componente relativo se marca `INCONCLUSIVE_BY_DESIGN_NEAR_ZERO`. La instancia permanece en el ensemble y no se reemplaza. *(P/C, `[PRE-CONGELADO]`.)*
 - **`δ_c` (margen TOST para `c_SV=0`) — anclaje (iii) ground-truth, con corrección de circularidad.** La v2 lo ataba a `|c_VD|` **observado**, que es un estadístico de salida → circular. Corregido: `δ_c = f·|c_VD^white-box|` con `f` pre-registrado (con interpretación documentada, por ejemplo una década de separación estructural), usando el `c_VD` **exacto de Nivel 1**, independiente de los datos de registro. *(D, `[CORREGIDO]`.)*
 - **ΔAIC > 2:** convención estándar de selección de modelo. *(C.)*
 
@@ -371,6 +372,7 @@ Para cada celda se guarda el vector de `T` estimaciones `{μ̂_t}`. De ahí:
   - calcular el **número de condición** del design matrix `[1, 1/B, 1/B²]` sobre la rejilla de `B`; como la rejilla está congelada, este número es **computable antes del hash** `[PRE-CONGELADO]` y se pre-registra un umbral. Si lo excede, la rejilla de `B` se densifica/extiende *antes* de congelar.
   - donde la colinealidad sea inevitable (alto `p`), usar **ajuste con restricción** (fijar el signo de la curvatura) o **profile-likelihood** para `β₀` con `β₁,β₂` como nuisance.
   - **propagar la incertidumbre de `β₀` (vía bootstrap conjunto) al CI de `δ̂`**, de modo que el presupuesto `τ_δ` refleje el error heredado de P1/P2, no solo el de la regresión `b(p)~p`. P5/P6 no se adjudican con `τ_δ` sin esta propagación.
+- **Ruta confirmatoria actual de Nivel 1.** E3/E4 usan directamente `b_VD,∞(p)` y `b_SV(p)` white-box exactos, sin extraer `β₀` desde datos finite-shot; por tanto P5/P6 son un chequeo determinista de consistencia interna del generador, no un test de potencia. El pilot reporta `tau_delta_value` solo como precisión de regresión informativa y adjudica la consistencia contra `delta_consistency_abs_tol`, que no depende del error observado. Si el PAP cambia a una ruta finite-shot para `δ`, esta frase deja de aplicar y la propagación bootstrap de `β₀` vuelve a ser bloqueante antes del hash.
 
 ### 7.4 Coeficiente de muestreo `v_m`, `s_m`
 - `v̂_m = β₁ − 2 b̂_m ĉ_m` (despeje de ṽ). Contraste contra `v_VD = (σ²_N + μ² σ²_D − 2μ σ_ND)/D²` y `v_SV = σ²_acc/a`.
@@ -432,8 +434,8 @@ Para cada Pk: **CONFIRMA / REFUTA / INCONCLUSO** según (a) inclusión del valor
 | P2 | primaria | Nivel 1 | E1 | `b²` | `β₀` | 95% BCa | `b²_pred ∈ CI` | vacío |
 | P3 | primaria | Nivel 1 | E2 | `c_VD` | pendiente vs `1/B` | 95% BCa | excluye 0 + error relativo ≤ `τ` | vacío |
 | P4 | primaria | Nivel 1 | E2 | 0 | TOST `c_SV` | margen `δ_c` | equivalencia dentro del margen | vacío |
-| P5 | primaria | Nivel 1 | E3 | `δ_VD` | pendiente `b(p)` | 95% BCa | dentro CI + error relativo ≤ `τ_δ` | vacío |
-| P6 | primaria | Nivel 1 | E4 | `δ_SV` | pendiente `b(p)` | 95% BCa | dentro CI + error relativo ≤ `τ_δ` | vacío |
+| P5 | primaria | Nivel 1 | E3 | `δ_VD` | pendiente `b(p)` white-box | determinista | `delta_fit_abs_error <= delta_consistency_abs_tol`; si `|δ| < delta_abs_floor`, `INCONCLUSO` near-zero | vacío |
+| P6 | primaria | Nivel 1 | E4 | `δ_SV` | pendiente `b(p)` white-box | determinista | `delta_fit_abs_error <= delta_consistency_abs_tol`; si `|δ| < delta_abs_floor`, `INCONCLUSO` near-zero | vacío |
 | P7–P13 | secundaria/descriptiva | según §8 | E5–E12 | según §2 | según §7 | 95% BCa/cluster | criterio específico de cada Pk | vacío |
 
 El campo `Estado` solo puede tomar `CONFIRMA`, `REFUTA`, `INCONCLUSO` o `EXPLORATORIO`. No se permite crear nuevos estados después de ver datos.
@@ -501,7 +503,7 @@ Si el pilot muestra potencia insuficiente para P3–P6, se ajusta el diseño ant
 
 El dimensionamiento debe **demostrarse alcanzable mediante un pilot simulado ejecutado antes del hash**, no solo argumentarse por fórmula asintótica. El pilot y su regla de decisión se pre-registran.
 
-- **Pilot de potencia (precondición del congelado).** Sobre Nivel 1, 1–2 instancias y una rejilla de `p` gruesa, estimar empíricamente: (i) la curtosis por celda; (ii) el semiancho de CI alcanzable para `δ̂` (P5/P6) **incluyendo la propagación de `β₀`** (§7.3); (iii) la potencia del test de pendiente `c_VD≠0` y del TOST `c_SV` (P3/P4); (iv) el semiancho de CI de los exponentes (P8/P10). **Regla de decisión pre-registrada:** si el pilot muestra el diseño subpotenciado para `τ_δ=0.15` o para potencia ≥ 0.9 en los tests discriminantes, ajustar `T`, el rango de `B`, o el nº de puntos de `p` **antes** de congelar. Este ajuste es legítimo porque es pre-data-de-registro.
+- **Pilot de potencia (precondición del congelado).** Sobre Nivel 1, el ensemble completo congelado (10 instancias), una rejilla de `p` gruesa propia del pilot y semillas propias que no se reutilizan en la corrida confirmatoria, estimar empíricamente/analíticamente: (i) la curtosis por celda; (ii) la precisión determinista de la regresión de `δ` y el error de truncación contra `delta_consistency_abs_tol`; (iii) la potencia del test de pendiente `c_VD≠0` y del TOST `c_SV` (P3/P4); (iv) opcionalmente el semiancho de CI de los exponentes (P8/P10). **Regla de decisión pre-registrada:** si el pilot muestra potencia < 0.9 en P3/P4, o si `delta_fit_abs_error > delta_consistency_abs_tol` para P5/P6, ajustar `T`, el rango de `B`, el nº de puntos de `p`, o degradar el endpoint **antes** de congelar; si un `δ` cae por debajo de `delta_abs_floor`, se reporta `INCONCLUSO` por diseño, no refutación. Este ajuste es legítimo porque es pre-data-de-registro.
 - **MSE:** error relativo de `MŜE` con T réplicas `≈ √(2/T)·(1+exceso de curtosis/2)^{1/2}`. Para 5% relativo con colas moderadas ⇒ `T ≳ 1500–2000` (cifra a confirmar por el pilot). Subir T donde el cociente tenga colas pesadas (cerca/por debajo de B_den).
 - **Pendiente `c_m` (P3/P4):** calcular el `B`-rango mínimo y `T` para que el CI de la pendiente excluya 0 (VD) y caiga dentro de `δ_c` (SV) con potencia ≥ 0.9. Pre-registrar el resultado del pilot.
 - **Exponentes (P8, P10):** nº de puntos de p / B y rango (≥1.5 décadas) para CI de exponente con semiancho < 0.15, confirmado por el pilot.

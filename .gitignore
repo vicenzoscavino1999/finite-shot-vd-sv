@@ -14,6 +14,10 @@ venv/
 # Results / data / figures are regenerated; keep dirs (via .gitkeep) but not contents
 results/*
 !results/.gitkeep
+!results/pilot/
+results/pilot/*
+!results/pilot/pilot_power_report.csv
+!results/pilot/pilot_power_report.md
 results/.partial/*
 !results/.partial/.gitkeep
 data/*

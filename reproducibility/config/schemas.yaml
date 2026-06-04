@@ -4,8 +4,9 @@
 e1_quotient_decomposition.csv:
   format: csv
   level: 1
-  row_matching_key: [noise_strength, B, method]
+  row_matching_key: [instance_id, noise_strength, B, method]
   columns:
+    instance_id: {type: string}
     noise_strength: {type: float, min: 0.0, max: 1.0}
     B: {type: int, min: 1}
     method: {type: string, allowed: [vd, unmitigated]}
@@ -17,12 +18,19 @@ e1_quotient_decomposition.csv:
     b2_closed_form: {type: float}
     vtilde_closed_form: {type: float}
     delta_aic: {type: float}
+    ensemble_beta0_mean: {type: float}
+    ensemble_beta0_std: {type: float, min: 0.0}
+    ensemble_beta1_mean: {type: float}
+    ensemble_beta1_std: {type: float, min: 0.0}
+    ensemble_delta_aic_mean: {type: float}
+    ensemble_delta_aic_std: {type: float, min: 0.0}
 
 e2_c_sv_zero.csv:
   format: csv
   level: 1
-  row_matching_key: [noise_strength, B, method]
+  row_matching_key: [instance_id, noise_strength, B, method]
   columns:
+    instance_id: {type: string}
     noise_strength: {type: float, min: 0.0, max: 1.0}
     B: {type: int, min: 1}
     method: {type: string, allowed: [vd, sv]}
@@ -30,32 +38,45 @@ e2_c_sv_zero.csv:
     c_slope_estimate: {type: float}
     c_slope_ci_lower: {type: float}
     c_slope_ci_upper: {type: float}
+    ensemble_c_slope_mean: {type: float}
+    ensemble_c_slope_std: {type: float, min: 0.0}
 
 e3_delta_vd_generator.csv:
   format: csv
   level: 1
-  row_matching_key: [noise_strength]
+  row_matching_key: [instance_id, noise_strength]
   columns:
+    instance_id: {type: string}
     noise_strength: {type: float, min: 0.0, max: 1.0}
     b_vd_inf: {type: float}
     delta_vd_measured: {type: float}
     delta_vd_closed_form: {type: float}
+    ensemble_delta_vd_measured_mean: {type: float}
+    ensemble_delta_vd_measured_std: {type: float, min: 0.0}
+    ensemble_delta_vd_closed_form_mean: {type: float}
+    ensemble_delta_vd_closed_form_std: {type: float, min: 0.0}
 
 e4_delta_sv_firstorder.csv:
   format: csv
   level: 1
-  row_matching_key: [noise_strength]
+  row_matching_key: [instance_id, noise_strength]
   columns:
+    instance_id: {type: string}
     noise_strength: {type: float, min: 0.0, max: 1.0}
     b_sv: {type: float}
     delta_sv_measured: {type: float}
     delta_sv_closed_form: {type: float}
+    ensemble_delta_sv_measured_mean: {type: float}
+    ensemble_delta_sv_measured_std: {type: float, min: 0.0}
+    ensemble_delta_sv_closed_form_mean: {type: float}
+    ensemble_delta_sv_closed_form_std: {type: float, min: 0.0}
 
 e5_denominator_concentration.csv:
   format: csv
   level: 1
-  row_matching_key: [noise_strength, copies_M, method, B]
+  row_matching_key: [instance_id, noise_strength, copies_M, method, B]
   columns:
+    instance_id: {type: string}
     noise_strength: {type: float, min: 0.0, max: 1.0}
     copies_M: {type: int, min: 1}
     method: {type: string, allowed: [vd]}
@@ -79,8 +100,9 @@ e5_denominator_concentration.csv:
 e7_certified_crossing.csv:
   format: csv
   level: 1
-  row_matching_key: [noise_strength, resource_R]
+  row_matching_key: [instance_id, noise_strength, resource_R]
   columns:
+    instance_id: {type: string}
     noise_strength: {type: float, min: 0.0, max: 1.0}
     resource_R: {type: float, min: 0.0}
     mse_vd: {type: float, min: 0.0}
@@ -97,8 +119,9 @@ e7_certified_crossing.csv:
 e7_resource_observable_sensitivity.csv:
   format: csv
   level: 1
-  row_matching_key: [noise_strength, copies_M, observable_normalization, resource_definition, method_pair]
+  row_matching_key: [instance_id, noise_strength, copies_M, observable_normalization, resource_definition, method_pair]
   columns:
+    instance_id: {type: string}
     noise_strength: {type: float, min: 0.0, max: 1.0}
     copies_M: {type: int, min: 1}
     observable_normalization: {type: string, allowed: [inf, sector_trace_zero_spectral]}

@@ -1,6 +1,6 @@
 # Instance selection diagnostics
 
-Status: development_not_frozen.
+Status: pap_freeze_ready.
 
 Entropy threshold I2: 0.5 bits.
 Included target per size: 5.

@@ -19,11 +19,12 @@ from scipy.stats import binom
 
 from vd_sv.estimators import make_rng, mse
 
-from ._common import default_model, write_csv
+from ._common import frozen_models, stable_seed, write_csv
 
 P_FIXED = 0.20
 M_COPIES = 3
 FIELDS = [
+    "instance_id",
     "noise_strength",
     "copies_M",
     "method",
@@ -53,50 +54,51 @@ def run(outdir: str | Path, mode: str = "fast", seed: int = 505) -> Path:
         if mode == "fast"
         else np.array([0.125, 0.177, 0.25, 0.354, 0.5, 0.707, 1.0, 1.414, 2.0, 4.0, 8.0])
     )
-    rng = make_rng(seed)
-    model = default_model()
-    vdc = model.vd(P_FIXED, M_COPIES)
-    d_m = float(vdc["D_M"])
-    n_m = float(vdc["N_M"])
-    b_den = float(vdc["B_den"])
-
     rows = []
-    for factor in factors:
-        B = max(2, int(round(b_den * float(factor))))
-        n_hat, d_hat = _sample_vd_stream_means(n_m, d_m, B, t, rng)
-        clipped = n_hat / np.maximum(d_hat, 0.5 * d_m)
-        with np.errstate(divide="ignore", invalid="ignore"):
-            ordinary = n_hat / d_hat
-        finite = np.isfinite(ordinary)
-        ordinary_finite = ordinary[finite]
+    for model in frozen_models():
+        rng = make_rng(stable_seed(seed, model.inst.name, "e5"))
+        vdc = model.vd(P_FIXED, M_COPIES)
+        d_m = float(vdc["D_M"])
+        n_m = float(vdc["N_M"])
+        b_den = float(vdc["B_den"])
 
-        bad_emp = float(np.mean(d_hat < 0.5 * d_m))
-        clip_rate = bad_emp
-        leading = float(vdc["b_VD"] ** 2 + vdc["v_tilde_VD"] / B)
-        mse_clip = mse(clipped, model.mu_star)
-        mse_ord = float(np.mean((ordinary_finite - model.mu_star) ** 2))
+        for factor in factors:
+            B = max(2, int(round(b_den * float(factor))))
+            n_hat, d_hat = _sample_vd_stream_means(n_m, d_m, B, t, rng)
+            clipped = n_hat / np.maximum(d_hat, 0.5 * d_m)
+            with np.errstate(divide="ignore", invalid="ignore"):
+                ordinary = n_hat / d_hat
+            finite = np.isfinite(ordinary)
+            ordinary_finite = ordinary[finite]
 
-        rows.append({
-            "noise_strength": P_FIXED,
-            "copies_M": M_COPIES,
-            "method": "vd",
-            "B": B,
-            "B_over_Bden": float(B / b_den),
-            "D_M": d_m,
-            "B_den": b_den,
-            "bernstein_bound": _bernstein_bound(d_m, B),
-            "bad_denominator_prob_exact": _bad_denominator_prob_exact(d_m, B),
-            "bad_denominator_prob_empirical": bad_emp,
-            "clip_activation_rate": clip_rate,
-            "mse_clipped": mse_clip,
-            "mse_ordinary_finite": mse_ord,
-            "ordinary_nonfinite_rate": float(1.0 - np.mean(finite)),
-            "p1_leading_mse": leading,
-            "relative_deviation_clipped": float((mse_clip - leading) / leading),
-            "relative_deviation_ordinary_finite": float((mse_ord - leading) / leading),
-            "excess_kurtosis_clipped": _excess_kurtosis(clipped),
-            "excess_kurtosis_ordinary_finite": _excess_kurtosis(ordinary_finite),
-        })
+            bad_emp = float(np.mean(d_hat < 0.5 * d_m))
+            clip_rate = bad_emp
+            leading = float(vdc["b_VD"] ** 2 + vdc["v_tilde_VD"] / B)
+            mse_clip = mse(clipped, model.mu_star)
+            mse_ord = float(np.mean((ordinary_finite - model.mu_star) ** 2))
+
+            rows.append({
+                "instance_id": model.inst.name,
+                "noise_strength": P_FIXED,
+                "copies_M": M_COPIES,
+                "method": "vd",
+                "B": B,
+                "B_over_Bden": float(B / b_den),
+                "D_M": d_m,
+                "B_den": b_den,
+                "bernstein_bound": _bernstein_bound(d_m, B),
+                "bad_denominator_prob_exact": _bad_denominator_prob_exact(d_m, B),
+                "bad_denominator_prob_empirical": bad_emp,
+                "clip_activation_rate": clip_rate,
+                "mse_clipped": mse_clip,
+                "mse_ordinary_finite": mse_ord,
+                "ordinary_nonfinite_rate": float(1.0 - np.mean(finite)),
+                "p1_leading_mse": leading,
+                "relative_deviation_clipped": float((mse_clip - leading) / leading),
+                "relative_deviation_ordinary_finite": float((mse_ord - leading) / leading),
+                "excess_kurtosis_clipped": _excess_kurtosis(clipped),
+                "excess_kurtosis_ordinary_finite": _excess_kurtosis(ordinary_finite),
+            })
     return write_csv(Path(outdir) / "e5_denominator_concentration.csv", FIELDS, rows)
 
 

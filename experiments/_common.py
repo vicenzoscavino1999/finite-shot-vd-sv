@@ -11,6 +11,8 @@ final adjudication step.
 from __future__ import annotations
 
 import csv
+import hashlib
+import json
 from dataclasses import replace
 from pathlib import Path
 
@@ -29,6 +31,9 @@ CHANNEL_SEED = 1
 KAPPA_VD = 2.0   # VD uses numerator + denominator streams (eq. resource_normalization_v13)
 KAPPA_SV = 1.0
 KAPPA_UNMIT = 1.0
+REPO_ROOT = Path(__file__).resolve().parents[1]
+FROZEN_INSTANCES = REPO_ROOT / "results" / "frozen" / "frozen_instances.csv"
+FROZEN_ANGLES = REPO_ROOT / "results" / "frozen" / "frozen_qaoa_angles.csv"
 
 
 def default_model(observable_normalization: str = "inf") -> cf.WhiteBoxModel:
@@ -41,6 +46,29 @@ def default_model(observable_normalization: str = "inf") -> cf.WhiteBoxModel:
     obs = normalized_observable(inst, observable_normalization)
     mu_star = float(np.real(model.psi.conj() @ (obs @ model.psi)))
     return replace(model, observable=obs, mu_star=mu_star)
+
+
+def frozen_models(observable_normalization: str = "inf") -> list[cf.WhiteBoxModel]:
+    """Build the included pre-freeze ensemble from pinned CSV artifacts."""
+    if not FROZEN_INSTANCES.exists() or not FROZEN_ANGLES.exists():
+        return [default_model(observable_normalization=observable_normalization)]
+    instance_rows = _read_csv(FROZEN_INSTANCES)
+    angle_rows = _read_csv(FROZEN_ANGLES)
+    models = [
+        _model_from_frozen_row(row, angle_rows, observable_normalization)
+        for row in sorted(
+            instance_rows,
+            key=lambda r: (int(r["size_n"]), int(r["candidate_index"]), r["instance_id"]),
+        )
+        if row["selection_status"] == "included"
+    ]
+    return models or [default_model(observable_normalization=observable_normalization)]
+
+
+def stable_seed(base_seed: int, *parts: object) -> int:
+    payload = "|".join([str(int(base_seed)), *(str(part) for part in parts)]).encode("utf-8")
+    digest = hashlib.sha256(payload).digest()
+    return int.from_bytes(digest[:8], "big") % (2**63)
 
 
 def normalized_observable(inst: qaoa.QAOAInstance, normalization: str) -> np.ndarray:
@@ -74,6 +102,41 @@ def write_csv(path: str | Path, fieldnames: list[str], rows: list[dict]) -> Path
         for r in rows:
             w.writerow(r)
     return path
+
+
+def _model_from_frozen_row(
+    row: dict,
+    angle_rows: list[dict],
+    observable_normalization: str,
+) -> cf.WhiteBoxModel:
+    matching = sorted(
+        (a for a in angle_rows if a["instance_id"] == row["instance_id"]),
+        key=lambda a: int(a["layer"]),
+    )
+    if not matching:
+        raise ValueError(f"missing frozen angles for {row['instance_id']}")
+    inst = qaoa.QAOAInstance(
+        n=int(row["size_n"]),
+        weight=int(row["sector_weight"]),
+        edges=tuple((int(i), int(j)) for i, j in json.loads(row["edges_json"])),
+        weights=tuple(float(x) for x in json.loads(row["weights_json"])),
+        mixer_edges=tuple((int(i), int(j)) for i, j in json.loads(row["mixer_edges_json"])),
+        name=row["instance_id"],
+    )
+    gammas = np.asarray([float(a["gamma"]) for a in matching], dtype=np.float64)
+    betas = np.asarray([float(a["beta"]) for a in matching], dtype=np.float64)
+    channel = noise.heterogeneous_ad_pd(inst.n, seed=int(row["noise_channel_seed"]))
+    model = cf.build_model(inst, gammas, betas, channel)
+    if observable_normalization == "inf":
+        return model
+    obs = normalized_observable(inst, observable_normalization)
+    mu_star = float(np.real(model.psi.conj() @ (obs @ model.psi)))
+    return replace(model, observable=obs, mu_star=mu_star)
+
+
+def _read_csv(path: Path) -> list[dict]:
+    with path.open(newline="", encoding="utf-8") as fh:
+        return list(csv.DictReader(fh))
 
 
 def wls_fit(x_cols: np.ndarray, y: np.ndarray, w: np.ndarray):
