@@ -1,0 +1,26 @@
+# Randomness policy for PAP amendment v2.
+# The design is unchanged from v1; only finite-shot RNG streams are fresh.
+
+generator: "numpy.random.Generator(numpy.random.PCG64(seed))"
+amendment: "v2_p1_negative_control"
+parent_rng_policy: "reproducibility/config/rng_policy.yaml"
+
+per_experiment_seed:
+  e1_quotient_decomposition: 10101
+  e2_c_sv_zero: 10202
+  e3_delta_vd_generator: 10303
+  e4_delta_sv_firstorder: 10404
+  e5_denominator_concentration: 10505
+  e7_certified_crossing: 10707
+  e7_resource_observable_sensitivity: 10808
+
+bootstrap:
+  method: "resample T estimator replicas"
+  e1_mse_se_n_boot: 200
+
+model_freeze_seeds:
+  qaoa_angle_seed: 0
+  qaoa_angle_restarts: 8
+  noise_channel_seed: 1
+
+aer_noise_model_seed: null
