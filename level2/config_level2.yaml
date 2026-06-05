@@ -1,0 +1,34 @@
+status: "Level 2 foundation (Phase B robustness layer)"
+snapshot_date: "2026-06-04 America/Lima"
+qiskit_version: "2.4.1"
+qiskit_aer_version: "0.17.2"
+
+noiseless_reference:
+  ideal_reference: "Trotterized Qiskit gate-level circuit statevector"
+  level1_comparison: "Level 1 exact dense XY mixer state"
+  mixer_trotter_steps: 128
+  trotter_gap_abs_tol: 1.0e-2
+  sector_leakage_tol: 1.0e-10
+  aer_seed_simulator: 20260604
+  qiskit_statevector_seed_note: "Statevector evolution is deterministic; seed is documented for Aer."
+
+noise_model:
+  backend_label: "AerSyntheticThermalReadoutV1"
+  source: "Manual qiskit_aer.noise snapshot because the installed [level2] extra exposes no FakeBackendV2 provider."
+  seed_simulator: 20260604
+  basis_gates:
+    - "u"
+    - "cx"
+    - "measure"
+  t1_ns: 80000.0
+  t2_ns: 60000.0
+  gate_times_ns:
+    u: 50.0
+    cx: 300.0
+  depolarizing_probabilities:
+    u: 0.0002
+    cx: 0.006
+  readout_error_matrix:
+    - [0.985, 0.015]
+    - [0.025, 0.975]
+
