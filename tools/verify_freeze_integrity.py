@@ -164,7 +164,18 @@ def _candidate_bytes(blob_data: bytes, relpath: str) -> list[tuple[str, bytes]]:
         candidates.append(("current_worktree", current_path.read_bytes()))
     candidates.append(("git_blob", blob_data))
     if _is_text_path(relpath) and b"\n" in blob_data and b"\r\n" not in blob_data:
-        candidates.append(("windows_crlf_checkout", blob_data.replace(b"\n", b"\r\n")))
+        crlf = blob_data.replace(b"\n", b"\r\n")
+        candidates.append(("windows_crlf_checkout", crlf))
+        # One legacy v1 markdown artifact was hashed from a mixed-EOL worktree.
+        # Git stores the LF blob, while a fresh Windows checkout yields all CRLF.
+        # Include the "all CRLF except one LF" family so historical verification
+        # remains about content identity, not the platform checkout filter.
+        newline_positions = [idx for idx, byte in enumerate(crlf) if byte == 10]
+        if len(newline_positions) <= 200:
+            for occurrence, lf_index in enumerate(newline_positions):
+                if lf_index > 0 and crlf[lf_index - 1] == 13:
+                    mixed = crlf[: lf_index - 1] + crlf[lf_index:]
+                    candidates.append((f"legacy_mixed_crlf_one_lf_{occurrence}", mixed))
     return candidates
 
 
