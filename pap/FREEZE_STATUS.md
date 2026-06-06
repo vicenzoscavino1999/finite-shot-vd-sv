@@ -36,9 +36,11 @@ not the active state of this repository.
 ## Helper Drift
 
 The current-tree v1 audit reports `pap/hash_pap.py` and
-`reproducibility/run_all.py` as expected drift for v1 only. They are allowlisted
-in `pap/known_v1_drift.txt` because v1 is audited historically at commit
-`0814ba7...`, while the current tree is the post-v2 repository state.
+`reproducibility/run_all.py` as expected drift for v1 only. Their git content is
+identical to commit `0814ba7...`, and v2 preserves the exact v1 hashes for both
+files append-only. The current-tree v1 drift flag is caused by raw working-tree
+line endings: this Windows checkout materializes CRLF bytes while the registered
+v1 hashes used LF bytes.
 
 In the current clean v2, amendment logic lives in new files:
 
@@ -69,6 +71,14 @@ The real registered-freeze audit is:
 ```text
 python pap/verify_freeze.py
 ```
+
+## Audit Semantics
+
+`pap/verify_freeze.py` audits the committed git state, with explicit tolerance
+for checkout EOL differences. It first checks raw working-tree bytes, then falls
+back to the committed `HEAD` blob and tolerated LF/CRLF representations. An
+uncommitted edit to a frozen file can therefore still report OK if `HEAD` still
+matches the manifest. Interpret the audit only with `git status --short` clean.
 
 ## Evidence
 

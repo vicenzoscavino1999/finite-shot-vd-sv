@@ -7,6 +7,13 @@ which only recomputes a hypothetical hash for the current tree.
 Exit code is nonzero for any aggregate/hash-file mismatch, missing target, or
 unexpected content drift. v1 allows only paths listed in
 ``pap/known_v1_drift.txt``. v2 is expected to have zero drift.
+
+Audit semantics: this script audits the committed git content, with explicit EOL
+tolerance for Windows checkouts. It first checks raw working-tree bytes, then
+falls back to the committed ``HEAD`` blob and tolerated checkout representations.
+An uncommitted edit to a frozen file can therefore still report OK if ``HEAD``
+matches the manifest. This is intentional for the release flow, which assumes
+``git status --short`` is clean before interpreting the audit.
 """
 
 from __future__ import annotations
