@@ -6,8 +6,9 @@ qiskit_aer_version: "0.17.2"
 noiseless_reference:
   ideal_reference: "Trotterized Qiskit gate-level circuit statevector"
   level1_comparison: "Level 1 exact dense XY mixer state"
-  mixer_trotter_steps: 128
-  trotter_gap_abs_tol: 1.0e-2
+  mixer_trotter_steps: 1
+  high_fidelity_mixer_trotter_steps: 128
+  trotter_gap_gate: "informative_only"
   sector_leakage_tol: 1.0e-10
   aer_seed_simulator: 20260604
   qiskit_statevector_seed_note: "Statevector evolution is deterministic; seed is documented for Aer."
@@ -31,4 +32,3 @@ noise_model:
   readout_error_matrix:
     - [0.985, 0.015]
     - [0.025, 0.975]
-

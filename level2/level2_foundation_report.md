@@ -7,26 +7,28 @@ Status: Level 2 foundation (Phase B robustness layer). Trotterized gate-level ci
 - Initial state: Qiskit `StatePreparation` of the Dicke vector `|D^n_k>`.
 - Cost convention: `RZZGate(theta)=exp(-i theta ZZ/2)`, so each cost edge uses `theta=2*gamma*w`.
 - Mixer convention: `XXPlusYYGate(theta,0)=exp(-i theta(XX+YY)/4)`, so each Trotter substep uses `theta=4*beta/s`.
-- Mixer Trotter substeps per QAOA layer: `128`.
+- Mixer Trotter substeps per QAOA layer: `1` (realistic gate-level default).
+- Optional high-fidelity diagnostic substeps: `128` (not a realistic noisy-circuit depth).
 - Ordering: Level 1 is big-endian; Qiskit statevectors are little-endian. Logical qubit labels are kept the same and statevectors are bit-reversed for comparison.
 
 ## Noiseless Cross-Check
 
-- Max sector leakage: `5.252e-27` with tolerance `1.0e-10`.
-- Max `|mu_L2-mu_L1|`: `0.00766977` with tolerance `1.0e-02`.
+- Max sector leakage: `2.694e-27` with tolerance `1.0e-10`.
+- Max `|mu_L2-mu_L1|` at realistic depth: `0.214093`. This is informative only, not a PASS/FAIL gate.
+- Optional high-fidelity max `|mu_L2-mu_L1|`: `0.00766977` at `128` substeps.
 
-| instance | n | k | engine | mu_L1 | mu_L2 | abs gap | sector leakage | in-sector | gap |
-|---|---:|---:|---|---:|---:|---:|---:|---|---|
-| g6_k2_c000 | 6 | 2 | aer | -0.241379902392 | -0.241506822514 | 0.00012692 | 1.146e-27 | PASS | PASS |
-| g6_k2_c001 | 6 | 2 | aer | -0.268202493567 | -0.260532722115 | 0.00766977 | 1.223e-28 | PASS | PASS |
-| g6_k2_c002 | 6 | 2 | aer | -0.289773777963 | -0.288167987906 | 0.00160579 | 5.724e-28 | PASS | PASS |
-| g6_k2_c003 | 6 | 2 | aer | -0.26333447264 | -0.266455046328 | 0.00312057 | 1.261e-28 | PASS | PASS |
-| g6_k2_c004 | 6 | 2 | aer | -0.239207703119 | -0.23744967787 | 0.00175803 | 7.539e-28 | PASS | PASS |
-| g8_k3_c000 | 8 | 3 | aer | -0.15369090421 | -0.153929900487 | 0.000238996 | 5.252e-27 | PASS | PASS |
-| g8_k3_c001 | 8 | 3 | aer | -0.172105059618 | -0.174715623767 | 0.00261056 | 2.401e-27 | PASS | PASS |
-| g8_k3_c002 | 8 | 3 | aer | -0.130001830242 | -0.129980081484 | 2.17488e-05 | 5.025e-27 | PASS | PASS |
-| g8_k3_c003 | 8 | 3 | aer | -0.128983285317 | -0.129096905024 | 0.00011362 | 4.382e-27 | PASS | PASS |
-| g8_k3_c004 | 8 | 3 | aer | -0.188909904802 | -0.188190536719 | 0.000719368 | 3.691e-27 | PASS | PASS |
+| instance | n | k | engine | substeps | mu_L1 | mu_L2 | abs gap | sector leakage | in-sector | gap status |
+|---|---:|---:|---|---:|---:|---:|---:|---:|---|---|
+| g6_k2_c000 | 6 | 2 | aer | 1 | -0.241379902392 | -0.243431939047 | 0.00205204 | 1.780e-29 | PASS | informative_only |
+| g6_k2_c001 | 6 | 2 | aer | 1 | -0.268202493567 | -0.187546088705 | 0.0806564 | 1.698e-29 | PASS | informative_only |
+| g6_k2_c002 | 6 | 2 | aer | 1 | -0.289773777963 | -0.0756811869483 | 0.214093 | 1.613e-29 | PASS | informative_only |
+| g6_k2_c003 | 6 | 2 | aer | 1 | -0.26333447264 | -0.0702553946486 | 0.193079 | 1.746e-29 | PASS | informative_only |
+| g6_k2_c004 | 6 | 2 | aer | 1 | -0.239207703119 | -0.0459785241752 | 0.193229 | 1.685e-29 | PASS | informative_only |
+| g8_k3_c000 | 8 | 3 | aer | 1 | -0.15369090421 | -0.0668269693964 | 0.0868639 | 2.692e-27 | PASS | informative_only |
+| g8_k3_c001 | 8 | 3 | aer | 1 | -0.172105059618 | -0.0714285714286 | 0.100676 | 2.651e-27 | PASS | informative_only |
+| g8_k3_c002 | 8 | 3 | aer | 1 | -0.130001830242 | -0.122131009802 | 0.00787082 | 2.694e-27 | PASS | informative_only |
+| g8_k3_c003 | 8 | 3 | aer | 1 | -0.128983285317 | -0.0952735377535 | 0.0337097 | 2.684e-27 | PASS | informative_only |
+| g8_k3_c004 | 8 | 3 | aer | 1 | -0.188909904802 | -0.119064875119 | 0.069845 | 2.690e-27 | PASS | informative_only |
 
 ## Noise Model Snapshot
 

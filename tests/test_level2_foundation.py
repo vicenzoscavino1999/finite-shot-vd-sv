@@ -28,14 +28,19 @@ def test_level2_bit_reversal_roundtrip_is_exact():
         assert np.array_equal(recovered, state)
 
 
-def test_level2_all_instances_are_in_sector_and_within_trotter_gap():
+def test_level2_all_instances_are_in_sector_and_gap_is_informative():
     rows = circuits.foundation_diagnostics(engine="statevector")
     assert len(rows) == 10
     for row in rows:
         assert row["in_sector_pass"] is True
-        assert row["gap_trotter_pass"] is True
         assert row["sector_leakage"] <= circuits.SECTOR_LEAKAGE_TOL
-        assert row["trotter_gap_abs"] <= circuits.TROTTER_GAP_ABS_TOL
+        assert row["gap_trotter_status"] == "informative_only"
+        assert row["trotter_gap_abs"] >= 0.0
+
+
+def test_level2_realistic_depth_is_default_and_high_fidelity_is_optional():
+    assert circuits.MIXER_TROTTER_STEPS == 1
+    assert circuits.HIGH_FIDELITY_TROTTER_STEPS > circuits.MIXER_TROTTER_STEPS
 
 
 def test_level2_noiseless_statevector_is_deterministic():

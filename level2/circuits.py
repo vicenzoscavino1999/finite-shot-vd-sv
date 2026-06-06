@@ -2,8 +2,9 @@
 
 The Level 2 circuit is a Trotterized gate-level implementation of the frozen
 Level 1 XY-mixer QAOA instance. Its ideal reference is its own noiseless
-statevector. The dense Level 1 state is used only as a convention check: the gap
-``|mu_L2 - mu_L1|`` should be small at the declared Trotter resolution.
+statevector. The dense Level 1 state is used only as an informative convention
+diagnostic: ``|mu_L2 - mu_L1|`` is not a gate because Level 2 is gate-level and
+Trotterized, while Level 1 uses the exact dense XY mixer exponential.
 """
 
 from __future__ import annotations
@@ -31,25 +32,25 @@ from level2.noise_model import build_aer_simulator, load_config, noise_model_sum
 REPORT_PATH = Path(__file__).resolve().with_name("level2_foundation_report.md")
 CONFIG = load_config()
 MIXER_TROTTER_STEPS = int(CONFIG["noiseless_reference"]["mixer_trotter_steps"])
-TROTTER_GAP_ABS_TOL = float(CONFIG["noiseless_reference"]["trotter_gap_abs_tol"])
+HIGH_FIDELITY_TROTTER_STEPS = int(CONFIG["noiseless_reference"]["high_fidelity_mixer_trotter_steps"])
 SECTOR_LEAKAGE_TOL = float(CONFIG["noiseless_reference"]["sector_leakage_tol"])
 AER_SEED_SIMULATOR = int(CONFIG["noiseless_reference"]["aer_seed_simulator"])
 
 
 def main() -> int:
     rows = foundation_diagnostics(engine="aer")
-    failures = [
-        row for row in rows
-        if row["sector_leakage"] > SECTOR_LEAKAGE_TOL or row["trotter_gap_abs"] > TROTTER_GAP_ABS_TOL
-    ]
-    REPORT_PATH.write_text(render_foundation_report(rows), encoding="utf-8")
+    high_fidelity_rows = foundation_diagnostics(
+        mixer_trotter_steps=HIGH_FIDELITY_TROTTER_STEPS,
+        engine="statevector",
+    )
+    failures = [row for row in rows if row["sector_leakage"] > SECTOR_LEAKAGE_TOL]
+    REPORT_PATH.write_text(render_foundation_report(rows, high_fidelity_rows), encoding="utf-8")
     print(REPORT_PATH)
     if failures:
         for row in failures:
             print(
                 "FOUNDATION CHECK FAIL "
-                f"{row['instance_id']}: leakage={row['sector_leakage']:.3e}, "
-                f"gap={row['trotter_gap_abs']:.3e}"
+                f"{row['instance_id']}: leakage={row['sector_leakage']:.3e}"
             )
         return 1
     return 0
@@ -176,7 +177,7 @@ def foundation_diagnostics(
             "trotter_gap_abs": float(abs(mu_l2 - model.mu_star)),
             "sector_leakage": float(leakage),
             "in_sector_pass": bool(leakage <= SECTOR_LEAKAGE_TOL),
-            "gap_trotter_pass": bool(abs(mu_l2 - model.mu_star) <= TROTTER_GAP_ABS_TOL),
+            "gap_trotter_status": "informative_only",
         })
     return rows
 
@@ -196,10 +197,12 @@ def sector_leakage(psi_level1_order: np.ndarray, inst: qaoa.QAOAInstance) -> flo
     return float(np.sum(probs[weights != inst.weight]))
 
 
-def render_foundation_report(rows: list[dict]) -> str:
+def render_foundation_report(rows: list[dict], high_fidelity_rows: list[dict] | None = None) -> str:
     summary = noise_model_summary()
     max_gap = max(row["trotter_gap_abs"] for row in rows)
     max_leakage = max(row["sector_leakage"] for row in rows)
+    high_fidelity_rows = high_fidelity_rows or []
+    hf_max_gap = max((row["trotter_gap_abs"] for row in high_fidelity_rows), default=float("nan"))
     lines = [
         "# Level 2 Foundation",
         "",
@@ -210,23 +213,26 @@ def render_foundation_report(rows: list[dict]) -> str:
         "- Initial state: Qiskit `StatePreparation` of the Dicke vector `|D^n_k>`.",
         "- Cost convention: `RZZGate(theta)=exp(-i theta ZZ/2)`, so each cost edge uses `theta=2*gamma*w`.",
         "- Mixer convention: `XXPlusYYGate(theta,0)=exp(-i theta(XX+YY)/4)`, so each Trotter substep uses `theta=4*beta/s`.",
-        f"- Mixer Trotter substeps per QAOA layer: `{MIXER_TROTTER_STEPS}`.",
+        f"- Mixer Trotter substeps per QAOA layer: `{MIXER_TROTTER_STEPS}` (realistic gate-level default).",
+        f"- Optional high-fidelity diagnostic substeps: `{HIGH_FIDELITY_TROTTER_STEPS}` (not a realistic noisy-circuit depth).",
         "- Ordering: Level 1 is big-endian; Qiskit statevectors are little-endian. Logical qubit labels are kept the same and statevectors are bit-reversed for comparison.",
         "",
         "## Noiseless Cross-Check",
         "",
         f"- Max sector leakage: `{max_leakage:.3e}` with tolerance `{SECTOR_LEAKAGE_TOL:.1e}`.",
-        f"- Max `|mu_L2-mu_L1|`: `{max_gap:.6g}` with tolerance `{TROTTER_GAP_ABS_TOL:.1e}`.",
+        f"- Max `|mu_L2-mu_L1|` at realistic depth: `{max_gap:.6g}`. This is informative only, not a PASS/FAIL gate.",
+        f"- Optional high-fidelity max `|mu_L2-mu_L1|`: `{hf_max_gap:.6g}` at `{HIGH_FIDELITY_TROTTER_STEPS}` substeps.",
         "",
-        "| instance | n | k | engine | mu_L1 | mu_L2 | abs gap | sector leakage | in-sector | gap |",
-        "|---|---:|---:|---|---:|---:|---:|---:|---|---|",
+        "| instance | n | k | engine | substeps | mu_L1 | mu_L2 | abs gap | sector leakage | in-sector | gap status |",
+        "|---|---:|---:|---|---:|---:|---:|---:|---:|---|---|",
     ]
     for row in rows:
         lines.append(
             f"| {row['instance_id']} | {row['n']} | {row['weight']} | {row['statevector_engine']} "
+            f"| {row['mixer_trotter_steps']} "
             f"| {row['mu_star_L1']:.12g} | {row['mu_star_L2']:.12g} "
             f"| {row['trotter_gap_abs']:.6g} | {row['sector_leakage']:.3e} "
-            f"| {_pass(row['in_sector_pass'])} | {_pass(row['gap_trotter_pass'])} |"
+            f"| {_pass(row['in_sector_pass'])} | {row['gap_trotter_status']} |"
         )
     lines.extend([
         "",

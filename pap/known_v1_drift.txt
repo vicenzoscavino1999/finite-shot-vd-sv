@@ -1,0 +1,3 @@
+# path | reason
+pap/hash_pap.py | EXPECTED-DRIFT for current-tree v1 audit: v2 moved amendment hashing into pap/hash_pap_v2.py; v1 is recoverable byte-for-byte at commit 0814ba796b7d8819e709780ffa01e9f94be7a727.
+reproducibility/run_all.py | EXPECTED-DRIFT for current-tree v1 audit: v2 moved amended RNG-policy execution into reproducibility/run_all_v2.py; v1 is recoverable byte-for-byte at commit 0814ba796b7d8819e709780ffa01e9f94be7a727.
