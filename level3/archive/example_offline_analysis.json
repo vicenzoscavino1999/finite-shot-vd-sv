@@ -1,0 +1,92 @@
+{
+  "abs_bias": {
+    "sv_readout_mitigated_weight_postselect": 0.07521748606175305,
+    "unmitigated": 0.175594184235872
+  },
+  "analysis_inputs": {
+    "calibration_shots_each": 4096,
+    "qaoa_shots": 4096,
+    "source": "archived_counts_only"
+  },
+  "archive_path": "level3\\archive\\example_offline_counts.json.gz",
+  "backend_name": "AerSyntheticThermalReadoutV1",
+  "bias": {
+    "sv_readout_mitigated_weight_postselect": 0.07521748606175305,
+    "unmitigated": 0.175594184235872
+  },
+  "estimators": {
+    "sv_readout_mitigated_weight_postselect": -0.16821445298507404,
+    "unmitigated": -0.06783775481095508
+  },
+  "instance_id": "g6_k2_c000",
+  "job_id": "offline-aer-seed-20260607",
+  "mu_ideal_noiseless_l2": -0.24343193904682708,
+  "n": 6,
+  "negative_mass_before_clip": 1.6226614849176333e-05,
+  "readout_matrices": [
+    [
+      [
+        0.987548828125,
+        0.012451171875
+      ],
+      [
+        0.029541015625,
+        0.970458984375
+      ]
+    ],
+    [
+      [
+        0.98291015625,
+        0.01708984375
+      ],
+      [
+        0.025390625,
+        0.974609375
+      ]
+    ],
+    [
+      [
+        0.98095703125,
+        0.01904296875
+      ],
+      [
+        0.027587890625,
+        0.972412109375
+      ]
+    ],
+    [
+      [
+        0.9853515625,
+        0.0146484375
+      ],
+      [
+        0.025634765625,
+        0.974365234375
+      ]
+    ],
+    [
+      [
+        0.987060546875,
+        0.012939453125
+      ],
+      [
+        0.020751953125,
+        0.979248046875
+      ]
+    ],
+    [
+      [
+        0.98583984375,
+        0.01416015625
+      ],
+      [
+        0.02392578125,
+        0.97607421875
+      ]
+    ]
+  ],
+  "schema_version": "level3.analysis.v1",
+  "sector_weight": 2,
+  "sv_acceptance_after_readout_mitigation": 0.5996243244253985,
+  "sv_reduces_abs_bias_vs_unmitigated": true
+}
