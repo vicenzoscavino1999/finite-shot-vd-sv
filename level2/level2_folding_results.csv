@@ -1,0 +1,4 @@
+row_kind,instance_id,method,noise_scale_lambda,fold_k,mixer_trotter_steps,mu_ideal_l2,mu_noiseless_folded,noiseless_abs_error,noisy_population_estimate,bias_population,abs_bias_population,mse_population_bias_only,cx_count,u_count,depth,readout_error_included,simulator_seed,runtime_seconds
+aggregate,g6_k2_c000,unmitigated_density_matrix_population,1,0,1,-0.243431939046827,-0.243431939046827,0,-0.0605015447094639,0.182930394337363,0.182930394337363,0.0334635291724232,97,233,210,true,921038693,5.366
+aggregate,g6_k2_c000,unmitigated_density_matrix_population,3,1,1,-0.243431939046827,-0.243431939046826,1.33226762955019e-15,-0.00758047962960846,0.235851459417219,0.235851459417219,0.0556259109092319,291,699,630,true,1504621965,5.366
+aggregate,g6_k2_c000,unmitigated_density_matrix_population,5,2,1,-0.243431939046827,-0.243431939046824,2.60902410786912e-15,0.00646908916209164,0.249901028208919,0.249901028208919,0.0624505238998748,485,1165,1050,true,1911503014,5.366
