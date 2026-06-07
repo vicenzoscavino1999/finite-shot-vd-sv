@@ -23,9 +23,12 @@ Status: validacion EN FORMA, no matcheo de coeficientes de Nivel 1. Additive Pha
 
 - Noisy denominator reference shots: `1024`.
 - Noisy implementation denominator reference: `0.138672`.
+- Estimated `B_den` from the E5/Level-1 Hadamard concentration scale: `2951.33`.
+- Current B range relative to this scale: `0.0433702` to `0.173481`.
 - Clip rule: `max(D_hat, 0.5 * D_impl_reference)`.
 - Clip value used: `0.0693359`.
 - Rationale: this is the Level 2 implementation analogue of the Level 1 clipped quotient `max(D_hat, 0.5*D_M)`. The noisy c-SWAP implementation has its own population denominator, which is not the pure-state noiseless value 1.
+- Interpretation: with this implementation denominator, the current smoke grid is far below the denominator-concentration scale. It probes wiring and the quotient failure mode, not stable VD MSE extraction.
 
 ## Resource Accounting
 
@@ -56,4 +59,6 @@ Status: validacion EN FORMA, no matcheo de coeficientes de Nivel 1. Additive Pha
 
 ## Descriptive Conclusion
 
-At B=512, VD has absolute bias `0.0341246`. VD reduces the absolute bias relative to the Step 2 unmitigated context (`0.18383`). The noise of the two-copy interferometric VD circuit is included, so this is a Level 2 form check rather than a Level 1 coefficient recovery claim. With only `2` repetitions, variance estimates and `var*B` are expected to be noisy; the high-power multi-method ensemble run is intentionally deferred.
+The smoke run does not support a VD bias-reduction claim. The noisy implementation denominator is about `0.138672`, giving an E5-style concentration scale `B_den ~= 2951.33`, while the current B grid is only `128`-`512`. The quotient estimates across the three B values are `0.0362638, 0.108793, -0.277557`, so the apparent large-B bias is not a stable quantity with only two repetitions. This is an echo EN FORMA of the Level 1 P7/E5 denominator-concentration finding: below the denominator scale, the VD quotient is high-variance and clip-sensitive. The demonstration of VD bias reduction is deferred to the Step 5 high-power, multi-method ensemble run.
+
+Optional Step 5 cross-check: compare the sampled noisy VD quotient against `Tr(O rho^2)/Tr(rho^2)` from a density-matrix simulation of the noisy Level 2 circuit state. That would validate the mixed-state target beyond the pure-state noiseless degeneracy checked here.

@@ -40,12 +40,14 @@ def test_level2_vd_noiseless_crosscheck_recovers_pure_state_reference():
         assert float(row["noiseless_mu_abs_error"]) <= vd.NOISELESS_MU_TOL
 
 
-def test_level2_vd_reduces_bias_vs_unmitigated_context_at_largest_b():
+def test_level2_vd_smoke_does_not_claim_bias_reduction():
     row = _row(max(vd.B_VALUES))
-    vd_abs_bias = abs(float(row["bias_empirical"]))
-    unmit_abs_bias = float(row["unmitigated_context_abs_bias"])
-    assert row["vd_bias_reduces_vs_unmitigated_context"] == "true"
-    assert vd_abs_bias + vd.VD_BIAS_REDUCTION_TOL < unmit_abs_bias
+    assert row["vd_bias_interpretation"] == "not_inferable_small_denominator_smoke"
+    assert float(row["B_den_impl_estimate"]) > max(vd.B_VALUES)
+    assert float(row["B_over_B_den_impl_estimate"]) < 0.25
+    report = REPORT_PATH.read_text(encoding="utf-8")
+    assert "does not support a VD bias-reduction claim" in report
+    assert "deferred to the Step 5 high-power" in report
 
 
 def test_level2_vd_clip_and_resource_columns_are_present():

@@ -90,10 +90,12 @@ FIELDS = [
     "bias_floor_fit",
     "variance_slope_fit",
     "mse_fit_r2",
-    "vd_bias_reduces_vs_unmitigated_context",
+    "vd_bias_interpretation",
     "unmitigated_context_abs_bias",
     "sv_mitigated_context_abs_bias",
     "denominator_clip_fraction",
+    "B_den_impl_estimate",
+    "B_over_B_den_impl_estimate",
     "mixer_trotter_steps",
     "runtime_seconds",
 ]
@@ -160,6 +162,7 @@ def run_vd_sampling(
         DENOMINATOR_CLIP_FRACTION * noisy_d_reference,
         DENOMINATOR_CLIP_MIN,
     )
+    b_den_impl = denominator_sample_threshold(noisy_d_reference)
 
     samples: list[dict] = []
     for b in config.b_values:
@@ -186,11 +189,21 @@ def run_vd_sampling(
         noiseless,
         noisy_d_reference,
         denominator_clip_value,
+        b_den_impl,
         metadata,
         context,
         runtime_seconds,
     )
-    report = render_report(rows, config, noiseless, noisy_d_reference, denominator_clip_value, metadata, context)
+    report = render_report(
+        rows,
+        config,
+        noiseless,
+        noisy_d_reference,
+        denominator_clip_value,
+        b_den_impl,
+        metadata,
+        context,
+    )
     return rows, report
 
 
@@ -277,6 +290,15 @@ def noisy_denominator_reference(
     return estimate_denominator(counts, inst.n)
 
 
+def denominator_sample_threshold(d_m: float, eps: float = 1e-3) -> float:
+    """Level-2 implementation analogue of Level-1 hadamard_Bmin_v4."""
+    d_abs = abs(float(d_m))
+    if d_abs <= 0.0:
+        return float("inf")
+    sigma_d2 = max(1.0 - d_abs**2, 0.0)
+    return float((8.0 * sigma_d2 / d_abs**2 + 8.0 / (3.0 * d_abs)) * math.log(1.0 / eps))
+
+
 def noisy_vd_sample(
     circuits: dict[str, QuantumCircuit],
     inst: qaoa.QAOAInstance,
@@ -358,6 +380,7 @@ def aggregate_samples(
     noiseless: dict[str, float],
     noisy_d_reference: float,
     denominator_clip_value: float,
+    b_den_impl: float,
     metadata: dict[str, float],
     context: dict[str, float],
     runtime_seconds: float,
@@ -415,10 +438,12 @@ def aggregate_samples(
             "bias_floor_fit": fit["intercept"],
             "variance_slope_fit": fit["slope"],
             "mse_fit_r2": fit["r2"],
-            "vd_bias_reduces_vs_unmitigated_context": bool(abs(bias) < unmit_bias),
+            "vd_bias_interpretation": "not_inferable_small_denominator_smoke",
             "unmitigated_context_abs_bias": unmit_bias,
             "sv_mitigated_context_abs_bias": sv_bias,
             "denominator_clip_fraction": DENOMINATOR_CLIP_FRACTION,
+            "B_den_impl_estimate": float(b_den_impl),
+            "B_over_B_den_impl_estimate": float(b / b_den_impl) if math.isfinite(b_den_impl) and b_den_impl > 0 else 0.0,
             "mixer_trotter_steps": MIXER_TROTTER_STEPS,
             "runtime_seconds": runtime_seconds,
         })
@@ -484,6 +509,7 @@ def render_report(
     noiseless: dict[str, float],
     noisy_d_reference: float,
     denominator_clip_value: float,
+    b_den_impl: float,
     metadata: dict[str, float],
     context: dict[str, float],
 ) -> str:
@@ -515,9 +541,12 @@ def render_report(
         "",
         f"- Noisy denominator reference shots: `{config.noisy_denominator_reference_shots}`.",
         f"- Noisy implementation denominator reference: `{noisy_d_reference:.6g}`.",
+        f"- Estimated `B_den` from the E5/Level-1 Hadamard concentration scale: `{b_den_impl:.6g}`.",
+        f"- Current B range relative to this scale: `{min(config.b_values) / b_den_impl:.6g}` to `{max(config.b_values) / b_den_impl:.6g}`.",
         f"- Clip rule: `max(D_hat, {DENOMINATOR_CLIP_FRACTION} * D_impl_reference)`.",
         f"- Clip value used: `{denominator_clip_value:.6g}`.",
         "- Rationale: this is the Level 2 implementation analogue of the Level 1 clipped quotient `max(D_hat, 0.5*D_M)`. The noisy c-SWAP implementation has its own population denominator, which is not the pure-state noiseless value 1.",
+        "- Interpretation: with this implementation denominator, the current smoke grid is far below the denominator-concentration scale. It probes wiring and the quotient failure mode, not stable VD MSE extraction.",
         "",
         "## Resource Accounting",
         "",
@@ -556,18 +585,24 @@ def render_report(
         "## Descriptive Conclusion",
         "",
     ])
-    reduction_text = (
-        "VD reduces the absolute bias relative to the Step 2 unmitigated context "
-        if largest["vd_bias_reduces_vs_unmitigated_context"]
-        else "VD does not reduce the absolute bias relative to the Step 2 unmitigated context "
-    )
+    estimates = ", ".join(f"{row['mean_estimate']:.6g}" for row in rows)
     lines.append(
-        f"At B={largest_b}, VD has absolute bias `{abs(float(largest['bias_empirical'])):.6g}`. "
-        f"{reduction_text}(`{context.get('unmitigated_abs_bias', float('nan')):.6g}`). "
-        "The noise of the two-copy interferometric VD circuit is included, so this is a "
-        "Level 2 form check rather than a Level 1 coefficient recovery claim. With only "
-        f"`{config.repetitions}` repetitions, variance estimates and `var*B` are expected "
-        "to be noisy; the high-power multi-method ensemble run is intentionally deferred."
+        f"The smoke run does not support a VD bias-reduction claim. The noisy implementation "
+        f"denominator is about `{noisy_d_reference:.6g}`, giving an E5-style concentration "
+        f"scale `B_den ~= {b_den_impl:.6g}`, while the current B grid is only "
+        f"`{min(config.b_values)}`-`{max(config.b_values)}`. The quotient estimates across "
+        f"the three B values are `{estimates}`, so the apparent large-B bias is not a stable "
+        "quantity with only two repetitions. This is an echo EN FORMA of the Level 1 P7/E5 "
+        "denominator-concentration finding: below the denominator scale, the VD quotient is "
+        "high-variance and clip-sensitive. The demonstration of VD bias reduction is deferred "
+        "to the Step 5 high-power, multi-method ensemble run."
+    )
+    lines.append("")
+    lines.append(
+        "Optional Step 5 cross-check: compare the sampled noisy VD quotient against "
+        "`Tr(O rho^2)/Tr(rho^2)` from a density-matrix simulation of the noisy Level 2 "
+        "circuit state. That would validate the mixed-state target beyond the pure-state "
+        "noiseless degeneracy checked here."
     )
     return "\n".join(lines) + "\n"
 
