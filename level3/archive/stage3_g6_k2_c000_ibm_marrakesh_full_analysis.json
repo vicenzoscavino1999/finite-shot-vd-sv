@@ -1,0 +1,773 @@
+{
+  "analysis_inputs": {
+    "archive_count": 38,
+    "bootstrap_reps": 2000,
+    "bootstrap_seed": 33033,
+    "denominator_clip_fraction": 0.5,
+    "source": "archived_counts_only"
+  },
+  "epochs": [
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch01_20260607T163302Z_d8ipqak2upec739mhs2g.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:33:02.280932Z",
+      "epoch_index": 1,
+      "job_id": "d8ipqak2upec739mhs2g",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch02_20260607T163324Z_d8ipqg1e8nrc73bikqjg.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:33:23.780590Z",
+      "epoch_index": 2,
+      "job_id": "d8ipqg1e8nrc73bikqjg",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch03_20260607T163345Z_d8ipqlc2upec739mhsg0.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:33:45.147556Z",
+      "epoch_index": 3,
+      "job_id": "d8ipqlc2upec739mhsg0",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch04_20260607T163407Z_d8ipqqs2upec739mhsn0.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:34:07.362195Z",
+      "epoch_index": 4,
+      "job_id": "d8ipqqs2upec739mhsn0",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch05_20260607T163428Z_d8ipr0e6983c73dsem0g.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:34:28.055454Z",
+      "epoch_index": 5,
+      "job_id": "d8ipr0e6983c73dsem0g",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch06_20260607T163450Z_d8ipr5k2upec739mht4g.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:34:49.729479Z",
+      "epoch_index": 6,
+      "job_id": "d8ipr5k2upec739mht4g",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch07_20260607T163510Z_d8ipras2upec739mhtb0.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:35:10.584520Z",
+      "epoch_index": 7,
+      "job_id": "d8ipras2upec739mhtb0",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch08_20260607T163532Z_d8iprg42upec739mhtig.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:35:31.905134Z",
+      "epoch_index": 8,
+      "job_id": "d8iprg42upec739mhtig",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch09_20260607T163553Z_d8iprle6983c73dsemn0.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:35:53.135880Z",
+      "epoch_index": 9,
+      "job_id": "d8iprle6983c73dsemn0",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch10_20260607T163614Z_d8iprqhe8nrc73biks3g.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:36:14.265752Z",
+      "epoch_index": 10,
+      "job_id": "d8iprqhe8nrc73biks3g",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch11_20260607T163635Z_d8ips042upec739mhu50.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:36:35.032264Z",
+      "epoch_index": 11,
+      "job_id": "d8ips042upec739mhu50",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch12_20260607T163656Z_d8ips566983c73dsen7g.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:36:56.143267Z",
+      "epoch_index": 12,
+      "job_id": "d8ips566983c73dsen7g",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch13_20260607T163717Z_d8ipsalv8cos73f5tg40.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:37:17.672798Z",
+      "epoch_index": 13,
+      "job_id": "d8ipsalv8cos73f5tg40",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch14_20260607T163740Z_d8ipsfpe8nrc73bikssg.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:37:39.952159Z",
+      "epoch_index": 14,
+      "job_id": "d8ipsfpe8nrc73bikssg",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch15_20260607T163802Z_d8ipslc2upec739mhv00.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:38:01.328974Z",
+      "epoch_index": 15,
+      "job_id": "d8ipslc2upec739mhv00",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch01_20260607T163904Z_d8ipt51e8nrc73biktl0.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:39:04.262670Z",
+      "epoch_index": 16,
+      "job_id": "d8ipt51e8nrc73biktl0",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch02_20260607T163933Z_d8iptak2upec739mhvpg.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:39:33.635440Z",
+      "epoch_index": 17,
+      "job_id": "d8iptak2upec739mhvpg",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch03_20260607T163956Z_d8ipthu6983c73dseop0.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:39:55.936357Z",
+      "epoch_index": 18,
+      "job_id": "d8ipthu6983c73dseop0",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch04_20260607T164018Z_d8iptne6983c73dseoug.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:40:17.814353Z",
+      "epoch_index": 19,
+      "job_id": "d8iptne6983c73dseoug",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch05_20260607T164039Z_d8iptss2upec739mi0g0.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:40:38.807187Z",
+      "epoch_index": 20,
+      "job_id": "d8iptss2upec739mi0g0",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch06_20260607T164100Z_d8ipu25v8cos73f5ti10.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:41:00.226800Z",
+      "epoch_index": 21,
+      "job_id": "d8ipu25v8cos73f5ti10",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch07_20260607T164120Z_d8ipu7he8nrc73bikutg.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:41:20.684478Z",
+      "epoch_index": 22,
+      "job_id": "d8ipu7he8nrc73bikutg",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch08_20260607T164141Z_d8ipuclv8cos73f5tibg.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:41:41.047600Z",
+      "epoch_index": 23,
+      "job_id": "d8ipuclv8cos73f5tibg",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch09_20260607T164201Z_d8ipuhk2upec739mi1bg.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:42:01.161219Z",
+      "epoch_index": 24,
+      "job_id": "d8ipuhk2upec739mi1bg",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch10_20260607T164222Z_d8ipumpe8nrc73bikveg.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:42:22.105751Z",
+      "epoch_index": 25,
+      "job_id": "d8ipumpe8nrc73bikveg",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch11_20260607T164243Z_d8ipurs2upec739mi1o0.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:42:43.343268Z",
+      "epoch_index": 26,
+      "job_id": "d8ipurs2upec739mi1o0",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch12_20260607T164304Z_d8ipv1c2upec739mi210.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:43:04.285324Z",
+      "epoch_index": 27,
+      "job_id": "d8ipv1c2upec739mi210",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch13_20260607T164334Z_d8ipv6lv8cos73f5tja0.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:43:34.261534Z",
+      "epoch_index": 28,
+      "job_id": "d8ipv6lv8cos73f5tja0",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch14_20260607T164355Z_d8ipve5v8cos73f5tjkg.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:43:55.133497Z",
+      "epoch_index": 29,
+      "job_id": "d8ipve5v8cos73f5tjkg",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch15_20260607T164416Z_d8ipvj5v8cos73f5tjq0.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:44:15.824295Z",
+      "epoch_index": 30,
+      "job_id": "d8ipvj5v8cos73f5tjq0",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch16_20260607T164436Z_d8ipvoc2upec739mi2s0.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:44:36.656666Z",
+      "epoch_index": 31,
+      "job_id": "d8ipvoc2upec739mi2s0",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch17_20260607T164458Z_d8ipvtk2upec739mi32g.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:44:57.799687Z",
+      "epoch_index": 32,
+      "job_id": "d8ipvtk2upec739mi32g",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch18_20260607T164520Z_d8iq02tv8cos73f5tkd0.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:45:19.928740Z",
+      "epoch_index": 33,
+      "job_id": "d8iq02tv8cos73f5tkd0",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch19_20260607T164540Z_d8iq08c2upec739mi3jg.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:45:40.675481Z",
+      "epoch_index": 34,
+      "job_id": "d8iq08c2upec739mi3jg",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch20_20260607T164603Z_d8iq0dlv8cos73f5tkqg.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:46:02.984069Z",
+      "epoch_index": 35,
+      "job_id": "d8iq0dlv8cos73f5tkqg",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch01_20260607T164653Z_d8iq0qhe8nrc73bil20g.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:46:53.203031Z",
+      "epoch_index": 36,
+      "job_id": "d8iq0qhe8nrc73bil20g",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch01_20260607T164744Z_d8iq171e8nrc73bil2g0.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:47:43.688191Z",
+      "epoch_index": 37,
+      "job_id": "d8iq171e8nrc73bil2g0",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_marrakesh_epoch02_20260607T164803Z_d8iq1cc2upec739mi52g.json.gz",
+      "backend": "ibm_marrakesh",
+      "created_at_utc": "2026-06-07T16:48:03.662524Z",
+      "epoch_index": 38,
+      "job_id": "d8iq1cc2upec739mi52g",
+      "quantum_seconds": 14.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    }
+  ],
+  "qualitative": {
+    "interpretation": "qualitative_sv_dominance_vd_overhead_degraded",
+    "largest_B": 8192,
+    "mse_order_at_largest_B": [
+      {
+        "method": "sv_readout_mitigated_weight_postselect",
+        "mse": 0.010262794966643032
+      },
+      {
+        "method": "unmitigated",
+        "mse": 0.045000477272471175
+      },
+      {
+        "method": "vd_m2_readout_mitigated",
+        "mse": 0.0741405524751682
+      }
+    ],
+    "vd_beats_sv_at_any_same_B": false
+  },
+  "rows": [
+    {
+      "B": 512,
+      "B_den_estimate": null,
+      "B_over_B_den_estimate": null,
+      "bias": 0.10278782227222473,
+      "bias_ci95": [
+        0.09828921727282747,
+        0.10718994377318498
+      ],
+      "epochs": 38,
+      "mean_estimate": -0.14064411677460234,
+      "mean_vd_denominator": null,
+      "mean_vd_denominator_clip": null,
+      "mean_vd_denominator_reference": null,
+      "method": "sv_readout_mitigated_weight_postselect",
+      "mse": 0.010762801100240728,
+      "mse_ci95": [
+        0.00982271395550014,
+        0.011699558047475328
+      ],
+      "resource_paired_sample": 512.0,
+      "resource_two_qubit_gate_proxy": 512.0,
+      "variance_between_epochs": 0.00020280157636276777
+    },
+    {
+      "B": 1024,
+      "B_den_estimate": null,
+      "B_over_B_den_estimate": null,
+      "bias": 0.10142733372731456,
+      "bias_ci95": [
+        0.09815244623803411,
+        0.10463000489524074
+      ],
+      "epochs": 38,
+      "mean_estimate": -0.14200460531951248,
+      "mean_vd_denominator": null,
+      "mean_vd_denominator_clip": null,
+      "mean_vd_denominator_reference": null,
+      "method": "sv_readout_mitigated_weight_postselect",
+      "mse": 0.01040024856046419,
+      "mse_ci95": [
+        0.00974167469898298,
+        0.011056474151746884
+      ],
+      "resource_paired_sample": 1024.0,
+      "resource_two_qubit_gate_proxy": 1024.0,
+      "variance_between_epochs": 0.00011579168298436198
+    },
+    {
+      "B": 2048,
+      "B_den_estimate": null,
+      "B_over_B_den_estimate": null,
+      "bias": 0.10153815568587177,
+      "bias_ci95": [
+        0.09878838179973748,
+        0.10427359531168345
+      ],
+      "epochs": 38,
+      "mean_estimate": -0.14189378336095532,
+      "mean_vd_denominator": null,
+      "mean_vd_denominator_clip": null,
+      "mean_vd_denominator_reference": null,
+      "method": "sv_readout_mitigated_weight_postselect",
+      "mse": 0.010385233392810339,
+      "mse_ci95": [
+        0.009826067035994961,
+        0.010947648451945392
+      ],
+      "resource_paired_sample": 2048.0,
+      "resource_two_qubit_gate_proxy": 2048.0,
+      "variance_between_epochs": 7.726974711989589e-05
+    },
+    {
+      "B": 4096,
+      "B_den_estimate": null,
+      "B_over_B_den_estimate": null,
+      "bias": 0.10123970530818711,
+      "bias_ci95": [
+        0.09889489110935057,
+        0.10357248915623511
+      ],
+      "epochs": 38,
+      "mean_estimate": -0.14219223373863998,
+      "mean_vd_denominator": null,
+      "mean_vd_denominator_clip": null,
+      "mean_vd_denominator_reference": null,
+      "method": "sv_readout_mitigated_weight_postselect",
+      "mse": 0.010304717708488753,
+      "mse_ci95": [
+        0.009837194010775738,
+        0.010783066076334667
+      ],
+      "resource_paired_sample": 4096.0,
+      "resource_two_qubit_gate_proxy": 4096.0,
+      "variance_between_epochs": 5.673274456234801e-05
+    },
+    {
+      "B": 8192,
+      "B_den_estimate": null,
+      "B_over_B_den_estimate": null,
+      "bias": 0.10108462661490861,
+      "bias_ci95": [
+        0.0989595839078326,
+        0.10311093968832183
+      ],
+      "epochs": 38,
+      "mean_estimate": -0.14234731243191848,
+      "mean_vd_denominator": null,
+      "mean_vd_denominator_clip": null,
+      "mean_vd_denominator_reference": null,
+      "method": "sv_readout_mitigated_weight_postselect",
+      "mse": 0.010262794966643032,
+      "mse_ci95": [
+        0.009834297936469848,
+        0.01066946377851551
+      ],
+      "resource_paired_sample": 8192.0,
+      "resource_two_qubit_gate_proxy": 8192.0,
+      "variance_between_epochs": 4.590115386937327e-05
+    },
+    {
+      "B": 512,
+      "B_den_estimate": null,
+      "B_over_B_den_estimate": null,
+      "bias": 0.2116376969296885,
+      "bias_ci95": [
+        0.2064667427381104,
+        0.21705709670649978
+      ],
+      "epochs": 38,
+      "mean_estimate": -0.03179424211713858,
+      "mean_vd_denominator": null,
+      "mean_vd_denominator_clip": null,
+      "mean_vd_denominator_reference": null,
+      "method": "unmitigated",
+      "mse": 0.045042093199505806,
+      "mse_ci95": [
+        0.04284185126380794,
+        0.04743043236904679
+      ],
+      "resource_paired_sample": 512.0,
+      "resource_two_qubit_gate_proxy": 512.0,
+      "variance_between_epochs": 0.0002583778550410405
+    },
+    {
+      "B": 1024,
+      "B_den_estimate": null,
+      "B_over_B_den_estimate": null,
+      "bias": 0.21092293364995926,
+      "bias_ci95": [
+        0.2072993522470182,
+        0.2148622450484775
+      ],
+      "epochs": 38,
+      "mean_estimate": -0.032509005396867824,
+      "mean_vd_denominator": null,
+      "mean_vd_denominator_clip": null,
+      "mean_vd_denominator_reference": null,
+      "method": "unmitigated",
+      "mse": 0.044627590062819744,
+      "mse_ci95": [
+        0.04309591963868761,
+        0.046315280013103595
+      ],
+      "resource_paired_sample": 1024.0,
+      "resource_two_qubit_gate_proxy": 1024.0,
+      "variance_between_epochs": 0.0001428657482690696
+    },
+    {
+      "B": 2048,
+      "B_den_estimate": null,
+      "B_over_B_den_estimate": null,
+      "bias": 0.21225755396849114,
+      "bias_ci95": [
+        0.2087054815838481,
+        0.2158821262254331
+      ],
+      "epochs": 38,
+      "mean_estimate": -0.031174385078335937,
+      "mean_vd_denominator": null,
+      "mean_vd_denominator_clip": null,
+      "mean_vd_denominator_reference": null,
+      "method": "unmitigated",
+      "mse": 0.04518092863485698,
+      "mse_ci95": [
+        0.043663335152934676,
+        0.04674085781248672
+      ],
+      "resource_paired_sample": 2048.0,
+      "resource_two_qubit_gate_proxy": 2048.0,
+      "variance_between_epochs": 0.00013110967271517848
+    },
+    {
+      "B": 4096,
+      "B_den_estimate": null,
+      "B_over_B_den_estimate": null,
+      "bias": 0.21272982123922612,
+      "bias_ci95": [
+        0.20971140023641083,
+        0.21574378513234985
+      ],
+      "epochs": 38,
+      "mean_estimate": -0.03070211780760093,
+      "mean_vd_denominator": null,
+      "mean_vd_denominator_clip": null,
+      "mean_vd_denominator_reference": null,
+      "method": "unmitigated",
+      "mse": 0.04534676418563835,
+      "mse_ci95": [
+        0.044078511160034244,
+        0.04664883635983778
+      ],
+      "resource_paired_sample": 4096.0,
+      "resource_two_qubit_gate_proxy": 4096.0,
+      "variance_between_epochs": 9.52951071426792e-05
+    },
+    {
+      "B": 8192,
+      "B_den_estimate": null,
+      "B_over_B_den_estimate": null,
+      "bias": 0.2119620496988647,
+      "bias_ci95": [
+        0.2094210036576023,
+        0.2146820154734882
+      ],
+      "epochs": 38,
+      "mean_estimate": -0.03146988934796238,
+      "mean_vd_denominator": null,
+      "mean_vd_denominator_clip": null,
+      "mean_vd_denominator_reference": null,
+      "method": "unmitigated",
+      "mse": 0.045000477272471175,
+      "mse_ci95": [
+        0.04392959442695329,
+        0.04615970911844327
+      ],
+      "resource_paired_sample": 8192.0,
+      "resource_two_qubit_gate_proxy": 8192.0,
+      "variance_between_epochs": 7.452802370899088e-05
+    },
+    {
+      "B": 512,
+      "B_den_estimate": 13304.130260099128,
+      "B_over_B_den_estimate": 0.03848428946426936,
+      "bias": 0.16746675010686515,
+      "bias_ci95": [
+        0.08236783249253106,
+        0.2436679725203375
+      ],
+      "epochs": 38,
+      "mean_estimate": -0.07596518893996193,
+      "mean_vd_denominator": 0.08068741524718939,
+      "mean_vd_denominator_clip": 0.033985968791417374,
+      "mean_vd_denominator_reference": 0.06797193758283475,
+      "method": "vd_m2_readout_mitigated",
+      "mse": 0.0917140706346326,
+      "mse_ci95": [
+        0.06271378199158091,
+        0.12473032917099534
+      ],
+      "resource_paired_sample": 512.0,
+      "resource_two_qubit_gate_proxy": 7168.0,
+      "variance_between_epochs": 0.06538974089850111
+    },
+    {
+      "B": 1024,
+      "B_den_estimate": 13304.130260099128,
+      "B_over_B_den_estimate": 0.07696857892853871,
+      "bias": 0.2758149979577349,
+      "bias_ci95": [
+        0.21292911011547097,
+        0.34704188286945803
+      ],
+      "epochs": 38,
+      "mean_estimate": 0.03238305891090785,
+      "mean_vd_denominator": 0.08155812170667155,
+      "mean_vd_denominator_clip": 0.033985968791417374,
+      "mean_vd_denominator_reference": 0.06797193758283475,
+      "method": "vd_m2_readout_mitigated",
+      "mse": 0.12279715856402396,
+      "mse_ci95": [
+        0.07860471522064241,
+        0.1759732512758623
+      ],
+      "resource_paired_sample": 1024.0,
+      "resource_two_qubit_gate_proxy": 14336.0,
+      "variance_between_epochs": 0.047986035883587796
+    },
+    {
+      "B": 2048,
+      "B_den_estimate": 13304.130260099128,
+      "B_over_B_den_estimate": 0.15393715785707743,
+      "bias": 0.25123094166999876,
+      "bias_ci95": [
+        0.20100192177431972,
+        0.2981081401903842
+      ],
+      "epochs": 38,
+      "mean_estimate": 0.007799002623171712,
+      "mean_vd_denominator": 0.07401199536452045,
+      "mean_vd_denominator_clip": 0.033985968791417374,
+      "mean_vd_denominator_reference": 0.06797193758283475,
+      "method": "vd_m2_readout_mitigated",
+      "mse": 0.08602653336610644,
+      "mse_ci95": [
+        0.0649305860729551,
+        0.10940336874190985
+      ],
+      "resource_paired_sample": 2048.0,
+      "resource_two_qubit_gate_proxy": 28672.0,
+      "variance_between_epochs": 0.023528724268136767
+    },
+    {
+      "B": 4096,
+      "B_den_estimate": 13304.130260099128,
+      "B_over_B_den_estimate": 0.30787431571415486,
+      "bias": 0.2588529248569211,
+      "bias_ci95": [
+        0.2280270108268779,
+        0.2886076273333728
+      ],
+      "epochs": 38,
+      "mean_estimate": 0.01542098581009399,
+      "mean_vd_denominator": 0.06784330791376074,
+      "mean_vd_denominator_clip": 0.033985968791417374,
+      "mean_vd_denominator_reference": 0.06797193758283475,
+      "method": "vd_m2_readout_mitigated",
+      "mse": 0.0765483190139303,
+      "mse_ci95": [
+        0.060478843046877125,
+        0.09359554935791224
+      ],
+      "resource_paired_sample": 4096.0,
+      "resource_two_qubit_gate_proxy": 57344.0,
+      "variance_between_epochs": 0.009801414261189292
+    },
+    {
+      "B": 8192,
+      "B_den_estimate": 13304.130260099128,
+      "B_over_B_den_estimate": 0.6157486314283097,
+      "bias": 0.2645702314106235,
+      "bias_ci95": [
+        0.24435231425069678,
+        0.28522310358966046
+      ],
+      "epochs": 38,
+      "mean_estimate": 0.021138292363796374,
+      "mean_vd_denominator": 0.06797193758283475,
+      "mean_vd_denominator_clip": 0.033985968791417374,
+      "mean_vd_denominator_reference": 0.06797193758283475,
+      "method": "vd_m2_readout_mitigated",
+      "mse": 0.0741405524751682,
+      "mse_ci95": [
+        0.06342235436287867,
+        0.085587339621032
+      ],
+      "resource_paired_sample": 8192.0,
+      "resource_two_qubit_gate_proxy": 114688.0,
+      "variance_between_epochs": 0.0042551220218080875
+    }
+  ],
+  "schema_version": "level3.stage3.analysis.v1"
+}
