@@ -42,4 +42,4 @@ class Stage1Config:
     near_cap_fraction: float = DEFAULT_NEAR_CAP_FRACTION
     archive_dir: Path = ARCHIVE_DIR
     mu_ideal_hint: float = -0.243
-
+    initial_layout: tuple[int, ...] | None = None

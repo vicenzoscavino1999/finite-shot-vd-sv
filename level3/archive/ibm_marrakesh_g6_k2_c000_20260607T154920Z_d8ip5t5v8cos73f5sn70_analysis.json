@@ -1,0 +1,92 @@
+{
+  "abs_bias": {
+    "sv_readout_mitigated_weight_postselect": 0.10010837852167923,
+    "unmitigated": 0.2584844395531002
+  },
+  "analysis_inputs": {
+    "calibration_shots_each": 4096,
+    "qaoa_shots": 4096,
+    "source": "archived_counts_only"
+  },
+  "archive_path": "level3\\archive\\ibm_marrakesh_g6_k2_c000_20260607T154920Z_d8ip5t5v8cos73f5sn70.json.gz",
+  "backend_name": "ibm_marrakesh",
+  "bias": {
+    "sv_readout_mitigated_weight_postselect": 0.10010837852167923,
+    "unmitigated": 0.2584844395531002
+  },
+  "estimators": {
+    "sv_readout_mitigated_weight_postselect": -0.14332356052514786,
+    "unmitigated": 0.01505250050627311
+  },
+  "instance_id": "g6_k2_c000",
+  "job_id": "d8ip5t5v8cos73f5sn70",
+  "mu_ideal_noiseless_l2": -0.24343193904682708,
+  "n": 6,
+  "negative_mass_before_clip": -0.0,
+  "readout_matrices": [
+    [
+      [
+        0.99609375,
+        0.00390625
+      ],
+      [
+        0.01171875,
+        0.98828125
+      ]
+    ],
+    [
+      [
+        0.996826171875,
+        0.003173828125
+      ],
+      [
+        0.00732421875,
+        0.99267578125
+      ]
+    ],
+    [
+      [
+        0.990478515625,
+        0.009521484375
+      ],
+      [
+        0.038330078125,
+        0.961669921875
+      ]
+    ],
+    [
+      [
+        0.998291015625,
+        0.001708984375
+      ],
+      [
+        0.007568359375,
+        0.992431640625
+      ]
+    ],
+    [
+      [
+        0.996826171875,
+        0.003173828125
+      ],
+      [
+        0.005615234375,
+        0.994384765625
+      ]
+    ],
+    [
+      [
+        0.999267578125,
+        0.000732421875
+      ],
+      [
+        0.006103515625,
+        0.993896484375
+      ]
+    ]
+  ],
+  "schema_version": "level3.analysis.v1",
+  "sector_weight": 2,
+  "sv_acceptance_after_readout_mitigation": 0.5001136115704663,
+  "sv_reduces_abs_bias_vs_unmitigated": true
+}

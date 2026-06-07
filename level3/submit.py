@@ -31,6 +31,7 @@ def dry_run(config: Stage1Config, backend: Any | None = None) -> dict[str, Any]:
         backend=backend,
         optimization_level=config.optimization_level,
         seed_transpiler=config.seed_transpiler,
+        initial_layout_override=config.initial_layout,
     )
     estimate = estimate_budget(
         [circuit.depth() for circuit in transpiled.circuits],
@@ -50,6 +51,15 @@ def dry_run(config: Stage1Config, backend: Any | None = None) -> dict[str, Any]:
     }
 
 
+def real_backend_dry_run(config: Stage1Config) -> dict[str, Any]:
+    backend = load_ibm_backend(config)
+    result = dry_run(config, backend=backend)
+    result["mode"] = "real_backend_dry_run"
+    result["backend_name"] = getattr(backend, "name", config.backend_name)
+    result["backend_status"] = backend_status(backend)
+    return result
+
+
 def run_offline_pipeline(
     config: Stage1Config,
     archive_name: str = "example_offline_counts.json.gz",
@@ -63,6 +73,7 @@ def run_offline_pipeline(
         backend=backend,
         optimization_level=config.optimization_level,
         seed_transpiler=config.seed_transpiler,
+        initial_layout_override=config.initial_layout,
     )
     estimate = estimate_budget(
         [circuit.depth() for circuit in transpiled.circuits],
@@ -111,16 +122,16 @@ def submit_to_ibm(
 ) -> tuple[Path, dict[str, Any]]:
     if not confirm_submit:
         raise BudgetExceeded("real QPU submission requires --confirm-submit")
-    from qiskit_ibm_runtime import QiskitRuntimeService, SamplerV2
+    from qiskit_ibm_runtime import SamplerV2
 
-    service = QiskitRuntimeService(channel=config.ibm_channel, region=config.ibm_region)
-    backend = service.backend(config.backend_name)
+    backend = load_ibm_backend(config)
     bundle = build_stage1_circuits(config.instance_id)
     transpiled = transpile_stage1_bundle(
         bundle,
         backend=backend,
         optimization_level=config.optimization_level,
         seed_transpiler=config.seed_transpiler,
+        initial_layout_override=config.initial_layout,
     )
     estimate = estimate_budget(
         [circuit.depth() for circuit in transpiled.circuits],
@@ -155,6 +166,13 @@ def submit_to_ibm(
     archive_path = Path(config.archive_dir) / archive_name
     write_archive(archive_path, payload)
     return archive_path, payload
+
+
+def load_ibm_backend(config: Stage1Config) -> Any:
+    from qiskit_ibm_runtime import QiskitRuntimeService
+
+    service = QiskitRuntimeService()
+    return service.backend(config.backend_name)
 
 
 def sampler_counts(result: Any) -> list[dict[str, int]]:
@@ -252,6 +270,19 @@ def backend_metadata(backend: Any) -> dict[str, Any]:
         "num_qubits": getattr(backend, "num_qubits", None),
         "version": getattr(backend, "version", None),
         "provider": str(provider),
+        "status": backend_status(backend),
+    }
+
+
+def backend_status(backend: Any) -> dict[str, Any]:
+    try:
+        status = backend.status()
+    except Exception:
+        return {}
+    return {
+        "operational": bool(getattr(status, "operational", False)),
+        "pending_jobs": int(getattr(status, "pending_jobs", -1)),
+        "status_msg": str(getattr(status, "status_msg", "")),
     }
 
 
@@ -292,7 +323,14 @@ def build_config_from_args(args: argparse.Namespace) -> Stage1Config:
         max_total_shots=args.max_total_shots,
         near_cap_fraction=args.near_cap_fraction,
         archive_dir=args.archive_dir,
+        initial_layout=parse_initial_layout(args.initial_layout),
     )
+
+
+def parse_initial_layout(value: str | None) -> tuple[int, ...] | None:
+    if value is None or not value.strip():
+        return None
+    return tuple(int(part.strip()) for part in value.split(",") if part.strip())
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -307,9 +345,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--shots-per-circuit", type=int, default=Stage1Config().shots_per_circuit)
     parser.add_argument("--max-total-shots", type=int, default=Stage1Config().max_total_shots)
     parser.add_argument("--near-cap-fraction", type=float, default=Stage1Config().near_cap_fraction)
+    parser.add_argument("--initial-layout")
     parser.add_argument("--archive-dir", type=Path, default=ARCHIVE_DIR)
     parser.add_argument("--archive-name", default="example_offline_counts.json.gz")
     parser.add_argument("--offline-execute", action="store_true")
+    parser.add_argument("--real-backend-dry-run", action="store_true")
     parser.add_argument("--submit", action="store_true")
     parser.add_argument("--confirm-near-cap", action="store_true")
     parser.add_argument("--confirm-submit", action="store_true")
@@ -328,6 +368,21 @@ def main(argv: list[str] | None = None) -> int:
             print(f"ARCHIVE_WRITTEN {archive_path}")
             if args.print_json:
                 print(json.dumps(payload, indent=2, sort_keys=True))
+            return 0
+        if args.real_backend_dry_run:
+            result = real_backend_dry_run(config)
+            status = result["backend_status"]
+            print(
+                "REAL_BACKEND_DRY_RUN "
+                f"backend={result['backend_name']} "
+                f"operational={str(status.get('operational')).lower()} "
+                f"pending_jobs={status.get('pending_jobs')} "
+                f"status_msg={status.get('status_msg')}"
+            )
+            print(render_budget_estimate(result["budget"]))
+            print("DRY_RUN no submission; use --submit --confirm-submit --confirm-near-cap for QPU")
+            if args.print_json:
+                print(json.dumps(result["bundle"].transpile_metadata, indent=2, sort_keys=True))
             return 0
         if args.offline_execute:
             archive_path, payload = run_offline_pipeline(
