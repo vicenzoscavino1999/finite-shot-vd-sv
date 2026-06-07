@@ -53,6 +53,6 @@ Status: validacion EN FORMA, no matcheo de coeficientes de Nivel 1. Additive Pha
 
 ## Descriptive Conclusion
 
-This redo replaces the trajectory-capped Step 5a table with exact-rho Option A. VD is sampled in every frozen instance and every grid reaches at least 10x B_den. The comparison is intentionally asymmetric in a conservative direction for any `SV dominates VD` reading: unmitigated and SV include the exact state-preparation noise plus configured readout, while VD receives an optimistic state-noise-only Hadamard-binomial model without c-SWAP/interference/readout overhead. No E5/E7/E8/E12 conclusions are drawn here; those analyses consume this table next.
+This redo replaces the trajectory-capped Step 5a table with exact-rho Option A. VD is sampled in every frozen instance and every grid reaches at least 10x B_den. The ordering of VD/SV/unmitigated is operating-window dependent, not universal: the optimistic VD model has the smaller bias floor in the n=6 moderate-noise window, while SV has the smaller error in the n=8 extreme-decoherence window where D_2 is near 0.007. Two caveats are explicit: the n=6 VD rows are an optimistic state-noise-only model without c-SWAP/interference/readout overhead, and the n=8 window is close to maximally mixed. No E5/E7/E8/E12 conclusions are drawn here; those analyses consume this table next.
 
 Runtime for this harness run: `43.763` seconds.

@@ -44,6 +44,8 @@ def test_level2_highpower_outputs_are_present_and_scoped():
     report = REPORT_PATH.read_text(encoding="utf-8")
     assert "validacion EN FORMA" in report
     assert "exact-rho Option A" in report
+    assert "operating-window dependent" in report
+    assert "conservative direction" not in report
     assert "Analyses E5/E7/E8/E12 are deferred" in report
 
 
