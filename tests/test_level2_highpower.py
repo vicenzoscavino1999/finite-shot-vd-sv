@@ -8,10 +8,11 @@ from level2 import highpower
 REPO_ROOT = Path(__file__).resolve().parents[1]
 CSV_PATH = REPO_ROOT / "level2" / "level2_highpower_results.csv"
 REPORT_PATH = REPO_ROOT / "level2" / "level2_highpower_report.md"
+STEP2_CSV_PATH = REPO_ROOT / "level2" / "level2_sampling_results.csv"
 
 
-def _rows():
-    with CSV_PATH.open(newline="", encoding="utf-8") as fh:
+def _rows(path=CSV_PATH):
+    with path.open(newline="", encoding="utf-8") as fh:
         return list(csv.DictReader(fh))
 
 
@@ -34,94 +35,93 @@ def test_level2_highpower_outputs_are_present_and_scoped():
     assert CSV_PATH.exists()
     assert REPORT_PATH.exists()
     rows = _rows()
+    assert len(rows) == len(highpower.INSTANCE_IDS) * len(highpower.METHODS) * len(highpower.B_GRID_FACTORS)
     assert {row["instance_id"] for row in rows} == set(highpower.INSTANCE_IDS)
     assert {row["method"] for row in rows} == set(highpower.METHODS)
+    assert {row["sample_status"] for row in rows} == {"sampled"}
     assert {int(row["mixer_trotter_steps"]) for row in rows} == {1}
     assert {int(row["repetitions"]) for row in rows} == {highpower.REPETITIONS}
     report = REPORT_PATH.read_text(encoding="utf-8")
     assert "validacion EN FORMA" in report
+    assert "exact-rho Option A" in report
     assert "Analyses E5/E7/E8/E12 are deferred" in report
 
 
 def test_level2_highpower_noiseless_vd_crosschecks_pass_for_all_instances():
-    vd_rows = [row for row in _rows() if row["method"] == "vd_m2_hadamard_swap"]
+    vd_rows = [row for row in _rows() if row["method"] == "vd_m2_hadamard_binomial"]
     assert {row["instance_id"] for row in vd_rows} == set(highpower.INSTANCE_IDS)
     for row in vd_rows:
         assert abs(float(row["noiseless_D_hat"]) - 1.0) <= highpower.NOISELESS_D_TOL
         assert float(row["noiseless_mu_abs_error"]) <= highpower.NOISELESS_MU_TOL
 
 
-def test_level2_highpower_b_grid_and_budget_flags_are_consistent():
+def test_level2_highpower_vd_is_sampled_and_grid_reaches_10x_bden():
     rows = _rows()
-    saw_crossed = False
-    saw_budget_limited = False
     for instance_id in highpower.INSTANCE_IDS:
-        inst_rows = [row for row in rows if row["instance_id"] == instance_id]
-        b_values = sorted({int(row["B"]) for row in inst_rows})
-        assert len(b_values) >= 1
+        vd_rows = [
+            row for row in rows
+            if row["instance_id"] == instance_id and row["method"] == "vd_m2_hadamard_binomial"
+        ]
+        assert len(vd_rows) == len(highpower.B_GRID_FACTORS)
+        assert {row["sample_status"] for row in vd_rows} == {"sampled"}
+        b_values = sorted(int(row["B"]) for row in vd_rows)
         b_max = max(b_values)
-        for row in inst_rows:
+        b_over = [float(row["B_over_B_den"]) for row in vd_rows]
+        assert min(b_over) < 1.0
+        assert max(b_over) >= 10.0
+        for row in vd_rows:
             b_den = float(row["B_den_impl_estimate"])
-            if math.isfinite(b_den) and b_den > 0:
-                assert _bool_cell(row["grid_crosses_B_den"]) == (b_max >= b_den)
-                assert _bool_cell(row["grid_reaches_10x_B_den"]) == (b_max >= 10.0 * b_den)
+            assert b_den > 0.0
             assert int(row["B_max_instance"]) == b_max
-        vd_rows = [row for row in inst_rows if row["method"] == "vd_m2_hadamard_swap"]
-        assert vd_rows
-        saw_crossed = saw_crossed or any(_bool_cell(row["grid_crosses_B_den"]) for row in vd_rows)
-        saw_budget_limited = saw_budget_limited or any(
-            row["sample_status"] == "budget_exceeded_not_sampled" for row in vd_rows
-        )
-    assert saw_crossed
-    assert saw_budget_limited
+            assert _bool_cell(row["grid_crosses_B_den"])
+            assert _bool_cell(row["grid_reaches_10x_B_den"])
+            assert b_max >= 10.0 * b_den
 
 
-def test_level2_highpower_resource_columns_and_direct_samples_present():
+def test_level2_highpower_resource_bden_and_model_columns_are_present():
     rows = _rows()
-    direct_rows = [row for row in rows if row["method"] in {"unmitigated", "sv_mitigated"}]
-    assert direct_rows
     for row in rows:
         assert float(row["B_den_impl_estimate"]) > 0.0
+        assert float(row["D_2_exact"]) > 0.0
         assert float(row["resource_R_paired_sample"]) > 0.0
         assert float(row["resource_R_two_qubit_gate_proxy"]) > 0.0
         assert float(row["kappa_paired_sample"]) > 0.0
         assert float(row["kappa_two_qubit_gate_proxy"]) > 0.0
-    for row in direct_rows:
-        assert row["sample_status"] == "sampled"
         assert math.isfinite(float(row["bias_empirical"]))
         assert math.isfinite(float(row["variance_empirical"]))
         assert math.isfinite(float(row["mse_empirical"]))
+        if row["method"] == "vd_m2_hadamard_binomial":
+            assert row["estimator_model"] == highpower.VD_MODEL
+            assert math.isfinite(float(row["mean_N_hat"]))
+            assert math.isfinite(float(row["mean_D_hat"]))
+            assert math.isfinite(float(row["mean_D_clipped"]))
+        else:
+            assert row["estimator_model"] == highpower.UNMIT_SV_MODEL
 
 
-def test_level2_highpower_small_harness_is_deterministic(monkeypatch):
-    fixed_meta = {
-        "noiseless_D_hat": 1.0,
-        "noiseless_N_hat": -0.25,
-        "noiseless_mu_hat": -0.25,
-        "noiseless_mu_abs_error": 0.0,
-        "noisy_D_reference": 0.05,
-        "denominator_clip_value": 0.025,
-        "B_den_impl_estimate": 1000.0,
-        "vd_circuit_qubits": 13.0,
-        "cswap_cx_count": 42.0,
-        "numerator_cx_count": 100.0,
-        "denominator_cx_count": 100.0,
-        "kappa_paired_sample_vd": 1.0,
-        "kappa_two_qubit_gate_proxy_vd": 14.0,
-    }
+def test_level2_highpower_unmitigated_matches_step2_trajectory_context():
+    step_rows = [row for row in _rows(STEP2_CSV_PATH) if row["method"] == "unmitigated"]
+    step_b = max(int(row["B"]) for row in step_rows)
+    step_row = next(row for row in step_rows if int(row["B"]) == step_b)
+    high_rows = [
+        row for row in _rows()
+        if row["instance_id"] == "g6_k2_c000" and row["method"] == "unmitigated"
+    ]
+    nearest = min(high_rows, key=lambda row: abs(int(row["B"]) - step_b))
+    assert abs(float(nearest["population_mean"]) - float(step_row["mean_estimate"])) < 0.03
+    assert abs(float(nearest["mean_estimate"]) - float(step_row["mean_estimate"])) < 0.03
 
-    monkeypatch.setattr(highpower, "vd_metadata_for_instance", lambda model, cfg, mu: fixed_meta)
+
+def test_level2_highpower_small_harness_is_deterministic():
     cfg = highpower.HighPowerConfig(
         instance_ids=("g6_k2_c000",),
-        repetitions=2,
+        repetitions=4,
         b_min=64,
-        b_max_cap=64,
+        absolute_b_ceiling=100_000,
         base_seed=909,
-        vd_trajectory_shot_cap_per_circuit=1,
-        sv_acceptance_reference_shots=32,
     )
     rows_a, _report_a = highpower.run_highpower(cfg, started_at=0.0)
     rows_b, _report_b = highpower.run_highpower(cfg, started_at=0.0)
     assert _normalize_for_compare(rows_a) == _normalize_for_compare(rows_b)
-    assert any(row["sample_status"] == "budget_exceeded_not_sampled" for row in rows_a)
-    assert any(not bool(row["grid_crosses_B_den"]) for row in rows_a)
+    assert {row["sample_status"] for row in rows_a} == {"sampled"}
+    assert any(row["method"] == "vd_m2_hadamard_binomial" for row in rows_a)

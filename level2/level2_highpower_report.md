@@ -1,48 +1,58 @@
-# Level 2 Step 5a High-Power Harness
+# Level 2 Step 5a High-Power Harness (Redo, Option A)
 
 Status: validacion EN FORMA, no matcheo de coeficientes de Nivel 1. Additive Phase B base-data harness; not a freeze and not an adjudication.
 
 ## Scope
 
 - Frozen instances: `g6_k2_c000, g6_k2_c001, g6_k2_c002, g6_k2_c003, g6_k2_c004, g8_k3_c000, g8_k3_c001, g8_k3_c002, g8_k3_c003, g8_k3_c004`.
-- Methods represented: `unmitigated, sv_mitigated, vd_m2_hadamard_swap`.
-- Direct-Z methods use T=`64` noisy Aer trajectory repetitions by splitting a single B_max shot pool per instance.
-- VD M=2 uses Step 3 Hadamard/SWAP cross-checks and B_den sizing. Cells whose requested trajectory budget exceeds the cap are marked, not imputed.
-- B cap: `8192`; VD trajectory cap per numerator/denominator circuit: `4096`.
+- Methods represented: `unmitigated, sv_mitigated, vd_m2_hadamard_binomial`.
+- Repetitions per cell: `100`.
+- Common base: exact Aer density matrix of the noisy state-preparation circuit at `mixer_trotter_steps=1`.
+- Unmitigated/SV model: exact rho plus configured tensor-product readout, then multinomial finite-shot sampling.
+- VD model: exact `D_2=Tr(rho^2)` and `N_2=Tr(O rho^2)` plus independent Hadamard-binomial finite-shot sampling.
+- VD framing: state-noise-only optimistic model; it omits the extra c-SWAP/interference/readout noise characterized in Step 3.
 - Analyses E5/E7/E8/E12 are deferred to Step 5b/5c over this base table.
 
-## Cross-Checks And Budget
+## Cross-Checks And Grid
 
-- Sampled aggregate rows: `66`.
-- Budget-marked rows: `33`.
-- VD budget-marked instances: `g6_k2_c000, g6_k2_c001, g6_k2_c002, g6_k2_c003, g6_k2_c004, g8_k3_c000, g8_k3_c001, g8_k3_c002, g8_k3_c003, g8_k3_c004`.
-- Instances not reaching 10x B_den within cap: `g6_k2_c000, g6_k2_c001, g6_k2_c002, g6_k2_c003, g6_k2_c004, g8_k3_c000, g8_k3_c001, g8_k3_c002, g8_k3_c003, g8_k3_c004`.
+- Sampled aggregate rows: `210`.
+- Budget-marked rows: `0`.
+- Instances not reaching 10x B_den: `none`.
+- Absolute B ceiling configured: `20000000`.
 
 ## Per-Method Summary
 
-| method | sampled rows | budget rows | median abs bias sampled | median MSE sampled |
+| method | rows | median abs empirical bias | median MSE | median population bias |
 |---|---:|---:|---:|---:|
-| unmitigated | 33 | 0 | 0.113612 | 0.0133196 |
-| sv_mitigated | 33 | 0 | 0.0186573 | 0.0019654 |
-| vd_m2_hadamard_swap | 0 | 33 | nan | nan |
+| unmitigated | 70 | 0.104397 | 0.0110173 | 0.104409 |
+| sv_mitigated | 70 | 0.0144562 | 0.00036541 | 0.0144463 |
+| vd_m2_hadamard_binomial | 70 | 0.0549494 | 0.0332066 | 0.0747067 |
 
-## Instance Denominator Budget
+## Inter-Instance Dispersion
 
-| instance | n | B_den | B_max | crosses B_den | reaches 10x B_den | VD status | noisy D reference |
-|---|---:|---:|---:|---|---|---|---:|
-| g6_k2_c000 | 6 | 3865.49 | 8192 | yes | no | budget_exceeded_not_sampled | 0.121094 |
-| g6_k2_c001 | 6 | 36632.8 | 8192 | no | no | budget_exceeded_not_sampled | -0.0390625 |
-| g6_k2_c002 | 6 | 2326.16 | 8192 | yes | no | budget_exceeded_not_sampled | 0.15625 |
-| g6_k2_c003 | 6 | 30304.5 | 8192 | no | no | budget_exceeded_not_sampled | 0.0429688 |
-| g6_k2_c004 | 6 | 101332 | 8192 | no | no | budget_exceeded_not_sampled | 0.0234375 |
-| g8_k3_c000 | 8 | 57122.5 | 8192 | no | no | budget_exceeded_not_sampled | 0.03125 |
-| g8_k3_c001 | 8 | 25488.1 | 8192 | no | no | budget_exceeded_not_sampled | 0.046875 |
-| g8_k3_c002 | 8 | 4732.61 | 8192 | yes | no | budget_exceeded_not_sampled | 0.109375 |
-| g8_k3_c003 | 8 | 227477 | 8192 | no | no | budget_exceeded_not_sampled | 0.015625 |
-| g8_k3_c004 | 8 | 57122.5 | 8192 | no | no | budget_exceeded_not_sampled | 0.03125 |
+| method | large-B mean abs bias avg | large-B mean abs bias sd | large-B MSE avg | large-B MSE sd |
+|---|---:|---:|---:|---:|
+| unmitigated | 0.106045 | 0.043941 | 0.012985 | 0.00983965 |
+| sv_mitigated | 0.0263133 | 0.0253283 | 0.00127151 | 0.00198144 |
+| vd_m2_hadamard_binomial | 0.0778666 | 0.0697943 | 0.0122755 | 0.0114568 |
+
+## Instance Denominator Grid
+
+| instance | n | D_2 exact | B_den | B_max | reaches 10x B_den | VD sampled |
+|---|---:|---:|---:|---:|---|---|
+| g6_k2_c000 | 6 | 0.111672 | 4541.07 | 45411 | yes | yes |
+| g6_k2_c001 | 6 | 0.122551 | 3774.56 | 37746 | yes | yes |
+| g6_k2_c002 | 6 | 0.148171 | 2586.16 | 25862 | yes | yes |
+| g6_k2_c003 | 6 | 0.147866 | 2596.82 | 25969 | yes | yes |
+| g6_k2_c004 | 6 | 0.120478 | 3904.9 | 39050 | yes | yes |
+| g8_k3_c000 | 8 | 0.00667417 | 1.24331e+06 | 12433078 | yes | yes |
+| g8_k3_c001 | 8 | 0.00718115 | 1.07412e+06 | 10741241 | yes | yes |
+| g8_k3_c002 | 8 | 0.00691518 | 1.15824e+06 | 11582429 | yes | yes |
+| g8_k3_c003 | 8 | 0.00665702 | 1.24971e+06 | 12497138 | yes | yes |
+| g8_k3_c004 | 8 | 0.0070694 | 1.10831e+06 | 11083128 | yes | yes |
 
 ## Descriptive Conclusion
 
-This file is the base long-format harness output for later Level 2 analyses. Direct-Z unmitigated and SV rows are sampled at T=64 across the frozen ensemble using noisy Aer trajectories and configured tensor-product readout mitigation. VD M=2 rows carry the same B grid, resource columns, noiseless cross-checks, and B_den sizing; however, the noisy VD trajectory budget needed for T=64 at B_max exceeds the current cap, so those cells are explicitly marked as budget-limited rather than treated as evidence. Step 5b/5c should either raise the VD simulation budget or keep the VD limitation as an operational finding.
+This redo replaces the trajectory-capped Step 5a table with exact-rho Option A. VD is sampled in every frozen instance and every grid reaches at least 10x B_den. The comparison is intentionally asymmetric in a conservative direction for any `SV dominates VD` reading: unmitigated and SV include the exact state-preparation noise plus configured readout, while VD receives an optimistic state-noise-only Hadamard-binomial model without c-SWAP/interference/readout overhead. No E5/E7/E8/E12 conclusions are drawn here; those analyses consume this table next.
 
-Runtime for this harness run: `251.587` seconds.
+Runtime for this harness run: `43.763` seconds.

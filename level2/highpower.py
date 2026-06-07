@@ -1,13 +1,14 @@
-"""Level 2 Step 5a: multi-method high-power sampling harness.
+"""Level 2 Step 5a redo: exact-rho multi-method sampling harness.
 
 This additive Phase B harness generates the base long-format data consumed by
 later Level 2 analyses. It intentionally does not adjudicate E5/E7/E8/E12.
 
-The direct-Z methods (unmitigated and SV) are sampled with noisy Aer trajectories
-at T=64. VD M=2 is wired through the Step 3 Hadamard/SWAP circuits and receives
-per-instance noiseless cross-checks plus noisy-denominator/B_den sizing. If the
-requested VD trajectory budget is infeasible, rows are emitted with an explicit
-``budget_exceeded_not_sampled`` status instead of silently faking data.
+Option A uses an exact noisy preparation density matrix per frozen instance.
+Unmitigated and SV are sampled from the exact Z/readout distribution. VD M=2 is
+sampled from the independent Hadamard-test binomial model with exact
+``N_2=Tr(O rho^2)`` and ``D_2=Tr(rho^2)``. That VD model is intentionally
+state-noise-only and optimistic: it omits the extra noisy c-SWAP/interference
+circuit characterized in Step 3.
 """
 
 from __future__ import annotations
@@ -19,9 +20,9 @@ import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable
 
 import numpy as np
+from qiskit_aer import AerSimulator
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
@@ -29,10 +30,17 @@ if str(REPO_ROOT) not in sys.path:
 
 from experiments._common import frozen_models  # noqa: E402
 from experiments.e7_resource_observable_sensitivity import resource_definitions  # noqa: E402
-from level2 import sampling, vd  # noqa: E402
-from level2.circuits import MIXER_TROTTER_STEPS, observable_expectation, simulate_noiseless_statevector  # noqa: E402
-from level2.noise_model import build_aer_simulator, load_config  # noqa: E402
+from level2 import sampling  # noqa: E402
+from level2.circuits import (  # noqa: E402
+    MIXER_TROTTER_STEPS,
+    bit_reverse_index,
+    build_xy_qaoa_circuit,
+    observable_expectation,
+    simulate_noiseless_statevector,
+)
+from level2.noise_model import build_noise_model, load_config  # noqa: E402
 from vd_sv import qaoa  # noqa: E402
+from vd_sv.estimators import make_rng, sample_direct_mean  # noqa: E402
 
 
 OUT_CSV = REPO_ROOT / "level2" / "level2_highpower_results.csv"
@@ -41,20 +49,17 @@ REPORT_PATH = REPO_ROOT / "level2" / "level2_highpower_report.md"
 INSTANCE_IDS = tuple(f"g6_k2_c{i:03d}" for i in range(5)) + tuple(
     f"g8_k3_c{i:03d}" for i in range(5)
 )
-METHODS = ("unmitigated", "sv_mitigated", "vd_m2_hadamard_swap")
-REPETITIONS = 64
+METHODS = ("unmitigated", "sv_mitigated", "vd_m2_hadamard_binomial")
+REPETITIONS = 100
 BASE_SEED = 25005
-B_MAX_CAP = 8192
 B_MIN = 64
-GRID_FACTORS = (0.25, 0.5, 1.0, 2.0, 10.0)
-VD_NOISELESS_CHECK_SHOTS = 4096
-VD_D_REFERENCE_SHOTS_N6 = 512
-VD_D_REFERENCE_SHOTS_N8 = 128
-VD_TRAJECTORY_SHOT_CAP_PER_CIRCUIT = 4096
-SV_ACCEPTANCE_REFERENCE_SHOTS = 4096
-DIRECT_METHOD_MEMORY = True
-NOISELESS_D_TOL = vd.NOISELESS_D_TOL
-NOISELESS_MU_TOL = vd.NOISELESS_MU_TOL
+B_GRID_FACTORS = (0.10, 0.25, 0.50, 1.0, 2.0, 5.0, 10.0)
+ABSOLUTE_B_CEILING = 20_000_000
+NOISELESS_D_TOL = 1.0e-10
+NOISELESS_MU_TOL = 1.0e-10
+DENOMINATOR_CLIP_FRACTION = 0.5
+VD_MODEL = "state_noise_only_optimistic"
+UNMIT_SV_MODEL = "exact_rho_plus_configured_readout"
 
 FIELDS = [
     "row_kind",
@@ -62,6 +67,7 @@ FIELDS = [
     "n_qubits",
     "method",
     "sample_status",
+    "estimator_model",
     "B",
     "repetitions",
     "B_max_instance",
@@ -70,6 +76,8 @@ FIELDS = [
     "grid_crosses_B_den",
     "grid_reaches_10x_B_den",
     "mu_ideal_l2",
+    "population_mean",
+    "population_bias",
     "mean_estimate",
     "bias_empirical",
     "variance_empirical",
@@ -80,8 +88,13 @@ FIELDS = [
     "mean_N_hat",
     "mean_D_hat",
     "mean_D_clipped",
+    "D_2_exact",
+    "N_2_exact",
+    "vd_population_mean",
     "noisy_D_reference",
     "denominator_clip_value",
+    "state_purity_noisy",
+    "readout_assignment_model",
     "noiseless_D_hat",
     "noiseless_N_hat",
     "noiseless_mu_hat",
@@ -90,8 +103,6 @@ FIELDS = [
     "resource_R_two_qubit_gate_proxy",
     "kappa_paired_sample",
     "kappa_two_qubit_gate_proxy",
-    "vd_estimated_shots_per_circuit",
-    "vd_trajectory_shot_cap_per_circuit",
     "mixer_trotter_steps",
     "runtime_seconds",
 ]
@@ -101,14 +112,28 @@ FIELDS = [
 class HighPowerConfig:
     instance_ids: tuple[str, ...] = INSTANCE_IDS
     repetitions: int = REPETITIONS
-    b_max_cap: int = B_MAX_CAP
     b_min: int = B_MIN
+    absolute_b_ceiling: int = ABSOLUTE_B_CEILING
     base_seed: int = BASE_SEED
-    vd_trajectory_shot_cap_per_circuit: int = VD_TRAJECTORY_SHOT_CAP_PER_CIRCUIT
-    sv_acceptance_reference_shots: int = SV_ACCEPTANCE_REFERENCE_SHOTS
-    vd_noiseless_check_shots: int = VD_NOISELESS_CHECK_SHOTS
-    vd_d_reference_shots_n6: int = VD_D_REFERENCE_SHOTS_N6
-    vd_d_reference_shots_n8: int = VD_D_REFERENCE_SHOTS_N8
+
+
+@dataclass(frozen=True)
+class InstanceContext:
+    model: object
+    mu_ideal: float
+    rho_noisy: np.ndarray
+    p_true: np.ndarray
+    p_observed: np.ndarray
+    observable_values: np.ndarray
+    assignment: np.ndarray
+    sector_mask: np.ndarray
+    readout_matrices: np.ndarray
+    d2: float
+    n2: float
+    vd_population_mean: float
+    b_den: float
+    sv_acceptance_reference: float
+    noiseless: dict[str, float]
 
 
 def main() -> int:
@@ -127,360 +152,337 @@ def run_highpower(
     started_at: float | None = None,
 ) -> tuple[list[dict], str]:
     t0 = time.time() if started_at is None else started_at
-    models = [_select_model(instance_id) for instance_id in config.instance_ids]
     rows: list[dict] = []
-    for model in models:
-        rows.extend(run_instance(model, config))
+    for instance_id in config.instance_ids:
+        rows.extend(run_instance(_select_model(instance_id), config))
     runtime_seconds = round(time.time() - t0, 3)
     for row in rows:
         row["runtime_seconds"] = runtime_seconds
-    report = render_report(rows, config)
-    return rows, report
+    return rows, render_report(rows, config)
 
 
 def run_instance(model, config: HighPowerConfig) -> list[dict]:
+    context = build_instance_context(model)
+    b_grid = b_grid_for_bden(context.b_den, config.b_min, config.absolute_b_ceiling)
+    b_max = max(b_grid)
+    rows: list[dict] = []
+    rows.extend(run_unmitigated(context, config, b_grid, b_max))
+    rows.extend(run_sv(context, config, b_grid, b_max))
+    rows.extend(run_vd(context, config, b_grid, b_max))
+    return rows
+
+
+def build_instance_context(model) -> InstanceContext:
     inst = model.inst
     mu_ideal = observable_expectation(
         simulate_noiseless_statevector(model, mixer_trotter_steps=MIXER_TROTTER_STEPS),
         inst,
     )
-    vd_meta = vd_metadata_for_instance(model, config, mu_ideal)
-    b_grid = b_grid_for_bden(vd_meta["B_den_impl_estimate"], config.b_min, config.b_max_cap)
-    b_max = max(b_grid)
-    direct_rows = run_direct_methods(model, config, b_grid, mu_ideal, vd_meta)
-    vd_rows = run_or_mark_vd(model, config, b_grid, mu_ideal, vd_meta, b_max)
-    return direct_rows + vd_rows
+    rho_noisy = exact_preparation_density_matrix(model, noisy=True)
+    rho_noiseless = exact_preparation_density_matrix(model, noisy=False)
+    observable_values = normalized_observable_values(inst)
+    o_matrix = np.diag(observable_values)
 
-
-def vd_metadata_for_instance(model, config: HighPowerConfig, mu_ideal: float) -> dict[str, float | str]:
-    inst = model.inst
-    circuits = vd.build_vd_circuits(model)
-    noiseless = vd.noiseless_vd_crosscheck(
-        circuits,
-        inst,
-        shots=config.vd_noiseless_check_shots,
-        seed=stable_seed(config.base_seed, inst.name, "vd_noiseless_crosscheck"),
-        mu_ideal=mu_ideal,
-    )
-    if (
-        abs(noiseless["D_hat"] - 1.0) > NOISELESS_D_TOL
-        or noiseless["mu_abs_error"] > NOISELESS_MU_TOL
-    ):
-        raise RuntimeError(
-            f"VD noiseless cross-check failed for {inst.name}: "
-            f"D_hat={noiseless['D_hat']:.6g}, mu_abs_error={noiseless['mu_abs_error']:.6g}"
-        )
-    ref_shots = (
-        config.vd_d_reference_shots_n6 if inst.n <= 6 else config.vd_d_reference_shots_n8
-    )
-    noisy_d = vd.noisy_denominator_reference(
-        circuits,
-        inst,
-        shots=ref_shots,
-        seed=stable_seed(config.base_seed, inst.name, "vd_noisy_denominator_reference"),
-    )
-    b_den = vd.denominator_sample_threshold(noisy_d)
-    clip_value = max(vd.DENOMINATOR_CLIP_FRACTION * noisy_d, vd.DENOMINATOR_CLIP_MIN)
-    metadata = vd.vd_circuit_metadata(circuits, inst.n)
-    return {
-        "noiseless_D_hat": noiseless["D_hat"],
-        "noiseless_N_hat": noiseless["N_hat"],
-        "noiseless_mu_hat": noiseless["mu_hat"],
-        "noiseless_mu_abs_error": noiseless["mu_abs_error"],
-        "noisy_D_reference": float(noisy_d),
-        "denominator_clip_value": float(clip_value),
-        "B_den_impl_estimate": float(b_den),
-        **metadata,
+    d0, n0, mu0 = vd_population_from_rho(rho_noiseless, o_matrix)
+    noiseless = {
+        "D_hat": d0,
+        "N_hat": n0,
+        "mu_hat": mu0,
+        "mu_abs_error": abs(mu0 - mu_ideal),
     }
+    if abs(d0 - 1.0) > NOISELESS_D_TOL or noiseless["mu_abs_error"] > NOISELESS_MU_TOL:
+        raise RuntimeError(
+            f"exact-rho noiseless VD cross-check failed for {inst.name}: "
+            f"D_2={d0:.12g}, mu_abs_error={noiseless['mu_abs_error']:.12g}"
+        )
 
-
-def b_grid_for_bden(b_den: float, b_min: int, b_max_cap: int) -> tuple[int, ...]:
-    if not math.isfinite(float(b_den)) or float(b_den) <= 0.0:
-        base = [b_min, 2 * b_min, 4 * b_min, 8 * b_min, min(b_max_cap, 16 * b_min)]
-    else:
-        base = [int(round(float(b_den) * factor)) for factor in GRID_FACTORS]
-        base.extend([b_min, b_max_cap])
-    cleaned = []
-    for value in base:
-        value = max(int(b_min), min(int(b_max_cap), int(value)))
-        value = int(max(1, round(value / 64.0)) * 64)
-        value = max(int(b_min), min(int(b_max_cap), value))
-        cleaned.append(value)
-    unique = sorted(set(cleaned))
-    while len(unique) < 5:
-        candidate = min(int(b_max_cap), unique[-1] * 2)
-        if candidate == unique[-1]:
-            break
-        unique.append(candidate)
-    return tuple(unique)
-
-
-def run_direct_methods(model, config: HighPowerConfig, b_grid: tuple[int, ...], mu_ideal: float, vd_meta: dict) -> list[dict]:
-    inst = model.inst
-    b_max = max(b_grid)
-    total_shots = int(config.repetitions * b_max)
-    circuit = sampling.measured_noisy_qaoa_circuit(model)
-    memory = run_memory(
-        circuit,
-        shots=total_shots,
-        seed=stable_seed(config.base_seed, inst.name, "direct_methods", b_max, config.repetitions),
-    )
-    observable_values = sampling._observable_values(inst)
+    d2, n2, vd_mu = vd_population_from_rho(rho_noisy, o_matrix)
+    p_true = probability_vector(np.real(np.diag(rho_noisy)))
     readout_matrices = configured_readout_matrices(inst.n)
     assignment = sampling.assignment_matrix(readout_matrices)
-    acceptance_reference = estimate_acceptance_from_memory(
-        memory,
-        inst,
-        assignment,
-        shots=min(config.sv_acceptance_reference_shots, len(memory)),
+    p_observed = probability_vector(assignment @ p_true)
+    sector = sampling.hamming_weights(inst.n) == inst.weight
+    sv_acceptance = float(np.sum(p_true[sector]))
+    return InstanceContext(
+        model=model,
+        mu_ideal=mu_ideal,
+        rho_noisy=rho_noisy,
+        p_true=p_true,
+        p_observed=p_observed,
+        observable_values=observable_values,
+        assignment=assignment,
+        sector_mask=sector,
+        readout_matrices=readout_matrices,
+        d2=d2,
+        n2=n2,
+        vd_population_mean=vd_mu,
+        b_den=denominator_sample_threshold(d2),
+        sv_acceptance_reference=sv_acceptance,
+        noiseless=noiseless,
     )
-    samples = {"unmitigated": {b: [] for b in b_grid}, "sv_mitigated": {b: [] for b in b_grid}}
-    for rep in range(config.repetitions):
-        rep_memory = memory[rep * b_max : (rep + 1) * b_max]
-        for b in b_grid:
-            prefix = rep_memory[:b]
-            observed = observed_distribution_from_memory(prefix, inst.n)
-            unmit = float(np.sum(observed * observable_values))
-            mitigated, negative_mass = sampling.mitigate_distribution(observed, assignment)
-            sector = sampling.hamming_weights(inst.n) == inst.weight
-            mitigated_accept = float(np.sum(mitigated[sector]))
-            mitigated_num = float(np.sum(mitigated[sector] * observable_values[sector]))
-            sv_denom = max(mitigated_accept, sampling.SV_CLIP_FRACTION * acceptance_reference)
-            sv_estimate = mitigated_num / sv_denom
-            samples["unmitigated"][b].append({
-                "estimate": unmit,
-                "acceptance": 1.0,
-                "negative_mass": 0.0,
-            })
-            samples["sv_mitigated"][b].append({
-                "estimate": sv_estimate,
-                "acceptance": mitigated_accept,
-                "negative_mass": negative_mass,
-            })
-    rows: list[dict] = []
-    for method in ("unmitigated", "sv_mitigated"):
-        rows.extend(aggregate_direct_rows(method, samples[method], config, model, mu_ideal, vd_meta, b_max))
-    return rows
 
 
-def run_or_mark_vd(model, config: HighPowerConfig, b_grid: tuple[int, ...], mu_ideal: float, vd_meta: dict, b_max: int) -> list[dict]:
-    estimated_shots = int(config.repetitions * b_max)
-    if estimated_shots > config.vd_trajectory_shot_cap_per_circuit:
-        return [
-            base_row(
-                model,
-                method="vd_m2_hadamard_swap",
-                b=b,
-                repetitions=config.repetitions,
-                mu_ideal=mu_ideal,
-                vd_meta=vd_meta,
-                sample_status="budget_exceeded_not_sampled",
-                vd_estimated_shots_per_circuit=estimated_shots,
-                config=config,
+def exact_preparation_density_matrix(model, noisy: bool) -> np.ndarray:
+    circuit = build_xy_qaoa_circuit(
+        model,
+        mixer_trotter_steps=MIXER_TROTTER_STEPS,
+        decompose_for_aer=True,
+    )
+    circuit.save_density_matrix()
+    simulator = AerSimulator(
+        method="density_matrix",
+        noise_model=build_noise_model() if noisy else None,
+        seed_simulator=int(load_config()["noise_model"]["seed_simulator"]),
+    )
+    result = simulator.run(circuit).result()
+    rho_qiskit = np.asarray(result.data(0)["density_matrix"], dtype=np.complex128)
+    rho_level1 = qiskit_density_to_level1(rho_qiskit, model.inst.n)
+    rho_level1 = 0.5 * (rho_level1 + rho_level1.conj().T)
+    trace = np.trace(rho_level1)
+    if abs(trace) == 0.0:
+        raise ValueError(f"zero-trace density matrix for {model.inst.name}")
+    return rho_level1 / trace
+
+
+def qiskit_density_to_level1(rho: np.ndarray, n: int) -> np.ndarray:
+    perm = [bit_reverse_index(index, n) for index in range(2**n)]
+    return np.asarray(rho, dtype=np.complex128)[np.ix_(perm, perm)]
+
+
+def vd_population_from_rho(rho: np.ndarray, observable: np.ndarray) -> tuple[float, float, float]:
+    rho2 = rho @ rho
+    d2 = float(np.real(np.trace(rho2)))
+    n2 = float(np.real(np.trace(observable @ rho2)))
+    if not (0.0 < d2 <= 1.0 + 1.0e-9):
+        raise ValueError(f"invalid D_2={d2}")
+    return d2, n2, float(n2 / d2)
+
+
+def run_unmitigated(
+    context: InstanceContext,
+    config: HighPowerConfig,
+    b_grid: tuple[int, ...],
+    b_max: int,
+) -> list[dict]:
+    population = float(context.p_observed @ context.observable_values)
+    rows = []
+    for b in b_grid:
+        rng = make_rng(stable_seed(config.base_seed, context.model.inst.name, "unmitigated", int(b)))
+        estimates = sample_direct_mean(
+            context.p_observed,
+            context.observable_values,
+            int(b),
+            int(config.repetitions),
+            rng,
+        )
+        rows.append(
+            aggregate_row(
+                context,
+                config,
+                method="unmitigated",
+                estimator_model=UNMIT_SV_MODEL,
+                b=int(b),
                 b_max=b_max,
+                estimates=estimates,
+                population_mean=population,
             )
-            for b in b_grid
-        ]
-    circuits = vd.build_vd_circuits(model)
-    den_memory = run_memory(
-        circuits["denominator"],
-        shots=estimated_shots,
-        seed=stable_seed(config.base_seed, model.inst.name, "vd_den", b_max, config.repetitions),
-    )
-    num_memory = run_memory(
-        circuits["numerator"],
-        shots=estimated_shots,
-        seed=stable_seed(config.base_seed, model.inst.name, "vd_num", b_max, config.repetitions),
-    )
-    samples: dict[int, list[dict]] = {b: [] for b in b_grid}
-    for rep in range(config.repetitions):
-        den_rep = den_memory[rep * b_max : (rep + 1) * b_max]
-        num_rep = num_memory[rep * b_max : (rep + 1) * b_max]
-        for b in b_grid:
-            d_hat = estimate_denominator_from_memory(den_rep[:b], model.inst.n)
-            n_hat = estimate_numerator_from_memory(num_rep[:b], model.inst)
-            d_clipped = max(d_hat, float(vd_meta["denominator_clip_value"]))
-            estimate = n_hat / d_clipped
-            samples[b].append({
-                "estimate": estimate,
-                "N_hat": n_hat,
-                "D_hat": d_hat,
-                "D_clipped": d_clipped,
-            })
-    return aggregate_vd_rows(samples, config, model, mu_ideal, vd_meta, estimated_shots, b_max)
-
-
-def aggregate_direct_rows(method: str, samples_by_b: dict[int, list[dict]], config: HighPowerConfig, model, mu_ideal: float, vd_meta: dict, b_max: int) -> list[dict]:
-    rows = []
-    for b in sorted(samples_by_b):
-        samples_for_b = samples_by_b[b]
-        estimates = np.asarray([sample["estimate"] for sample in samples_for_b], dtype=np.float64)
-        errors = estimates - mu_ideal
-        row = base_row(
-            model,
-            method=method,
-            b=b,
-            repetitions=config.repetitions,
-            mu_ideal=mu_ideal,
-            vd_meta=vd_meta,
-            sample_status="sampled",
-            vd_estimated_shots_per_circuit=0,
-            config=config,
-            b_max=b_max,
         )
-        row.update({
-            "mean_estimate": float(np.mean(estimates)),
-            "bias_empirical": float(np.mean(estimates) - mu_ideal),
-            "variance_empirical": float(np.var(estimates, ddof=1)),
-            "mse_empirical": float(np.mean(errors**2)),
-            "var_times_B": float(np.var(estimates, ddof=1) * b),
-            "mean_acceptance_fraction": float(np.mean([sample["acceptance"] for sample in samples_for_b])),
-            "mean_negative_mass": float(np.mean([sample["negative_mass"] for sample in samples_for_b])),
-        })
-        rows.append(row)
     return rows
 
 
-def aggregate_vd_rows(samples_by_b: dict[int, list[dict]], config: HighPowerConfig, model, mu_ideal: float, vd_meta: dict, estimated_shots: int, b_max: int) -> list[dict]:
+def run_sv(
+    context: InstanceContext,
+    config: HighPowerConfig,
+    b_grid: tuple[int, ...],
+    b_max: int,
+) -> list[dict]:
+    sector = context.sector_mask
+    population_num = float(np.sum(context.p_true[sector] * context.observable_values[sector]))
+    population = population_num / context.sv_acceptance_reference
     rows = []
-    for b in sorted(samples_by_b):
-        samples_for_b = samples_by_b[b]
-        estimates = np.asarray([sample["estimate"] for sample in samples_for_b], dtype=np.float64)
-        errors = estimates - mu_ideal
-        row = base_row(
-            model,
-            method="vd_m2_hadamard_swap",
-            b=b,
-            repetitions=config.repetitions,
-            mu_ideal=mu_ideal,
-            vd_meta=vd_meta,
-            sample_status="sampled",
-            vd_estimated_shots_per_circuit=estimated_shots,
-            config=config,
-            b_max=b_max,
+    for b in b_grid:
+        rng = make_rng(stable_seed(config.base_seed, context.model.inst.name, "sv_mitigated", int(b)))
+        counts = rng.multinomial(int(b), context.p_observed, size=int(config.repetitions))
+        estimates = []
+        acceptances = []
+        negative_mass = []
+        for sample_counts in counts:
+            observed = sample_counts.astype(np.float64) / float(b)
+            mitigated, neg = sampling.mitigate_distribution(observed, context.assignment)
+            mitigated_accept = float(np.sum(mitigated[sector]))
+            mitigated_num = float(np.sum(mitigated[sector] * context.observable_values[sector]))
+            denom = max(mitigated_accept, sampling.SV_CLIP_FRACTION * context.sv_acceptance_reference)
+            estimates.append(mitigated_num / denom)
+            acceptances.append(mitigated_accept)
+            negative_mass.append(neg)
+        rows.append(
+            aggregate_row(
+                context,
+                config,
+                method="sv_mitigated",
+                estimator_model=UNMIT_SV_MODEL,
+                b=int(b),
+                b_max=b_max,
+                estimates=np.asarray(estimates, dtype=np.float64),
+                population_mean=population,
+                acceptances=np.asarray(acceptances, dtype=np.float64),
+                negative_mass=np.asarray(negative_mass, dtype=np.float64),
+            )
         )
-        row.update({
-            "mean_estimate": float(np.mean(estimates)),
-            "bias_empirical": float(np.mean(estimates) - mu_ideal),
-            "variance_empirical": float(np.var(estimates, ddof=1)),
-            "mse_empirical": float(np.mean(errors**2)),
-            "var_times_B": float(np.var(estimates, ddof=1) * b),
-            "mean_N_hat": float(np.mean([sample["N_hat"] for sample in samples_for_b])),
-            "mean_D_hat": float(np.mean([sample["D_hat"] for sample in samples_for_b])),
-            "mean_D_clipped": float(np.mean([sample["D_clipped"] for sample in samples_for_b])),
-        })
-        rows.append(row)
     return rows
 
 
-def base_row(
-    model,
-    method: str,
+def run_vd(
+    context: InstanceContext,
+    config: HighPowerConfig,
+    b_grid: tuple[int, ...],
+    b_max: int,
+) -> list[dict]:
+    rows = []
+    for b in b_grid:
+        rng = make_rng(stable_seed(config.base_seed, context.model.inst.name, "vd_m2", int(b)))
+        estimates, n_hat, d_hat, d_clipped = sample_vd_streams(
+            context.n2,
+            context.d2,
+            int(b),
+            int(config.repetitions),
+            rng,
+        )
+        rows.append(
+            aggregate_row(
+                context,
+                config,
+                method="vd_m2_hadamard_binomial",
+                estimator_model=VD_MODEL,
+                b=int(b),
+                b_max=b_max,
+                estimates=estimates,
+                population_mean=context.vd_population_mean,
+                n_hat=n_hat,
+                d_hat=d_hat,
+                d_clipped=d_clipped,
+            )
+        )
+    return rows
+
+
+def sample_vd_streams(
+    n2: float,
+    d2: float,
     b: int,
     repetitions: int,
-    mu_ideal: float,
-    vd_meta: dict,
-    sample_status: str,
-    vd_estimated_shots_per_circuit: int,
+    rng,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    if not -1.0 <= n2 <= 1.0:
+        raise ValueError(f"N_2 outside [-1,1]: {n2}")
+    if not 0.0 < d2 <= 1.0:
+        raise ValueError(f"D_2 outside (0,1]: {d2}")
+    q_n = 0.5 * (1.0 + float(n2))
+    q_d = 0.5 * (1.0 + float(d2))
+    k_n = rng.binomial(int(b), q_n, size=int(repetitions))
+    k_d = rng.binomial(int(b), q_d, size=int(repetitions))
+    n_hat = 2.0 * k_n / float(b) - 1.0
+    d_hat = 2.0 * k_d / float(b) - 1.0
+    d_clipped = np.maximum(d_hat, DENOMINATOR_CLIP_FRACTION * float(d2))
+    return n_hat / d_clipped, n_hat, d_hat, d_clipped
+
+
+def aggregate_row(
+    context: InstanceContext,
     config: HighPowerConfig,
+    method: str,
+    estimator_model: str,
+    b: int,
     b_max: int,
+    estimates: np.ndarray,
+    population_mean: float,
+    acceptances: np.ndarray | None = None,
+    negative_mass: np.ndarray | None = None,
+    n_hat: np.ndarray | None = None,
+    d_hat: np.ndarray | None = None,
+    d_clipped: np.ndarray | None = None,
 ) -> dict:
-    inst = model.inst
-    kappa = resource_definitions(inst.n)
-    if method == "vd_m2_hadamard_swap":
-        k_paired = kappa["paired_sample"]["vd"]
-        k_twq = kappa["two_qubit_gate_proxy"]["vd"]
-    elif method == "sv_mitigated":
-        k_paired = kappa["paired_sample"]["sv"]
-        k_twq = kappa["two_qubit_gate_proxy"]["sv"]
-    else:
-        k_paired = kappa["paired_sample"]["unmitigated"]
-        k_twq = kappa["two_qubit_gate_proxy"]["unmitigated"]
-    b_den = float(vd_meta["B_den_impl_estimate"])
+    estimates = np.asarray(estimates, dtype=np.float64)
+    errors = estimates - context.mu_ideal
+    variance = float(np.var(estimates, ddof=1)) if estimates.size > 1 else 0.0
+    k_paired, k_twq = kappas_for_method(context.model.inst.n, method)
+    b_den = float(context.b_den)
     return {
         "row_kind": "aggregate",
-        "instance_id": inst.name,
-        "n_qubits": int(inst.n),
+        "instance_id": context.model.inst.name,
+        "n_qubits": int(context.model.inst.n),
         "method": method,
-        "sample_status": sample_status,
+        "sample_status": "sampled",
+        "estimator_model": estimator_model,
         "B": int(b),
-        "repetitions": int(repetitions),
+        "repetitions": int(config.repetitions),
         "B_max_instance": int(b_max),
         "B_den_impl_estimate": b_den,
-        "B_over_B_den": float(b / b_den) if math.isfinite(b_den) and b_den > 0 else 0.0,
-        "grid_crosses_B_den": bool(math.isfinite(b_den) and b_max >= b_den),
-        "grid_reaches_10x_B_den": bool(math.isfinite(b_den) and b_max >= 10.0 * b_den),
-        "mu_ideal_l2": float(mu_ideal),
-        "mean_estimate": float("nan"),
-        "bias_empirical": float("nan"),
-        "variance_empirical": float("nan"),
-        "mse_empirical": float("nan"),
-        "var_times_B": float("nan"),
-        "mean_acceptance_fraction": float("nan"),
-        "mean_negative_mass": float("nan"),
-        "mean_N_hat": float("nan"),
-        "mean_D_hat": float("nan"),
-        "mean_D_clipped": float("nan"),
-        "noisy_D_reference": float(vd_meta["noisy_D_reference"]),
-        "denominator_clip_value": float(vd_meta["denominator_clip_value"]),
-        "noiseless_D_hat": float(vd_meta["noiseless_D_hat"]),
-        "noiseless_N_hat": float(vd_meta["noiseless_N_hat"]),
-        "noiseless_mu_hat": float(vd_meta["noiseless_mu_hat"]),
-        "noiseless_mu_abs_error": float(vd_meta["noiseless_mu_abs_error"]),
+        "B_over_B_den": float(b / b_den),
+        "grid_crosses_B_den": bool(b_max >= b_den),
+        "grid_reaches_10x_B_den": bool(b_max >= 10.0 * b_den),
+        "mu_ideal_l2": float(context.mu_ideal),
+        "population_mean": float(population_mean),
+        "population_bias": float(population_mean - context.mu_ideal),
+        "mean_estimate": float(np.mean(estimates)),
+        "bias_empirical": float(np.mean(estimates) - context.mu_ideal),
+        "variance_empirical": variance,
+        "mse_empirical": float(np.mean(errors**2)),
+        "var_times_B": float(variance * b),
+        "mean_acceptance_fraction": mean_or_nan(acceptances),
+        "mean_negative_mass": mean_or_nan(negative_mass),
+        "mean_N_hat": mean_or_nan(n_hat),
+        "mean_D_hat": mean_or_nan(d_hat),
+        "mean_D_clipped": mean_or_nan(d_clipped),
+        "D_2_exact": float(context.d2),
+        "N_2_exact": float(context.n2),
+        "vd_population_mean": float(context.vd_population_mean),
+        "noisy_D_reference": float(context.d2),
+        "denominator_clip_value": float(DENOMINATOR_CLIP_FRACTION * context.d2),
+        "state_purity_noisy": float(context.d2),
+        "readout_assignment_model": configured_readout_label(),
+        "noiseless_D_hat": float(context.noiseless["D_hat"]),
+        "noiseless_N_hat": float(context.noiseless["N_hat"]),
+        "noiseless_mu_hat": float(context.noiseless["mu_hat"]),
+        "noiseless_mu_abs_error": float(context.noiseless["mu_abs_error"]),
         "resource_R_paired_sample": float(k_paired * b),
         "resource_R_two_qubit_gate_proxy": float(k_twq * b),
         "kappa_paired_sample": float(k_paired),
         "kappa_two_qubit_gate_proxy": float(k_twq),
-        "vd_estimated_shots_per_circuit": int(vd_estimated_shots_per_circuit),
-        "vd_trajectory_shot_cap_per_circuit": int(config.vd_trajectory_shot_cap_per_circuit),
         "mixer_trotter_steps": MIXER_TROTTER_STEPS,
         "runtime_seconds": 0.0,
     }
 
 
-def run_memory(circuit, shots: int, seed: int) -> list[str]:
-    simulator = build_aer_simulator(noisy=True)
-    simulator.set_options(
-        seed_simulator=int(seed),
-        max_parallel_threads=1,
-        max_parallel_experiments=1,
-        max_parallel_shots=1,
-    )
-    result = simulator.run(
-        circuit,
-        shots=int(shots),
-        seed_simulator=int(seed),
-        memory=DIRECT_METHOD_MEMORY,
-    ).result()
-    return [str(item).replace(" ", "") for item in result.get_memory()]
+def b_grid_for_bden(b_den: float, b_min: int, absolute_b_ceiling: int) -> tuple[int, ...]:
+    if not math.isfinite(float(b_den)) or float(b_den) <= 0.0:
+        raise ValueError(f"invalid B_den={b_den}")
+    values = []
+    for factor in B_GRID_FACTORS:
+        b = int(math.ceil(float(b_den) * float(factor)))
+        values.append(max(int(b_min), b))
+    required = int(math.ceil(10.0 * float(b_den)))
+    if required > int(absolute_b_ceiling):
+        values.append(int(absolute_b_ceiling))
+    else:
+        values.append(required)
+    return tuple(sorted(set(values)))
 
 
-def observed_distribution_from_memory(memory: list[str], n: int) -> np.ndarray:
-    total = float(len(memory))
-    dist = np.zeros(2**n, dtype=np.float64)
-    for key in memory:
-        dist[sampling.qiskit_key_to_level1_index(key, n)] += 1.0 / total
-    return dist
+def denominator_sample_threshold(d2: float, eps: float = 1.0e-3) -> float:
+    d_abs = abs(float(d2))
+    if d_abs <= 0.0:
+        return float("inf")
+    sigma_d2 = max(1.0 - d_abs**2, 0.0)
+    return float((8.0 * sigma_d2 / d_abs**2 + 8.0 / (3.0 * d_abs)) * math.log(1.0 / eps))
 
 
-def estimate_acceptance_from_memory(memory: list[str], inst: qaoa.QAOAInstance, assignment: np.ndarray, shots: int) -> float:
-    observed = observed_distribution_from_memory(memory[:shots], inst.n)
-    mitigated, _negative_mass = sampling.mitigate_distribution(observed, assignment)
-    return float(np.sum(mitigated[sampling.hamming_weights(inst.n) == inst.weight]))
-
-
-def estimate_denominator_from_memory(memory: list[str], n: int) -> float:
-    counts = {}
-    for key in memory:
-        counts[key] = counts.get(key, 0) + 1
-    return vd.estimate_denominator(counts, n)
-
-
-def estimate_numerator_from_memory(memory: list[str], inst: qaoa.QAOAInstance) -> float:
-    counts = {}
-    for key in memory:
-        counts[key] = counts.get(key, 0) + 1
-    return vd.estimate_numerator(counts, inst)
+def normalized_observable_values(inst: qaoa.QAOAInstance) -> np.ndarray:
+    diag = qaoa.cost_diagonal(inst)
+    scale = float(np.max(np.abs(diag)))
+    if scale == 0.0:
+        raise ValueError("zero observable scale")
+    return np.asarray(diag / scale, dtype=np.float64)
 
 
 def configured_readout_matrices(n: int) -> np.ndarray:
@@ -488,18 +490,48 @@ def configured_readout_matrices(n: int) -> np.ndarray:
     return np.repeat(matrix[None, :, :], int(n), axis=0)
 
 
+def configured_readout_label() -> str:
+    matrix = load_config()["noise_model"]["readout_error_matrix"]
+    return f"tensor_product_configured_readout_{matrix}"
+
+
+def probability_vector(values: np.ndarray) -> np.ndarray:
+    arr = np.clip(np.asarray(values, dtype=np.float64), 0.0, None)
+    total = float(np.sum(arr))
+    if total <= 0.0:
+        raise ValueError("non-positive probability vector")
+    return arr / total
+
+
+def kappas_for_method(n_qubits: int, method: str) -> tuple[float, float]:
+    kappa = resource_definitions(n_qubits)
+    if method == "vd_m2_hadamard_binomial":
+        key = "vd"
+    elif method == "sv_mitigated":
+        key = "sv"
+    else:
+        key = "unmitigated"
+    return float(kappa["paired_sample"][key]), float(kappa["two_qubit_gate_proxy"][key])
+
+
+def mean_or_nan(values: np.ndarray | None) -> float:
+    if values is None:
+        return float("nan")
+    arr = np.asarray(values, dtype=np.float64)
+    if arr.size == 0:
+        return float("nan")
+    return float(np.mean(arr))
+
+
 def render_report(rows: list[dict], config: HighPowerConfig) -> str:
-    sampled = [row for row in rows if row["sample_status"] == "sampled"]
-    budget = [row for row in rows if row["sample_status"] == "budget_exceeded_not_sampled"]
     instances = sorted({row["instance_id"] for row in rows})
-    vd_budget_instances = sorted({row["instance_id"] for row in budget if row["method"] == "vd_m2_hadamard_swap"})
-    non_crossing = sorted({
+    non_10x = sorted({
         row["instance_id"]
         for row in rows
-        if row["method"] == "vd_m2_hadamard_swap" and not bool(row["grid_reaches_10x_B_den"])
+        if row["method"] == "vd_m2_hadamard_binomial" and not bool(row["grid_reaches_10x_B_den"])
     })
     lines = [
-        "# Level 2 Step 5a High-Power Harness",
+        "# Level 2 Step 5a High-Power Harness (Redo, Option A)",
         "",
         "Status: validacion EN FORMA, no matcheo de coeficientes de Nivel 1. Additive Phase B base-data harness; not a freeze and not an adjudication.",
         "",
@@ -507,66 +539,79 @@ def render_report(rows: list[dict], config: HighPowerConfig) -> str:
         "",
         f"- Frozen instances: `{', '.join(instances)}`.",
         f"- Methods represented: `{', '.join(METHODS)}`.",
-        f"- Direct-Z methods use T=`{config.repetitions}` noisy Aer trajectory repetitions by splitting a single B_max shot pool per instance.",
-        "- VD M=2 uses Step 3 Hadamard/SWAP cross-checks and B_den sizing. Cells whose requested trajectory budget exceeds the cap are marked, not imputed.",
-        f"- B cap: `{config.b_max_cap}`; VD trajectory cap per numerator/denominator circuit: `{config.vd_trajectory_shot_cap_per_circuit}`.",
+        f"- Repetitions per cell: `{config.repetitions}`.",
+        "- Common base: exact Aer density matrix of the noisy state-preparation circuit at `mixer_trotter_steps=1`.",
+        "- Unmitigated/SV model: exact rho plus configured tensor-product readout, then multinomial finite-shot sampling.",
+        "- VD model: exact `D_2=Tr(rho^2)` and `N_2=Tr(O rho^2)` plus independent Hadamard-binomial finite-shot sampling.",
+        "- VD framing: state-noise-only optimistic model; it omits the extra c-SWAP/interference/readout noise characterized in Step 3.",
         "- Analyses E5/E7/E8/E12 are deferred to Step 5b/5c over this base table.",
         "",
-        "## Cross-Checks And Budget",
+        "## Cross-Checks And Grid",
         "",
-        f"- Sampled aggregate rows: `{len(sampled)}`.",
-        f"- Budget-marked rows: `{len(budget)}`.",
-        f"- VD budget-marked instances: `{', '.join(vd_budget_instances) if vd_budget_instances else 'none'}`.",
-        f"- Instances not reaching 10x B_den within cap: `{', '.join(non_crossing) if non_crossing else 'none'}`.",
+        f"- Sampled aggregate rows: `{len(rows)}`.",
+        "- Budget-marked rows: `0`.",
+        f"- Instances not reaching 10x B_den: `{', '.join(non_10x) if non_10x else 'none'}`.",
+        f"- Absolute B ceiling configured: `{config.absolute_b_ceiling}`.",
         "",
         "## Per-Method Summary",
         "",
-        "| method | sampled rows | budget rows | median abs bias sampled | median MSE sampled |",
+        "| method | rows | median abs empirical bias | median MSE | median population bias |",
         "|---|---:|---:|---:|---:|",
     ]
     for method in METHODS:
         method_rows = [row for row in rows if row["method"] == method]
-        method_sampled = [row for row in method_rows if row["sample_status"] == "sampled"]
-        abs_bias = [abs(float(row["bias_empirical"])) for row in method_sampled if math.isfinite(float(row["bias_empirical"]))]
-        mse = [float(row["mse_empirical"]) for row in method_sampled if math.isfinite(float(row["mse_empirical"]))]
+        abs_bias = [abs(float(row["bias_empirical"])) for row in method_rows]
+        mse = [float(row["mse_empirical"]) for row in method_rows]
+        pop_bias = [abs(float(row["population_bias"])) for row in method_rows]
         lines.append(
-            f"| {method} | {len(method_sampled)} | {len(method_rows) - len(method_sampled)} "
-            f"| {_median_or_nan(abs_bias):.6g} | {_median_or_nan(mse):.6g} |"
+            f"| {method} | {len(method_rows)} | {_median_or_nan(abs_bias):.6g} "
+            f"| {_median_or_nan(mse):.6g} | {_median_or_nan(pop_bias):.6g} |"
         )
     lines.extend([
         "",
-        "## Instance Denominator Budget",
+        "## Inter-Instance Dispersion",
         "",
-        "| instance | n | B_den | B_max | crosses B_den | reaches 10x B_den | VD status | noisy D reference |",
-        "|---|---:|---:|---:|---|---|---|---:|",
+        "| method | large-B mean abs bias avg | large-B mean abs bias sd | large-B MSE avg | large-B MSE sd |",
+        "|---|---:|---:|---:|---:|",
+    ])
+    for method in METHODS:
+        large_rows = largest_b_rows(rows, method)
+        abs_bias = np.asarray([abs(float(row["bias_empirical"])) for row in large_rows], dtype=np.float64)
+        mse = np.asarray([float(row["mse_empirical"]) for row in large_rows], dtype=np.float64)
+        lines.append(
+            f"| {method} | {float(np.mean(abs_bias)):.6g} | {_std_or_zero(abs_bias):.6g} "
+            f"| {float(np.mean(mse)):.6g} | {_std_or_zero(mse):.6g} |"
+        )
+    lines.extend([
+        "",
+        "## Instance Denominator Grid",
+        "",
+        "| instance | n | D_2 exact | B_den | B_max | reaches 10x B_den | VD sampled |",
+        "|---|---:|---:|---:|---:|---|---|",
     ])
     for instance_id in instances:
         vd_rows = [
             row for row in rows
-            if row["instance_id"] == instance_id and row["method"] == "vd_m2_hadamard_swap"
+            if row["instance_id"] == instance_id and row["method"] == "vd_m2_hadamard_binomial"
         ]
-        if not vd_rows:
-            continue
         row = vd_rows[0]
         lines.append(
-            f"| {instance_id} | {int(row['n_qubits'])} | {float(row['B_den_impl_estimate']):.6g} "
-            f"| {int(row['B_max_instance'])} | {_bool_word(bool(row['grid_crosses_B_den']))} "
-            f"| {_bool_word(bool(row['grid_reaches_10x_B_den']))} | {row['sample_status']} "
-            f"| {float(row['noisy_D_reference']):.6g} |"
+            f"| {instance_id} | {int(row['n_qubits'])} | {float(row['D_2_exact']):.6g} "
+            f"| {float(row['B_den_impl_estimate']):.6g} | {int(row['B_max_instance'])} "
+            f"| {_bool_word(bool(row['grid_reaches_10x_B_den']))} | {_bool_word(row['sample_status'] == 'sampled')} |"
         )
     lines.extend([
         "",
         "## Descriptive Conclusion",
         "",
         (
-            "This file is the base long-format harness output for later Level 2 analyses. "
-            "Direct-Z unmitigated and SV rows are sampled at T=64 across the frozen ensemble "
-            "using noisy Aer trajectories and configured tensor-product readout mitigation. "
-            "VD M=2 rows carry the same B grid, resource columns, noiseless cross-checks, and "
-            "B_den sizing; however, the noisy VD trajectory budget needed for T=64 at B_max "
-            "exceeds the current cap, so those cells are explicitly marked as budget-limited "
-            "rather than treated as evidence. Step 5b/5c should either raise the VD simulation "
-            "budget or keep the VD limitation as an operational finding."
+            "This redo replaces the trajectory-capped Step 5a table with exact-rho Option A. "
+            "VD is sampled in every frozen instance and every grid reaches at least 10x B_den. "
+            "The comparison is intentionally asymmetric in a conservative direction for any "
+            "`SV dominates VD` reading: unmitigated and SV include the exact state-preparation "
+            "noise plus configured readout, while VD receives an optimistic state-noise-only "
+            "Hadamard-binomial model without c-SWAP/interference/readout overhead. "
+            "No E5/E7/E8/E12 conclusions are drawn here; those analyses consume this table next."
         ),
         "",
         f"Runtime for this harness run: `{max(float(row['runtime_seconds']) for row in rows):.3f}` seconds.",
@@ -574,10 +619,28 @@ def render_report(rows: list[dict], config: HighPowerConfig) -> str:
     return "\n".join(lines) + "\n"
 
 
+def largest_b_rows(rows: list[dict], method: str) -> list[dict]:
+    out = []
+    for instance_id in sorted({row["instance_id"] for row in rows}):
+        inst_method = [
+            row for row in rows
+            if row["instance_id"] == instance_id and row["method"] == method
+        ]
+        if inst_method:
+            out.append(max(inst_method, key=lambda row: int(row["B"])))
+    return out
+
+
 def _median_or_nan(values: list[float]) -> float:
     if not values:
         return float("nan")
     return float(np.median(np.asarray(values, dtype=np.float64)))
+
+
+def _std_or_zero(values: np.ndarray) -> float:
+    if values.size <= 1:
+        return 0.0
+    return float(np.std(values, ddof=1))
 
 
 def _bool_word(value: bool) -> str:
