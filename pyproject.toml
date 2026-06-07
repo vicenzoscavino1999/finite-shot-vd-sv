@@ -41,6 +41,11 @@ level2 = [
     "qiskit>=1.0",
     "qiskit-aer>=0.14",
 ]
+level3 = [
+    "qiskit>=2.3",
+    "qiskit-aer>=0.17",
+    "qiskit-ibm-runtime>=0.43",
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]

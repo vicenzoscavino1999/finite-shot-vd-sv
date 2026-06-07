@@ -1,5 +1,5 @@
 .PHONY: reproduce run verify verify-freeze figures test check reproduce-fast reproduce-full \
-        reproduce-level1 analysis-from-hardware check-env determinism-check \
+        reproduce-level1 analysis-from-hardware level3-analysis check-env determinism-check \
         level2-foundation level2-sampling
 
 reproduce: run verify
@@ -34,8 +34,10 @@ reproduce-level1:
 	python reproducibility/verify.py --reference reproducibility/reference/
 
 analysis-from-hardware:
-	python reproducibility/run_all.py --level 3 --from-archived-counts
-	python reproducibility/verify.py --reference reproducibility/reference/
+	python scripts/reanalyze_level3_archives.py
+
+level3-analysis:
+	python scripts/reanalyze_level3_archives.py
 
 check-env:
 	python reproducibility/run_all.py --check-env-only

@@ -15,10 +15,10 @@ on hardware:
 - P9 form: SV dominates the observed MSE curve while VD is degraded by
   Hadamard/SWAP and routing overhead.
 
-The run uses one primary instance, `g6_k2_c000`. A second instance was not run
-because the primary run filled the intended hardware budget window with 38
-calibration epochs. Claims remain qualitative: no coefficient matching, no
-constant validation, and no Level 1 numeric adjudication.
+The run uses one primary instance, `g6_k2_c000`. Later additive robustness
+reports extend the same Stage 3 pipeline to `g6_k2_c001` and `g8_k3_c000`.
+Claims remain qualitative: no coefficient matching, no constant validation, and
+no Level 1 numeric adjudication.
 
 Each epoch is one SamplerV2 job containing readout calibration, the shared Z
 measurement circuit, VD numerator, and VD denominator. Epochs are the bootstrap

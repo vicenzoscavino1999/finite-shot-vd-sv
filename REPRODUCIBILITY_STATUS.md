@@ -1,24 +1,30 @@
 # Current Reproducibility Status
 
 Status: additive operational status note. Not a PAP freeze, not an adjudication,
-and not a replacement for `REPRODUCIBILITY_PLAN.md`.
+and not a replacement for the frozen `REPRODUCIBILITY_PLAN.md`.
 
-This document records the reproducibility state of the repository after the
-Level 2 Step 2 checkpoint. The formal plans are frozen artifacts; this file is
-the living runbook for what a reviewer or maintainer should run today.
+This document records the current runbook for the repository after the Level 2
+device-simulation layer and the Level 3 IBM hardware archive layer. The formal
+plans remain frozen artifacts; this file tracks what a reviewer or maintainer
+should run today.
 
 ## Scope At This Checkpoint
 
-Last experimental checkpoint before this reproducibility cleanup:
+Current checkpoint:
 
-- Commit: `9b6482f`
-- Scope: Level 2 Step 2, noisy Aer sampling for unmitigated and
-  readout-mitigated SV only.
-- Explicitly not included yet: Level 2 VD Hadamard/quotient sampling, gate
-  folding, Level 2 E5/E7/E12, and hardware.
+- Commit: `07fe23d`
+- Level 1: frozen white-box coefficient-validation core.
+- Level 2: additive Qiskit/Aer device-simulation robustness layer complete
+  through high-power exact-rho, realistic n=6 VD, denominator concentration,
+  crossing diagnostics, Efron--Stein window checks, and small-noise P10.
+- Level 3: additive IBM hardware layer complete as archive-only analysis:
+  Stage 2 precursor, full Stage 3 `g6_k2_c000`, and preliminary `g6_k2_c001`
+  inter-instance robustness check.
 
-The current cleanup is documentation/command organization only. It does not add
-experiments, does not change frozen artifacts, and does not create a new freeze.
+No new PAP freeze is active. Level 2 and Level 3 are additive validation layers:
+Level 2 validates laws in form under a gate-level model, and Level 3 validates
+qualitative feasibility from archived hardware counts. Coefficient-level claims
+remain Level 1 only.
 
 ## Freeze Provenance
 
@@ -53,11 +59,16 @@ Minimal Level 1 verification needs only the base package:
 pip install -e .
 ```
 
-The full current test suite includes Level 2 checks, so use:
+The current full local test environment includes development, figures, Level 2,
+and Level 3 Runtime dependencies:
 
 ```bash
-pip install -e ".[dev,figures,level2]"
+pip install -e ".[dev,figures,level2,level3]"
 ```
+
+Level 3 analysis from archives does not require an IBM account. Device
+submission scripts require a saved global IBM account and are not part of the
+public reproduction route.
 
 ### Level 1 Reference Verification
 
@@ -69,12 +80,12 @@ What it proves:
 
 - The current Level 1 canonical outputs match the committed reference package
   within registered tolerances.
-- The numerical white-box reproduction path is intact.
+- The numerical white-box coefficient-validation path is intact.
 
 What it does not prove:
 
 - It does not adjudicate v1/v2 again.
-- It does not verify Level 2 outputs yet.
+- It does not verify Level 2 outputs as a relaxed-tolerance reference tier.
 - It does not audit frozen-file drift; use `pap/verify_freeze.py` for that.
 
 ### Full Test Suite
@@ -86,45 +97,74 @@ python -m pytest tests/ -q
 What it proves:
 
 - Scientific invariants, regression checks, freeze-audit tests, secondary
-  endpoint tests, and Level 2 Step 1/2 tests pass in the current environment.
+  endpoint tests, Level 2 tests, and Level 3 archive-analysis tests pass in the
+  current environment.
 
 Runtime note:
 
-- The suite can take several minutes on Windows because Level 2 sampling tests
-  invoke Aer.
+- The suite can take several minutes on Windows because several tests exercise
+  Qiskit/Aer and archive-analysis paths.
 
-### Level 2 Step 1 Foundation
+### Level 2 Device-Simulation Layer
+
+The consolidated Level 2 summary is:
 
 ```bash
-pip install -e ".[level2]"
+level2/LEVEL2_SUMMARY.md
+```
+
+Representative commands:
+
+```bash
 python -m level2.circuits
+python -m level2.sampling
+python -m level2.vd
+python -m level2.highpower
+python -m level2.vd_realistic_n6
+python -m level2.crossing_denominator
+python -m level2.window_efronstein
+python -m level2.p10_smallnoise
 ```
 
 What it proves:
 
-- The realistic-depth Qiskit circuit builds.
-- The state remains inside the Hamming-weight sector.
-- The Qiskit/Level 1 ordering cross-check is exercised.
-- The synthetic Aer noise model loads.
+- The finite-shot laws are visible in form under the synthetic Aer device model.
+- Readout mitigation is applied before SV postselection.
+- Realistic VD overhead is represented by an explicit Hadamard/SWAP
+  interferometry circuit rather than by the optimistic state-noise-only contrast.
 
-It does not run noisy sampling.
+What it does not prove:
 
-### Level 2 Step 2 Sampling
+- It does not validate Level 1 analytic coefficients.
+- It is not yet registered in `reproducibility/verify.py` as a relaxed-tolerance
+  reference tier.
+
+### Level 3 Hardware Archive Analysis
+
+Re-run consolidated hardware analyses from committed archives:
 
 ```bash
-pip install -e ".[level2]"
-python -m level2.sampling
+python scripts/reanalyze_level3_archives.py
+```
+
+or:
+
+```bash
+make analysis-from-hardware
 ```
 
 What it proves:
 
-- The current additive Level 2 sampling layer regenerates
-  `level2/level2_sampling_results.csv` and
-  `level2/level2_sampling_report.md`.
-- Readout mitigation is applied before SV postselection.
-- The reported laws are checked in form, not as Level 1 coefficient recovery.
+- The Stage 3 `g6_k2_c000` and `g6_k2_c001` analyses can be reproduced from raw
+  archived hardware counts.
+- The analysis path does not connect to IBM Runtime and does not submit QPU
+  jobs.
+- Cluster-bootstrap summaries are recomputed from calibration epochs.
 
-It does not implement VD, folding, Level 2 E5/E7/E12, or hardware.
+What it does not prove:
+
+- It does not reproduce the hardware experiment by re-executing QPU jobs.
+- It does not validate analytic coefficients on hardware.
 
 ## Artifact Map
 
@@ -135,30 +175,35 @@ It does not implement VD, folding, Level 2 E5/E7/E12, or hardware.
 | v1/v2 confirmatory outputs | `results/confirmatory_full/`, `results/confirmatory_v2/` | frozen results, not modified |
 | Post-adjudication analysis | `analysis/ensemble_coverage_*`, `analysis/c_vd_se_sensitivity_*`, `analysis/e6_spectral_resolvability_*` | analysis only |
 | Secondary endpoints | `results/secondary/e6/e8/e9/e10/e11/e12...` | descriptive, additive |
-| Level 2 Step 1 | `level2/circuits.py`, `level2/noise_model.py`, `level2/level2_foundation_report.md` | additive Phase B |
-| Level 2 Step 2 | `level2/sampling.py`, `level2/level2_sampling_*` | additive Phase B |
+| Level 2 reports/data | `level2/*_report.md`, `level2/*_results.csv`, `level2/LEVEL2_SUMMARY.md` | additive form-validation |
+| Level 3 Stage 2 | `level3/level3_hardware_run_report.md`, `level3/archive/ibm_marrakesh_*.json.gz` | archive-only hardware precursor |
+| Level 3 Stage 3 | `level3/level3_full_p7p9_report.md`, `level3/archive/stage3_g6_k2_c000_*.json.gz` | archive-only qualitative hardware P7/P9 |
+| Level 3 robustness | `level3/level3_robustness_g6c001_report.md`, `level3/archive/stage3_g6_k2_c001_*.json.gz` | preliminary inter-instance check |
 
 ## Remaining Reproducibility Work Before A Final Release
 
-1. Decide which additive secondary and Level 2 outputs appear in the manuscript.
-2. For any included Level 2 numerical outputs, add an explicit relaxed-tolerance
-   reference tier and manifest entries. Do not mix them silently into Level 1
-   tight verification.
-3. Run a clean Docker reproduction path and record the platform/runtime.
-4. Regenerate figures from the final included numerical outputs.
+1. Regenerate `requirements-lock.txt` inside the final Docker image and record
+   the Docker platform/runtime.
+2. Add a documented relaxed-tolerance reference tier if Level 2 outputs are to
+   be verified by `reproducibility/verify.py`.
+3. Decide whether Level 3 consolidated JSON outputs should be registered in a
+   separate archive-only reference manifest.
+4. Regenerate final manuscript figures from the final included numerical
+   outputs.
 5. Add CI for the Level 1 fast path and freeze audit.
-6. If hardware is included, archive raw counts and calibration snapshots and
-   verify only the analysis-from-counts path.
-7. Prepare release metadata (`CITATION.cff`, Zenodo metadata, final tag, final
-   reference manifest).
+6. Prepare final release metadata: final tag, Zenodo DOI, and any public raw
+   hardware-count archive outside git if file size policy requires it.
 
 ## Maintenance Guardrails
 
 - Do not edit files listed in `freeze_manifest.json` or
   `freeze_manifest_v2.json` unless intentionally creating a documented new
   freeze. No such freeze is active now.
-- Do not update reference data just because formatting, logging, or docs changed.
-- Keep Level 2 as an additive robustness layer until `verify.py` has a documented
-  relaxed-tolerance tier for it.
+- Do not update Level 1 reference data just because formatting, logging, or
+  docs changed.
+- Keep Level 2 as a relaxed, form-validation layer unless it is explicitly
+  registered with its own tolerance tier.
+- Keep Level 3 as analysis-from-archived-counts only. Public reproduction must
+  never require re-running QPU jobs.
 - Always run `python pap/verify_freeze.py` and confirm v2 zero drift before
   claiming the audit trail is clean.
