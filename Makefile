@@ -1,5 +1,6 @@
-.PHONY: reproduce run verify figures test check reproduce-fast reproduce-full \
-        reproduce-level1 analysis-from-hardware check-env determinism-check
+.PHONY: reproduce run verify verify-freeze figures test check reproduce-fast reproduce-full \
+        reproduce-level1 analysis-from-hardware check-env determinism-check \
+        level2-foundation level2-sampling
 
 reproduce: run verify
 
@@ -8,6 +9,9 @@ run:
 
 verify:
 	python reproducibility/verify.py --reference reproducibility/reference/
+
+verify-freeze:
+	python pap/verify_freeze.py
 
 figures:
 	python scripts/generate_all_figures.py
@@ -35,6 +39,12 @@ analysis-from-hardware:
 
 check-env:
 	python reproducibility/run_all.py --check-env-only
+
+level2-foundation:
+	python -m level2.circuits
+
+level2-sampling:
+	python -m level2.sampling
 
 determinism-check:
 	python reproducibility/run_all.py --mode fast --output results/determinism-run-1
