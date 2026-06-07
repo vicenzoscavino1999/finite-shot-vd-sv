@@ -45,6 +45,20 @@ committed git state with the documented Windows EOL tolerance.
 
 ## Command Contract
 
+### Prerequisites
+
+Minimal Level 1 verification needs only the base package:
+
+```bash
+pip install -e .
+```
+
+The full current test suite includes Level 2 checks, so use:
+
+```bash
+pip install -e ".[dev,figures,level2]"
+```
+
 ### Level 1 Reference Verification
 
 ```bash

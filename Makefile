@@ -17,9 +17,9 @@ figures:
 	python scripts/generate_all_figures.py
 
 test:
-	pytest tests/ -v
+	python -m pytest tests/ -q
 
-check: test verify
+check: test verify verify-freeze
 
 reproduce-fast:
 	python reproducibility/run_all.py --mode fast

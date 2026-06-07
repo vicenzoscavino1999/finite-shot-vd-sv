@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "finite-shot-vd-sv"
 version = "0.1.0"
-description = "Finite-shot operating windows for virtual distillation (VD) and symmetry verification (SV): Level 1 white-box reproduction package."
+description = "Finite-shot operating windows for virtual distillation (VD) and symmetry verification (SV): Level 1 reproduction core plus additive Level 2 robustness tools."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }

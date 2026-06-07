@@ -94,10 +94,16 @@ $env:MKL_NUM_THREADS=1
 $env:OPENBLAS_NUM_THREADS=1
 ```
 
-Install Level 1/dev dependencies:
+Install the current development environment, including Level 2 tests:
 
 ```bash
-pip install -e ".[dev,figures]"
+pip install -e ".[dev,figures,level2]"
+```
+
+For a minimal Level 1-only reproduction environment, Qiskit/Aer is not needed:
+
+```bash
+pip install -e .
 ```
 
 Verify the frozen Level 1 reference outputs:
@@ -118,7 +124,7 @@ Audit the freezes:
 python pap/verify_freeze.py
 ```
 
-Install Level 2 extras only when needed:
+Run Level 2 commands when the `[level2]` extra is installed:
 
 ```bash
 pip install -e ".[level2]"
