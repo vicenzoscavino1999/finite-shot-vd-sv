@@ -1,16 +1,75 @@
 {
-  "git_tag": "v0.1.0-dev-ensemble",
-  "pap_hash": "31e92d21e0faf32ded9aad84a189fa7ae447afa1fdd9d835f16b74fb8bc443bd",
-  "frozen_commit_sha": "0814ba796b7d8819e709780ffa01e9f94be7a727",
-  "freeze_manifest": "freeze_manifest.json",
-  "created_utc": "2026-06-04T06:19:34Z",
+  "canonical_platform": {
+    "canonical_container": {
+      "base_digest": "sha256:a074fac67aa01841fee592d00bae14d25dcaf98ef6e12a683ecceb7e0147e2d1",
+      "base_image": "python:3.12.4-slim",
+      "image_digest": null,
+      "platform": "linux/amd64"
+    },
+    "dependencies": {
+      "numpy": "2.4.6",
+      "scipy": "1.17.1"
+    },
+    "deterministic_environment": {
+      "MKL_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "PYTHONHASHSEED": "0"
+    },
+    "environment_lock": {
+      "requirements_lock": {
+        "path": "requirements.lock",
+        "sha256": "sha256:39b4c887f3b14197a6c9559902786990e14debecfb4bea087fa72d750ebdd874"
+      }
+    },
+    "platform": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.36",
+    "python_version": "3.12.4",
+    "rng_policy": {
+      "path": "reproducibility/config/rng_policy.yaml",
+      "per_experiment_seed": {
+        "e1_quotient_decomposition": 101,
+        "e2_c_sv_zero": 202,
+        "e3_delta_vd_generator": 303,
+        "e4_delta_sv_firstorder": 404,
+        "e5_denominator_concentration": 505,
+        "e7_certified_crossing": 707,
+        "e7_resource_observable_sensitivity": 808
+      }
+    }
+  },
+  "created_utc": "2026-06-08T00:00:00Z",
   "files": {
-    "e1_quotient_decomposition.csv": "sha256:d3f99d8ddd1b3080368bdc1d1f60bf166222184961c8bf71b21c93d7dd934af6",
-    "e2_c_sv_zero.csv": "sha256:e56e4d3d019a2ad60b9b78d42c60adde1aecc4641312c6079ff0397085f3e8f8",
-    "e3_delta_vd_generator.csv": "sha256:bf00081f7fba29bca96bc250c05a85a86d619381e4804afe48ec9430e1a1add4",
-    "e4_delta_sv_firstorder.csv": "sha256:e382a8196719b55be9cc4201196798dbb03a28b6fb282652656a818bc7362db1",
-    "e5_denominator_concentration.csv": "sha256:e528f331247b4bccea473a77b478e34b6c3e987a032e10dc816b4e0745ff70a7",
-    "e7_certified_crossing.csv": "sha256:ea93908438b9ab8cd85b8e78857434808053d9dbb8b93b2fb3fc56d78524f26a",
-    "e7_resource_observable_sensitivity.csv": "sha256:183dd450c6b4d588c28b9c1112c6e9e75b1e70efe4ebab283d5eff5baa2e8362"
+    "e1_quotient_decomposition.csv": "sha256:81b2d20dfba0e356875dba63eadf362d78a123754ca59ee11685b89c2e2b7f43",
+    "e2_c_sv_zero.csv": "sha256:116ff5c7f7e25953a6cb3218526092af70842413ec562c14a62064302ce9fc59",
+    "e3_delta_vd_generator.csv": "sha256:3e637ecb61c179dc1741d2fcd5ae5d03b6a2d4391914f157c8b689814cee80e4",
+    "e4_delta_sv_firstorder.csv": "sha256:9dac4e1d5ec2bd69d3ddb68e4aaa394f1583dfbaeb60c5a108a821ada29e80c4",
+    "e5_denominator_concentration.csv": "sha256:c25941e6698295b46de28cfc22242bd9a799557dc759d9958c770e1656662eb1",
+    "e7_certified_crossing.csv": "sha256:20fd282dcb78dfa1891e1e1e119557cfcca7bb43db51d91fb6542b284a28aa76",
+    "e7_resource_observable_sensitivity.csv": "sha256:ab832f08a35366f5e32f04ec7e3e8da70faf6f1077bc9c31ceef92a0511721a1"
+  },
+  "generator": {
+    "driver": "reproducibility/run_all_current.py",
+    "level": 1,
+    "mode": "full",
+    "run_manifest": "manifest.json",
+    "run_manifest_sha256": "sha256:462eac32b2433293fb55d2108d7230762dbe009eb09fae23c6a6d3ba745af6e8"
+  },
+  "numeric_identity_contract": "Canonical linux/amd64 Docker runs are expected to match these CSV references with --exact-numeric. Non-canonical platforms are verified with the tolerances in reproducibility/config/tolerances.yaml.",
+  "pap_freezes": {
+    "v1": {
+      "frozen_commit_sha": "0814ba796b7d8819e709780ffa01e9f94be7a727",
+      "pap_hash": "31e92d21e0faf32ded9aad84a189fa7ae447afa1fdd9d835f16b74fb8bc443bd"
+    },
+    "v2": {
+      "frozen_commit_sha": "555d3dc1032991ae38cb8ff2a5570f5a0f8bf1a1",
+      "pap_hash": "8ca588e73f32ba021cb4611460cf7e33fb0e3da754b80c1874a3fdd91a34055a"
+    }
+  },
+  "reference_role": "canonical_linux_amd64_docker_level1",
+  "schema_version": "linux-canonical-reference-v1",
+  "source_state": {
+    "git_commit_sha": "66e74ef128dd5f0dcc90329ae0d99091cccf167f",
+    "git_dirty_excluding_output": false,
+    "git_dirty_paths_excluding_output": []
   }
 }
