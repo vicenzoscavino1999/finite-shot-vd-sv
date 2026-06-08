@@ -1,0 +1,584 @@
+{
+  "analysis_inputs": {
+    "analysis_role": "sensitivity_check_all_archived_kingston_epochs",
+    "archive_count": 19,
+    "bootstrap_reps": 2000,
+    "bootstrap_seed": 33033,
+    "denominator_clip_fraction": 0.5,
+    "source": "archived_counts_only"
+  },
+  "epochs": [
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_kingston_epoch01_20260607T234457Z_d8ivn5tv8cos73f64skg.json.gz",
+      "backend": "ibm_kingston",
+      "created_at_utc": "2026-06-07T23:44:57.207549Z",
+      "epoch_index": 1,
+      "job_id": "d8ivn5tv8cos73f64skg",
+      "quantum_seconds": 13.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_kingston_epoch02_20260607T234529Z_d8j04uu6983c73dsm7n0.json.gz",
+      "backend": "ibm_kingston",
+      "created_at_utc": "2026-06-07T23:45:28.852126Z",
+      "epoch_index": 2,
+      "job_id": "d8j04uu6983c73dsm7n0",
+      "quantum_seconds": 13.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_kingston_epoch03_20260607T234552Z_d8j056he8nrc73bisho0.json.gz",
+      "backend": "ibm_kingston",
+      "created_at_utc": "2026-06-07T23:45:51.812499Z",
+      "epoch_index": 3,
+      "job_id": "d8j056he8nrc73bisho0",
+      "quantum_seconds": 13.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_kingston_epoch04_20260607T234615Z_d8j05c9e8nrc73bishv0.json.gz",
+      "backend": "ibm_kingston",
+      "created_at_utc": "2026-06-07T23:46:15.665187Z",
+      "epoch_index": 4,
+      "job_id": "d8j05c9e8nrc73bishv0",
+      "quantum_seconds": 13.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_kingston_epoch05_20260607T234640Z_d8j05ic2upec739mq700.json.gz",
+      "backend": "ibm_kingston",
+      "created_at_utc": "2026-06-07T23:46:39.689091Z",
+      "epoch_index": 5,
+      "job_id": "d8j05ic2upec739mq700",
+      "quantum_seconds": 13.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_kingston_epoch06_20260607T234704Z_d8j05odv8cos73f65eo0.json.gz",
+      "backend": "ibm_kingston",
+      "created_at_utc": "2026-06-07T23:47:04.064510Z",
+      "epoch_index": 6,
+      "job_id": "d8j05odv8cos73f65eo0",
+      "quantum_seconds": 13.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_kingston_epoch07_20260607T234728Z_d8j05um6983c73dsm93g.json.gz",
+      "backend": "ibm_kingston",
+      "created_at_utc": "2026-06-07T23:47:28.560796Z",
+      "epoch_index": 7,
+      "job_id": "d8j05um6983c73dsm93g",
+      "quantum_seconds": 13.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_kingston_epoch08_20260607T234804Z_d8j064k2upec739mq84g.json.gz",
+      "backend": "ibm_kingston",
+      "created_at_utc": "2026-06-07T23:48:04.651709Z",
+      "epoch_index": 8,
+      "job_id": "d8j064k2upec739mq84g",
+      "quantum_seconds": 13.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_kingston_epoch09_20260607T234826Z_d8j06dtv8cos73f65flg.json.gz",
+      "backend": "ibm_kingston",
+      "created_at_utc": "2026-06-07T23:48:25.949735Z",
+      "epoch_index": 9,
+      "job_id": "d8j06dtv8cos73f65flg",
+      "quantum_seconds": 13.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_kingston_epoch10_20260607T234840Z_d8j06fm6983c73dsm9qg.json.gz",
+      "backend": "ibm_kingston",
+      "created_at_utc": "2026-06-07T23:48:39.716521Z",
+      "epoch_index": 10,
+      "job_id": "d8j06fm6983c73dsm9qg",
+      "quantum_seconds": 13.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_kingston_epoch10_20260607T234854Z_d8j06is2upec739mq8n0.json.gz",
+      "backend": "ibm_kingston",
+      "created_at_utc": "2026-06-07T23:48:53.915407Z",
+      "epoch_index": 11,
+      "job_id": "d8j06is2upec739mq8n0",
+      "quantum_seconds": 13.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_kingston_epoch11_20260607T234911Z_d8j06mc2upec739mq8tg.json.gz",
+      "backend": "ibm_kingston",
+      "created_at_utc": "2026-06-07T23:49:11.289056Z",
+      "epoch_index": 12,
+      "job_id": "d8j06mc2upec739mq8tg",
+      "quantum_seconds": 13.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_kingston_epoch11_20260607T234925Z_d8j06pu6983c73dsmacg.json.gz",
+      "backend": "ibm_kingston",
+      "created_at_utc": "2026-06-07T23:49:24.923473Z",
+      "epoch_index": 13,
+      "job_id": "d8j06pu6983c73dsmacg",
+      "quantum_seconds": 13.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_kingston_epoch12_20260607T234938Z_d8j06ue6983c73dsmaig.json.gz",
+      "backend": "ibm_kingston",
+      "created_at_utc": "2026-06-07T23:49:38.047612Z",
+      "epoch_index": 14,
+      "job_id": "d8j06ue6983c73dsmaig",
+      "quantum_seconds": 13.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_kingston_epoch12_20260607T234950Z_d8j071k2upec739mq9j0.json.gz",
+      "backend": "ibm_kingston",
+      "created_at_utc": "2026-06-07T23:49:49.780616Z",
+      "epoch_index": 15,
+      "job_id": "d8j071k2upec739mq9j0",
+      "quantum_seconds": 13.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_kingston_epoch13_20260607T235002Z_d8j074s2upec739mq9p0.json.gz",
+      "backend": "ibm_kingston",
+      "created_at_utc": "2026-06-07T23:50:02.026616Z",
+      "epoch_index": 16,
+      "job_id": "d8j074s2upec739mq9p0",
+      "quantum_seconds": 13.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_kingston_epoch13_20260607T235014Z_d8j077s2upec739mq9u0.json.gz",
+      "backend": "ibm_kingston",
+      "created_at_utc": "2026-06-07T23:50:14.325797Z",
+      "epoch_index": 17,
+      "job_id": "d8j077s2upec739mq9u0",
+      "quantum_seconds": 13.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_kingston_epoch14_20260607T235026Z_d8j07au6983c73dsmb30.json.gz",
+      "backend": "ibm_kingston",
+      "created_at_utc": "2026-06-07T23:50:26.075552Z",
+      "epoch_index": 18,
+      "job_id": "d8j07au6983c73dsmb30",
+      "quantum_seconds": 13.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    },
+    {
+      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g6_k2_c000_ibm_kingston_epoch14_20260607T235052Z_d8j07e42upec739mqa6g.json.gz",
+      "backend": "ibm_kingston",
+      "created_at_utc": "2026-06-07T23:50:52.303376Z",
+      "epoch_index": 19,
+      "job_id": "d8j07e42upec739mqa6g",
+      "quantum_seconds": 13.0,
+      "shots_per_circuit": 8192,
+      "total_shots": 40960
+    }
+  ],
+  "qualitative": {
+    "interpretation": "qualitative_sv_dominance_vd_overhead_degraded",
+    "largest_B": 8192,
+    "mse_order_at_largest_B": [
+      {
+        "method": "sv_readout_mitigated_weight_postselect",
+        "mse": 0.010267655744107453
+      },
+      {
+        "method": "unmitigated",
+        "mse": 0.041421851169005215
+      },
+      {
+        "method": "vd_m2_readout_mitigated",
+        "mse": 0.05032155497919345
+      }
+    ],
+    "vd_beats_sv_at_any_same_B": false
+  },
+  "rows": [
+    {
+      "B": 512,
+      "B_den_estimate": null,
+      "B_over_B_den_estimate": null,
+      "bias": 0.10492317909986565,
+      "bias_ci95": [
+        0.0987379098147502,
+        0.1109804712790096
+      ],
+      "epochs": 19,
+      "mean_estimate": -0.13850875994696144,
+      "mean_vd_denominator": null,
+      "mean_vd_denominator_clip": null,
+      "mean_vd_denominator_reference": null,
+      "method": "sv_readout_mitigated_weight_postselect",
+      "mse": 0.011204566144156802,
+      "mse_ci95": [
+        0.009952479851317303,
+        0.012442670082116847
+      ],
+      "resource_paired_sample": 512.0,
+      "resource_two_qubit_gate_proxy": 512.0,
+      "variance_between_epochs": 0.00020656444460844564
+    },
+    {
+      "B": 1024,
+      "B_den_estimate": null,
+      "B_over_B_den_estimate": null,
+      "bias": 0.1029134591717703,
+      "bias_ci95": [
+        0.09794286246550607,
+        0.10754505105459028
+      ],
+      "epochs": 19,
+      "mean_estimate": -0.14051847987505678,
+      "mean_vd_denominator": null,
+      "mean_vd_denominator_clip": null,
+      "mean_vd_denominator_reference": null,
+      "method": "sv_readout_mitigated_weight_postselect",
+      "mse": 0.010707601156078083,
+      "mse_ci95": [
+        0.00973273115926041,
+        0.011636743256595684
+      ],
+      "resource_paired_sample": 1024.0,
+      "resource_two_qubit_gate_proxy": 1024.0,
+      "variance_between_epochs": 0.00012288891501058608
+    },
+    {
+      "B": 2048,
+      "B_den_estimate": null,
+      "B_over_B_den_estimate": null,
+      "bias": 0.10189729020867397,
+      "bias_ci95": [
+        0.0994725475237217,
+        0.10428564984166273
+      ],
+      "epochs": 19,
+      "mean_estimate": -0.14153464883815312,
+      "mean_vd_denominator": null,
+      "mean_vd_denominator_clip": null,
+      "mean_vd_denominator_reference": null,
+      "method": "sv_readout_mitigated_weight_postselect",
+      "mse": 0.010412110277483878,
+      "mse_ci95": [
+        0.009920603410651629,
+        0.010905166903841162
+      ],
+      "resource_paired_sample": 2048.0,
+      "resource_two_qubit_gate_proxy": 2048.0,
+      "variance_between_epochs": 3.066655481388652e-05
+    },
+    {
+      "B": 4096,
+      "B_den_estimate": null,
+      "B_over_B_den_estimate": null,
+      "bias": 0.10073802838116905,
+      "bias_ci95": [
+        0.09897737957781017,
+        0.10233570128130286
+      ],
+      "epochs": 19,
+      "mean_estimate": -0.14269391066565804,
+      "mean_vd_denominator": null,
+      "mean_vd_denominator_clip": null,
+      "mean_vd_denominator_reference": null,
+      "method": "sv_readout_mitigated_weight_postselect",
+      "mse": 0.010162026736349116,
+      "mse_ci95": [
+        0.009810113969528493,
+        0.010483225190611472
+      ],
+      "resource_paired_sample": 4096.0,
+      "resource_two_qubit_gate_proxy": 4096.0,
+      "variance_between_epochs": 1.4647283903001252e-05
+    },
+    {
+      "B": 8192,
+      "B_den_estimate": null,
+      "B_over_B_den_estimate": null,
+      "bias": 0.10129676610188254,
+      "bias_ci95": [
+        0.1000614907018177,
+        0.10240097889368108
+      ],
+      "epochs": 19,
+      "mean_estimate": -0.14213517294494452,
+      "mean_vd_denominator": null,
+      "mean_vd_denominator_clip": null,
+      "mean_vd_denominator_reference": null,
+      "method": "sv_readout_mitigated_weight_postselect",
+      "mse": 0.010267655744107453,
+      "mse_ci95": [
+        0.010017949119419813,
+        0.010490918579647228
+      ],
+      "resource_paired_sample": 8192.0,
+      "resource_two_qubit_gate_proxy": 8192.0,
+      "variance_between_epochs": 6.988750375063102e-06
+    },
+    {
+      "B": 512,
+      "B_den_estimate": null,
+      "B_over_B_den_estimate": null,
+      "bias": 0.2064781672039907,
+      "bias_ci95": [
+        0.19903724340379406,
+        0.21300297437444757
+      ],
+      "epochs": 19,
+      "mean_estimate": -0.03695377184283637,
+      "mean_vd_denominator": null,
+      "mean_vd_denominator_clip": null,
+      "mean_vd_denominator_reference": null,
+      "method": "unmitigated",
+      "mse": 0.0428542154996237,
+      "mse_ci95": [
+        0.039988048775140936,
+        0.04550548500913041
+      ],
+      "resource_paired_sample": 512.0,
+      "resource_two_qubit_gate_proxy": 512.0,
+      "variance_between_epochs": 0.00023325874368814185
+    },
+    {
+      "B": 1024,
+      "B_den_estimate": null,
+      "B_over_B_den_estimate": null,
+      "bias": 0.20369088703568794,
+      "bias_ci95": [
+        0.19882149676062935,
+        0.20804571588677712
+      ],
+      "epochs": 19,
+      "mean_estimate": -0.03974105201113918,
+      "mean_vd_denominator": null,
+      "mean_vd_denominator_clip": null,
+      "mean_vd_denominator_reference": null,
+      "method": "unmitigated",
+      "mse": 0.04159300935730592,
+      "mse_ci95": [
+        0.039646716300202264,
+        0.04332626318024431
+      ],
+      "resource_paired_sample": 1024.0,
+      "resource_two_qubit_gate_proxy": 1024.0,
+      "variance_between_epochs": 0.00010875589013835687
+    },
+    {
+      "B": 2048,
+      "B_den_estimate": null,
+      "B_over_B_den_estimate": null,
+      "bias": 0.20343164701872396,
+      "bias_ci95": [
+        0.20039896145771605,
+        0.20680396228302197
+      ],
+      "epochs": 19,
+      "mean_estimate": -0.040000292028103145,
+      "mean_vd_denominator": null,
+      "mean_vd_denominator_clip": null,
+      "mean_vd_denominator_reference": null,
+      "method": "unmitigated",
+      "mse": 0.041434946374405375,
+      "mse_ci95": [
+        0.040185876976377065,
+        0.042844177065701414
+      ],
+      "resource_paired_sample": 2048.0,
+      "resource_two_qubit_gate_proxy": 2048.0,
+      "variance_between_epochs": 5.331755263549657e-05
+    },
+    {
+      "B": 4096,
+      "B_den_estimate": null,
+      "B_over_B_den_estimate": null,
+      "bias": 0.20271188972229714,
+      "bias_ci95": [
+        0.20046885931196623,
+        0.20502976378189594
+      ],
+      "epochs": 19,
+      "mean_estimate": -0.04072004932452993,
+      "mean_vd_denominator": null,
+      "mean_vd_denominator_clip": null,
+      "mean_vd_denominator_reference": null,
+      "method": "unmitigated",
+      "mse": 0.04111658806857238,
+      "mse_ci95": [
+        0.040203482976509566,
+        0.0420524886872187
+      ],
+      "resource_paired_sample": 4096.0,
+      "resource_two_qubit_gate_proxy": 4096.0,
+      "variance_between_epochs": 2.5837713442481376e-05
+    },
+    {
+      "B": 8192,
+      "B_den_estimate": null,
+      "B_over_B_den_estimate": null,
+      "bias": 0.20348111622866485,
+      "bias_ci95": [
+        0.20171577746498592,
+        0.20552197647849957
+      ],
+      "epochs": 19,
+      "mean_estimate": -0.039950822818162215,
+      "mean_vd_denominator": null,
+      "mean_vd_denominator_clip": null,
+      "mean_vd_denominator_reference": null,
+      "method": "unmitigated",
+      "mse": 0.041421851169005215,
+      "mse_ci95": [
+        0.0406946866362817,
+        0.04226190151384873
+      ],
+      "resource_paired_sample": 8192.0,
+      "resource_two_qubit_gate_proxy": 8192.0,
+      "variance_between_epochs": 1.8246868860783787e-05
+    },
+    {
+      "B": 512,
+      "B_den_estimate": 4076.746632359539,
+      "B_over_B_den_estimate": 0.12559034106656383,
+      "bias": 0.2515392921877094,
+      "bias_ci95": [
+        0.1837324949468194,
+        0.31941963540126866
+      ],
+      "epochs": 19,
+      "mean_estimate": 0.008107353140882304,
+      "mean_vd_denominator": 0.12567004554195144,
+      "mean_vd_denominator_clip": 0.05992703522373188,
+      "mean_vd_denominator_reference": 0.11985407044746375,
+      "method": "vd_m2_readout_mitigated",
+      "mse": 0.08666321212998486,
+      "mse_ci95": [
+        0.05191947100404837,
+        0.12798636726874885
+      ],
+      "resource_paired_sample": 512.0,
+      "resource_two_qubit_gate_proxy": 7168.0,
+      "variance_between_epochs": 0.02469070753878498
+    },
+    {
+      "B": 1024,
+      "B_den_estimate": 4076.746632359539,
+      "B_over_B_den_estimate": 0.25118068213312766,
+      "bias": 0.21604878966101423,
+      "bias_ci95": [
+        0.1700837014852936,
+        0.2648299053608863
+      ],
+      "epochs": 19,
+      "mean_estimate": -0.02738314938581286,
+      "mean_vd_denominator": 0.12094278358833574,
+      "mean_vd_denominator_clip": 0.05992703522373188,
+      "mean_vd_denominator_reference": 0.11985407044746375,
+      "method": "vd_m2_readout_mitigated",
+      "mse": 0.05812271663084686,
+      "mse_ci95": [
+        0.03676736569329544,
+        0.0820395180982548
+      ],
+      "resource_paired_sample": 1024.0,
+      "resource_two_qubit_gate_proxy": 14336.0,
+      "variance_between_epochs": 0.012081505845572
+    },
+    {
+      "B": 2048,
+      "B_den_estimate": 4076.746632359539,
+      "B_over_B_den_estimate": 0.5023613642662553,
+      "bias": 0.2323861693968941,
+      "bias_ci95": [
+        0.20725167894011468,
+        0.257607536788381
+      ],
+      "epochs": 19,
+      "mean_estimate": -0.011045769649933002,
+      "mean_vd_denominator": 0.12259462753629394,
+      "mean_vd_denominator_clip": 0.05992703522373188,
+      "mean_vd_denominator_reference": 0.11985407044746375,
+      "method": "vd_m2_readout_mitigated",
+      "mse": 0.057273269967267615,
+      "mse_ci95": [
+        0.0455509781361285,
+        0.07006159213593048
+      ],
+      "resource_paired_sample": 2048.0,
+      "resource_two_qubit_gate_proxy": 28672.0,
+      "variance_between_epochs": 0.003451601475878208
+    },
+    {
+      "B": 4096,
+      "B_den_estimate": 4076.746632359539,
+      "B_over_B_den_estimate": 1.0047227285325107,
+      "bias": 0.23389269219493097,
+      "bias_ci95": [
+        0.21700699062976272,
+        0.2508531085433902
+      ],
+      "epochs": 19,
+      "mean_estimate": -0.00953924685189611,
+      "mean_vd_denominator": 0.12185627902288591,
+      "mean_vd_denominator_clip": 0.05992703522373188,
+      "mean_vd_denominator_reference": 0.11985407044746375,
+      "method": "vd_m2_readout_mitigated",
+      "mse": 0.05610922535748507,
+      "mse_ci95": [
+        0.0483389085818719,
+        0.06416227417542607
+      ],
+      "resource_paired_sample": 4096.0,
+      "resource_two_qubit_gate_proxy": 57344.0,
+      "variance_between_epochs": 0.0014814024450308019
+    },
+    {
+      "B": 8192,
+      "B_den_estimate": 4076.746632359539,
+      "B_over_B_den_estimate": 2.0094454570650213,
+      "bias": 0.2231360500241555,
+      "bias_ci95": [
+        0.21284403091920565,
+        0.2328958442979307
+      ],
+      "epochs": 19,
+      "mean_estimate": -0.020295889022671574,
+      "mean_vd_denominator": 0.11985407044746375,
+      "mean_vd_denominator_clip": 0.05992703522373188,
+      "mean_vd_denominator_reference": 0.11985407044746375,
+      "method": "vd_m2_readout_mitigated",
+      "mse": 0.05032155497919345,
+      "mse_ci95": [
+        0.045753593633596296,
+        0.05462968200240171
+      ],
+      "resource_paired_sample": 8192.0,
+      "resource_two_qubit_gate_proxy": 114688.0,
+      "variance_between_epochs": 0.0005614058343005213
+    }
+  ],
+  "schema_version": "level3.stage3.analysis.v1"
+}

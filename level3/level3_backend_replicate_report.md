@@ -180,6 +180,38 @@ VD M=2:               0.0489415
 
 This repeats the qualitative ordering observed on `ibm_marrakesh`.
 
+## All-19 Sensitivity Check
+
+Primary analysis remains the 14 pre-registered epochs above. As a result-blind
+sensitivity check, the archive-only analysis was also rerun over all 19 archived
+Kingston epochs: the 14 fixed-primary epochs plus the 5 accidental extra jobs.
+No new QPU jobs were submitted.
+
+Command:
+
+```text
+python scripts/reanalyze_level3_archives.py --instance g6_k2_c000_kingston_all19_sensitivity --bootstrap-reps 2000
+```
+
+The all-19 sensitivity artifact is:
+
+```text
+level3/archive/stage3_g6_k2_c000_ibm_kingston_all19_sensitivity_analysis.json
+```
+
+At B=8192:
+
+```text
+SV readout-mitigated: 0.0102677
+unmitigated:          0.0414219
+VD M=2:               0.0503216
+order: SV < unmitigated < VD
+```
+
+Thus, including the 5 accidental extra epochs does not change the qualitative
+conclusion. The pre-registered primary result remains the 14-epoch analysis;
+the all-19 result is only a robustness/sensitivity check.
+
 ## Denominator Behavior
 
 | B | mean VD denominator | B / B_den estimate |

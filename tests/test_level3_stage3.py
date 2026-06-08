@@ -17,6 +17,12 @@ ROBUSTNESS_SUMMARY_PATH = REPO_ROOT / "level3" / "level3_hardware_robustness_sum
 BACKEND_REPLICATE_ANALYSIS_PATH = (
     REPO_ROOT / "level3" / "archive" / "stage3_g6_k2_c000_ibm_kingston_fixed14_analysis.json"
 )
+BACKEND_REPLICATE_ALL19_ANALYSIS_PATH = (
+    REPO_ROOT
+    / "level3"
+    / "archive"
+    / "stage3_g6_k2_c000_ibm_kingston_all19_sensitivity_analysis.json"
+)
 BACKEND_REPLICATE_REPORT_PATH = REPO_ROOT / "level3" / "level3_backend_replicate_report.md"
 
 
@@ -37,6 +43,11 @@ def _g8_analysis():
 
 def _backend_replicate_analysis():
     with BACKEND_REPLICATE_ANALYSIS_PATH.open(encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+def _backend_replicate_all19_analysis():
+    with BACKEND_REPLICATE_ALL19_ANALYSIS_PATH.open(encoding="utf-8") as fh:
         return json.load(fh)
 
 
@@ -63,6 +74,13 @@ def _g8_row(method: str, b: int) -> dict:
 
 def _backend_replicate_row(method: str, b: int) -> dict:
     for row in _backend_replicate_analysis()["rows"]:
+        if row["method"] == method and int(row["B"]) == int(b):
+            return row
+    raise KeyError((method, b))
+
+
+def _backend_replicate_all19_row(method: str, b: int) -> dict:
+    for row in _backend_replicate_all19_analysis()["rows"]:
         if row["method"] == method and int(row["B"]) == int(b):
             return row
     raise KeyError((method, b))
@@ -209,6 +227,28 @@ def test_level3_backend_replicate_vd_denominator_stays_small():
     assert _backend_replicate_row("vd_m2_readout_mitigated", 8192)["B_over_B_den_estimate"] > 1.0
 
 
+def test_level3_backend_replicate_all19_sensitivity_keeps_ordering():
+    result = _backend_replicate_all19_analysis()
+    assert result["analysis_inputs"]["source"] == "archived_counts_only"
+    assert result["analysis_inputs"]["analysis_role"] == (
+        "sensitivity_check_all_archived_kingston_epochs"
+    )
+    assert result["analysis_inputs"]["archive_count"] == 19
+    assert len(result["epochs"]) == 19
+    assert sum(epoch["quantum_seconds"] for epoch in result["epochs"]) == 247.0
+    assert result["qualitative"]["interpretation"] == "qualitative_sv_dominance_vd_overhead_degraded"
+    b = 8192
+    sv = _backend_replicate_all19_row("sv_readout_mitigated_weight_postselect", b)
+    unmit = _backend_replicate_all19_row("unmitigated", b)
+    vd = _backend_replicate_all19_row("vd_m2_readout_mitigated", b)
+    assert sv["mse"] < unmit["mse"] < vd["mse"]
+    assert backend_replicate_all19_method_order_labels() == [
+        "sv_readout_mitigated_weight_postselect",
+        "unmitigated",
+        "vd_m2_readout_mitigated",
+    ]
+
+
 def result_method_order_labels() -> list[str]:
     result = _analysis()
     return [
@@ -235,6 +275,14 @@ def g8_method_order_labels() -> list[str]:
 
 def backend_replicate_method_order_labels() -> list[str]:
     result = _backend_replicate_analysis()
+    return [
+        item["method"]
+        for item in result["qualitative"]["mse_order_at_largest_B"]
+    ]
+
+
+def backend_replicate_all19_method_order_labels() -> list[str]:
+    result = _backend_replicate_all19_analysis()
     return [
         item["method"]
         for item in result["qualitative"]["mse_order_at_largest_B"]

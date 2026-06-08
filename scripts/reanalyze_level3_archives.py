@@ -39,6 +39,11 @@ CASES = {
         "json_out": "stage3_g6_k2_c000_ibm_kingston_fixed14_analysis.json",
         "selector": "first_14_unique_jobs_by_ibm_created_timestamp",
     },
+    "g6_k2_c000_kingston_all19_sensitivity": {
+        "pattern": "stage3_g6_k2_c000_ibm_kingston_epoch*.json.gz",
+        "json_out": "stage3_g6_k2_c000_ibm_kingston_all19_sensitivity_analysis.json",
+        "analysis_role": "sensitivity_check_all_archived_kingston_epochs",
+    },
 }
 
 
@@ -107,6 +112,8 @@ def main(argv: list[str] | None = None) -> int:
         if not archives:
             raise SystemExit(f"no archives found for {name}: {case['pattern']}")
         result = analyze_archives(archives, bootstrap_reps=int(args.bootstrap_reps))
+        if case.get("analysis_role"):
+            result["analysis_inputs"]["analysis_role"] = case["analysis_role"]
         if extras:
             result["analysis_inputs"]["selection_rule"] = (
                 "first_14_unique_jobs_by_ibm_created_timestamp_pre_registered_fixed_epoch_stop"
