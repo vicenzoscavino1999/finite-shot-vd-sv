@@ -21,6 +21,20 @@ The active post-freeze driver is `reproducibility/run_all_current.py`. The
 original `reproducibility/run_all.py` and `reproducibility/run_all_v2.py` remain
 unchanged PAP artifacts so the registered freezes stay auditable.
 
+## Canonical Reproduction Contract
+
+The canonical numerical environment is the Linux/amd64 Docker image defined by
+`Dockerfile`. Its base image is pinned by digest and Python dependencies are
+installed from the single hash-locked `requirements.lock` file.
+
+Canonical Level 1 reference data in `reproducibility/reference/` are generated
+inside that Linux/amd64 container in `--mode full`. In the canonical container,
+`--exact-numeric` is the expected verification mode. Windows and macOS are
+treated as non-canonical cross-platform checks and are verified with the
+registered tolerances in `reproducibility/config/tolerances.yaml`.
+
+Use `REPRODUCING.md` for the one-command reviewer path.
+
 ## Freeze Status
 
 There are two registered freezes:
@@ -121,7 +135,42 @@ form/robustness claims, not coefficient validation.
 
 ## Quick Start
 
-PowerShell pinned environment:
+Canonical Docker path:
+
+```bash
+docker build --platform linux/amd64 -t finite-shot-vd-sv:repro .
+docker run --rm --platform linux/amd64 finite-shot-vd-sv:repro bash -lc "make check-ci"
+```
+
+Expected canonical verifier line:
+
+```bash
+VERIFY PASS: 18260 numeric comparisons within tolerance across 7 files; reference checksums OK
+```
+
+For the full reviewer command including freeze audit and figure regeneration:
+
+```bash
+docker run --rm --platform linux/amd64 finite-shot-vd-sv:repro bash -lc "make reproduce-all"
+```
+
+Local non-Docker install from the canonical lock:
+
+```bash
+python -m pip install --require-hashes -r requirements.lock
+python -m pip install --no-deps --no-build-isolation -e .
+```
+
+Set deterministic environment variables before local reproduction:
+
+```bash
+export PYTHONHASHSEED=0
+export OMP_NUM_THREADS=1
+export MKL_NUM_THREADS=1
+export OPENBLAS_NUM_THREADS=1
+```
+
+On PowerShell:
 
 ```powershell
 $env:PYTHONHASHSEED=0
@@ -130,29 +179,14 @@ $env:MKL_NUM_THREADS=1
 $env:OPENBLAS_NUM_THREADS=1
 ```
 
-Install the current development environment for Level 1, Level 2, and Level 3
-archive-only verification:
+Regenerate and verify the canonical full Level 1 reference outputs:
 
 ```bash
-pip install -c requirements-ci-constraints.txt -e ".[dev,level2]"
-```
-
-IBM Runtime submission tools are not needed for public reproduction. Install the
-`[level3]` extra only for private QPU submission/dry-run work.
-
-For a minimal Level 1-only reproduction environment, Qiskit/Aer is not needed:
-
-```bash
-pip install -c requirements-ci-constraints.txt -e .
-```
-
-Regenerate and verify the frozen Level 1 reference outputs:
-
-```bash
-python reproducibility/run_all_current.py --mode fast --output results
+python reproducibility/run_all_current.py --mode full --output results
 python reproducibility/verify_current.py \
   --reference reproducibility/reference/ \
-  --generated results
+  --generated results \
+  --exact-numeric
 ```
 
 Verify the committed reference package without regenerating:
@@ -164,9 +198,9 @@ python reproducibility/verify_current.py \
   --exact-numeric
 ```
 
-Use `--exact-numeric` for same-platform byte/float-stream checks. For
-Windows-to-Linux/Docker reproduction, use the registered tolerances above; tiny
-ULP differences in eigensolver/linear algebra paths are expected.
+Use `--exact-numeric` for canonical Linux/Docker checks. For Windows/macOS,
+omit `--exact-numeric` and use the registered tolerances; tiny ULP differences
+in eigensolver/linear-algebra paths are treated as expected non-canonical drift.
 
 Run tests:
 
@@ -189,13 +223,11 @@ python scripts/verify_level3_archives.py
 Docker path:
 
 ```bash
-docker build -t finite-shot-vd-sv:repro .
-docker run --rm finite-shot-vd-sv:repro
+docker build --platform linux/amd64 -t finite-shot-vd-sv:repro .
+docker run --rm --platform linux/amd64 finite-shot-vd-sv:repro
 ```
 
-The Docker image runs the Level 1 reproduction path by default. The PAP freeze
-audit requires git object history, so run `python pap/verify_freeze.py` from a
-normal git checkout rather than inside the image.
+The Docker image runs the canonical Level 1 reproduction path by default.
 
 Run Level 2 commands when the `[level2]` extra is installed:
 
@@ -214,18 +246,27 @@ python -m level2.p10_smallnoise
 ## Make Targets
 
 - `make reproduce-level1`: regenerate Level 1 outputs and verify them.
-- `make reproduce-fast`: run the fast Level 1 reproduction path and verify.
-- `make reproduce-full`: current Level 1 full path; Level 2 remains a separate
-  relaxed form-validation layer.
+- `make reproduce-fast`: fast smoke/schema check against its own generated
+  output; not the canonical reference comparison.
+- `make reproduce-full`: regenerate the canonical full Level 1 outputs and
+  verify them with `--exact-numeric`.
+- `make reproduce-all`: run strict environment check, canonical Level 1,
+  tests, freeze audit, Level 3 archive verification, and figure generation.
 - `make verify`: run `reproducibility/verify_current.py` against generated
   outputs in `results/`.
+- `make verify-exact`: exact numeric check against generated outputs in
+  `results/`.
 - `make verify-reference`: validate the committed Level 1 reference package.
 - `make verify-freeze`: run the real v1/v2 freeze audit.
 - `make verify-level3`: recompute Level 3 archive analyses in memory and compare
   them to committed JSON summaries.
 - `make test`: run the test suite.
-- `make check-ci`: container-safe check path; excludes the git-dependent freeze
-  integrity test/audit because `.git` is not copied into the Docker image.
+- `make check-ci`: canonical container check path: strict env, three full
+  deterministic runs, exact full reproduction, tests, reference integrity, and
+  Level 3 archive verification.
+- `make audit`: run `pip-audit` against `requirements.lock`.
+- `make reference-manifest`: refresh `reproducibility/reference/` checksums.
+- `make level3-manifest`: refresh Level 3 archive checksums.
 - `make level2-foundation`: run the Level 2 foundation smoke check.
 - `make level2-sampling`: regenerate the Level 2 sampling report.
 - `make analysis-from-hardware`: re-run Level 3 analysis from archived counts.
@@ -235,16 +276,17 @@ python -m level2.p10_smallnoise
 - The official `verify.py` reference package currently verifies the Level 1
   canonical outputs. The active wrapper is `verify_current.py`, which also
   checks reference SHA-256 manifests.
-- Level 2 outputs are committed and tested, but not yet registered as a
-  relaxed-tolerance reference tier.
+- Level 2 outputs are committed and tested as form validation. They are outside
+  the official numeric reference contract unless a future release defines a
+  separate relaxed-tolerance Level 2 tier.
 - Level 3 hardware outputs are committed as raw-count archives plus reports;
-  public reproduction is analysis-from-archived-counts only. Use
-  `verify_level3_archives.py` for non-mutating verification and
-  `run_all_current.py --level 3 --from-archived-counts` to rewrite summaries.
-- `requirements-lock.txt` is a current environment snapshot. For the final DOI
-  release, regenerate it inside the final Docker image. Until the manuscript is
-  finalized, `requirements-ci-constraints.txt` is the operational cross-platform
-  constraint file.
+  public reproduction is analysis-from-archived-counts only. The raw `.json.gz`
+  archives and consolidated `.json` summaries are registered in
+  `level3/archive/level3_archive_manifest.json`.
+- `requirements.lock` is the single dependency lock for the canonical Docker
+  environment and is installed with `pip --require-hashes`.
+- Zenodo DOI metadata remains intentionally unminted until the manuscript/PDF is
+  finalized.
 - Figures are regenerated from numerical data; exact PDF byte identity is not a
   reproducibility claim.
 

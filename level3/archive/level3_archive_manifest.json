@@ -1,0 +1,477 @@
+{
+  "created_utc": "2026-06-08T00:00:00Z",
+  "files": {
+    "example_offline_analysis.json": {
+      "bytes": 1924,
+      "role": "consolidated_analysis_json",
+      "sha256": "sha256:d673f5074e1cc6dd17e8d0f297101db7acda2546ee9f93ca290e7729bebdeda8"
+    },
+    "example_offline_counts.json.gz": {
+      "bytes": 1962,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:2023d0718cf4d7304469459fa250aa4b6584295704feca6b3a831ae4baad7238"
+    },
+    "ibm_marrakesh_g6_k2_c000_20260607T154920Z_d8ip5t5v8cos73f5sn70.json.gz": {
+      "bytes": 2054,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:d3357caf71ebd1289ae52ea31d2e9023e48484db9b5b0a0a6482e06f9999a0ec"
+    },
+    "ibm_marrakesh_g6_k2_c000_20260607T154920Z_d8ip5t5v8cos73f5sn70_analysis.json": {
+      "bytes": 1927,
+      "role": "consolidated_analysis_json",
+      "sha256": "sha256:fb1fdb07dfbd2915f4a5bd452bcb8fe873e10c13f601149eeb05f40bf6df58a1"
+    },
+    "stage3_g6_k2_c000_ibm_kingston_all19_sensitivity_analysis.json": {
+      "bytes": 19583,
+      "role": "consolidated_analysis_json",
+      "sha256": "sha256:cc407df696824f25f20173ec153fdd56a50d567d063d7e77a91b0de5ada3b7b9"
+    },
+    "stage3_g6_k2_c000_ibm_kingston_epoch01_20260607T234457Z_d8ivn5tv8cos73f64skg.json.gz": {
+      "bytes": 86529,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:dc1741009befe467a6aa6d0b4dbda29d147ccf94a2f5b1934204ed2d08b21266"
+    },
+    "stage3_g6_k2_c000_ibm_kingston_epoch02_20260607T234529Z_d8j04uu6983c73dsm7n0.json.gz": {
+      "bytes": 86480,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:8da3070ea6e0b2660155a5d1aaea703199b38bf725a78ce3323cd5690b1dc899"
+    },
+    "stage3_g6_k2_c000_ibm_kingston_epoch03_20260607T234552Z_d8j056he8nrc73bisho0.json.gz": {
+      "bytes": 87152,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:13b10e3bf7e4431276b631d181acd6bb892753cfc7854421023d177311885f41"
+    },
+    "stage3_g6_k2_c000_ibm_kingston_epoch04_20260607T234615Z_d8j05c9e8nrc73bishv0.json.gz": {
+      "bytes": 86692,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:c560cce682ba94f6c06974b8cbd1ea1671fbb9dbaff2d187b931afa2f215c552"
+    },
+    "stage3_g6_k2_c000_ibm_kingston_epoch05_20260607T234640Z_d8j05ic2upec739mq700.json.gz": {
+      "bytes": 87116,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:ad6f818b4048e170397d312ca47396c57ad5551b62f7f4702ac23449ad9acc6b"
+    },
+    "stage3_g6_k2_c000_ibm_kingston_epoch06_20260607T234704Z_d8j05odv8cos73f65eo0.json.gz": {
+      "bytes": 86834,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:37fc6248f2f21bff414a4f3ca1f24e186102a057045b0c415a299084678826af"
+    },
+    "stage3_g6_k2_c000_ibm_kingston_epoch07_20260607T234728Z_d8j05um6983c73dsm93g.json.gz": {
+      "bytes": 87175,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:ecf18ae11b748258d464e469ca2c106024d8f16f918e650c594cae71b66e6446"
+    },
+    "stage3_g6_k2_c000_ibm_kingston_epoch08_20260607T234804Z_d8j064k2upec739mq84g.json.gz": {
+      "bytes": 86863,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:cf553b2466df4cbc75186e0948bb989fa8324a7a277c9a97db9c59d4e3e87371"
+    },
+    "stage3_g6_k2_c000_ibm_kingston_epoch09_20260607T234826Z_d8j06dtv8cos73f65flg.json.gz": {
+      "bytes": 87410,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:b31a67edbad98da2339738162c6c699af083e96ff5f3855f04e36e7ff88d0b2c"
+    },
+    "stage3_g6_k2_c000_ibm_kingston_epoch10_20260607T234840Z_d8j06fm6983c73dsm9qg.json.gz": {
+      "bytes": 86838,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:7ca1fb078476b9f71dcd6976d62d2be12b5fb61ebd69abc8547e5148e62abe0c"
+    },
+    "stage3_g6_k2_c000_ibm_kingston_epoch10_20260607T234854Z_d8j06is2upec739mq8n0.json.gz": {
+      "bytes": 86495,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:2587f5bd0b19661084551a57fca2f967343ca9f2a43ad831a5b6039ef34a53f9"
+    },
+    "stage3_g6_k2_c000_ibm_kingston_epoch11_20260607T234911Z_d8j06mc2upec739mq8tg.json.gz": {
+      "bytes": 86131,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:481329d4238b4e6ffbe97eacd3a3bf3ce67223bf1c48672c1164dbb6d2b213a4"
+    },
+    "stage3_g6_k2_c000_ibm_kingston_epoch11_20260607T234925Z_d8j06pu6983c73dsmacg.json.gz": {
+      "bytes": 86754,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:e17cea5a8d60f091f93373d9ddb31216a65d5856b71b746aa0367d4b6b6987f2"
+    },
+    "stage3_g6_k2_c000_ibm_kingston_epoch12_20260607T234938Z_d8j06ue6983c73dsmaig.json.gz": {
+      "bytes": 86642,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:1d4ae1d9a3caeaa05e62f2f3fc91ece21c379ce6aff66965f7bc9d576a47aa13"
+    },
+    "stage3_g6_k2_c000_ibm_kingston_epoch12_20260607T234950Z_d8j071k2upec739mq9j0.json.gz": {
+      "bytes": 86529,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:4261dc912258bd0e70e7832be433bdfbcbd7c7bb6cea3b3f0330a0b1b13408d3"
+    },
+    "stage3_g6_k2_c000_ibm_kingston_epoch13_20260607T235002Z_d8j074s2upec739mq9p0.json.gz": {
+      "bytes": 86562,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:a527eca09726ac86e42b68d68b14f604169e80950e3b3523d3b5e30ced4c990e"
+    },
+    "stage3_g6_k2_c000_ibm_kingston_epoch13_20260607T235014Z_d8j077s2upec739mq9u0.json.gz": {
+      "bytes": 86419,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:a93f6a565192ff0ae9dc2a4622e9fd1a951bb4aaa55b3c9a791e3baf07a69d35"
+    },
+    "stage3_g6_k2_c000_ibm_kingston_epoch14_20260607T235026Z_d8j07au6983c73dsmb30.json.gz": {
+      "bytes": 87180,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:9a14338c8f84215298108be212633f1cb74df606bf810426755a5ce46a211e2d"
+    },
+    "stage3_g6_k2_c000_ibm_kingston_epoch14_20260607T235052Z_d8j07e42upec739mqa6g.json.gz": {
+      "bytes": 86767,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:07f7d85b02fd52ad77e49cffa65017f6976f8b8fce202ef643198a9cea6a0b8c"
+    },
+    "stage3_g6_k2_c000_ibm_kingston_fixed14_analysis.json": {
+      "bytes": 18321,
+      "role": "consolidated_analysis_json",
+      "sha256": "sha256:faca034c4acc024911d44c47532c9a4c36e25cd2243ceb74f2df9443b9003ef9"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch01_20260607T163302Z_d8ipqak2upec739mhs2g.json.gz": {
+      "bytes": 88481,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:6d5feaa66d34eef8f72ed8513e95ce082a4c1f3469f5dc24f002a2cf5ea78ca0"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch01_20260607T163904Z_d8ipt51e8nrc73biktl0.json.gz": {
+      "bytes": 88500,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:ec1b2475ec292f0bb662b0eb39b771c8f2c6b7e33298effb8ed4f25ad6de981f"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch01_20260607T164653Z_d8iq0qhe8nrc73bil20g.json.gz": {
+      "bytes": 89135,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:458cde2138c9155bfef9c585c9366b45210ae5561196d9cff5ae679d71059875"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch01_20260607T164744Z_d8iq171e8nrc73bil2g0.json.gz": {
+      "bytes": 88659,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:1bd7b0e86348340326fb91442735e4028d367e2817ac6ee928fc622a33a3b4af"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch02_20260607T163324Z_d8ipqg1e8nrc73bikqjg.json.gz": {
+      "bytes": 88637,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:9b8f599ec744675552053fbf2406e0507860b4ad7ced19da6062e86bafe8e63e"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch02_20260607T163933Z_d8iptak2upec739mhvpg.json.gz": {
+      "bytes": 87801,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:f6de0a757e3ddf5ed0d40ce27e0391fa27af252e7f044219d8164d897424cc46"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch02_20260607T164803Z_d8iq1cc2upec739mi52g.json.gz": {
+      "bytes": 88648,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:73efa352ae9d89409ffe6f27401c5cb1b771d873fff9707f34194e2b051cd082"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch03_20260607T163345Z_d8ipqlc2upec739mhsg0.json.gz": {
+      "bytes": 88361,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:5472570f44457e4e2213c5dd99c90efb15814572fde2a7104451ae1e24bd4c78"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch03_20260607T163956Z_d8ipthu6983c73dseop0.json.gz": {
+      "bytes": 87791,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:885fa2bd4dbd770635cbe9d7cafcd61532ecdc4f8f242088118e3bafbd60c70e"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch04_20260607T163407Z_d8ipqqs2upec739mhsn0.json.gz": {
+      "bytes": 88459,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:5163457020021aaf07495d70efba1800b416b34c3c34d4381138a9cd1ed68fe4"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch04_20260607T164018Z_d8iptne6983c73dseoug.json.gz": {
+      "bytes": 87595,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:a45cf3a16bc9852947bc86cf6e33584abc84d9f7f5d4f6dee1ad6b9da06d5182"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch05_20260607T163428Z_d8ipr0e6983c73dsem0g.json.gz": {
+      "bytes": 88493,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:7bd9ce1ecb19d53c15f5e5d75a93ee1d7116f4b4f4a66dea5b18a18c851c5092"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch05_20260607T164039Z_d8iptss2upec739mi0g0.json.gz": {
+      "bytes": 87932,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:59d80c6e555609a929abfe68cba4587acec48024591ca556e6c32727ee0b52d9"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch06_20260607T163450Z_d8ipr5k2upec739mht4g.json.gz": {
+      "bytes": 87509,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:3d7dcec5cb7000c5e02eb9554ba5069883223b0b02e79e8d0f0db168f33c5980"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch06_20260607T164100Z_d8ipu25v8cos73f5ti10.json.gz": {
+      "bytes": 87969,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:008e030d1eac84e8de48a0de51a996c6ac0aa5b474bbefc9991afcdd827d67d0"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch07_20260607T163510Z_d8ipras2upec739mhtb0.json.gz": {
+      "bytes": 87941,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:563f85bbc433a4f7b6d7978b38041353427376f6d1c242b4099377528ace471f"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch07_20260607T164120Z_d8ipu7he8nrc73bikutg.json.gz": {
+      "bytes": 88325,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:9c4c6084e01e62eb6751d7c4a51299a7952a54759abdcf24eaa996a7a1edfa1f"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch08_20260607T163532Z_d8iprg42upec739mhtig.json.gz": {
+      "bytes": 88171,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:cebab9d68d5608297a95cbbd09279f4298b4c28594bd87b6c50f02b72dee136a"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch08_20260607T164141Z_d8ipuclv8cos73f5tibg.json.gz": {
+      "bytes": 87817,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:ff31cee7b545840b4adbe77f4a1e0141b8a5d8d241f18838ede27a919b7ebcfb"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch09_20260607T163553Z_d8iprle6983c73dsemn0.json.gz": {
+      "bytes": 88545,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:12b4a77ae0b1da18dda182a0faa51763d1475746a1552cd95efcdd09aead2967"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch09_20260607T164201Z_d8ipuhk2upec739mi1bg.json.gz": {
+      "bytes": 88225,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:5eafc647ce270d63bda0c4b4a0acd3e86e009ff00128a6a430f9b99b9c381276"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch10_20260607T163614Z_d8iprqhe8nrc73biks3g.json.gz": {
+      "bytes": 88126,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:c646fd85a2d5587c1e841984d77bebd1168c3b88641429591c84c9616d407f46"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch10_20260607T164222Z_d8ipumpe8nrc73bikveg.json.gz": {
+      "bytes": 87772,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:c8c005f1c2be139eb60b45f0669fade88a8a5320aacfae9ba1a0ec823fee976b"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch11_20260607T163635Z_d8ips042upec739mhu50.json.gz": {
+      "bytes": 88374,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:089df3d19306c7146f79256ec4b4d48d6e8088616dde254dfa5911efbb0faa33"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch11_20260607T164243Z_d8ipurs2upec739mi1o0.json.gz": {
+      "bytes": 88288,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:bc4883ad3f514c87094a6c10563dcdad2e3e3f21819104e2ad3e2e5745334650"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch12_20260607T163656Z_d8ips566983c73dsen7g.json.gz": {
+      "bytes": 88372,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:9c5702dfc1ef3d0116a41e068a3d8ad399d8c5174f53dd4f8c3c818007b7c843"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch12_20260607T164304Z_d8ipv1c2upec739mi210.json.gz": {
+      "bytes": 88012,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:4db810cd43892d7fe4e058a66a6a6ba41f967c82f5394d9d2a88fa7152966081"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch13_20260607T163717Z_d8ipsalv8cos73f5tg40.json.gz": {
+      "bytes": 87742,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:a37ecfea50f8336163a142c8deabbe065bb65dd0311bf625c16d860e26869523"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch13_20260607T164334Z_d8ipv6lv8cos73f5tja0.json.gz": {
+      "bytes": 88046,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:9e7d18948d8b680be527af09acc9228f3356bdf88ff2b4a97226d667d081deb4"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch14_20260607T163740Z_d8ipsfpe8nrc73bikssg.json.gz": {
+      "bytes": 87971,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:456df909eb96618e5ca23dbc813539673f4c8236f7445a51a54417764bfb9931"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch14_20260607T164355Z_d8ipve5v8cos73f5tjkg.json.gz": {
+      "bytes": 88549,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:5abec1ffd93715510004a4b7fc6b1c394b178a73ee43aa0954426c6bfb8fd824"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch15_20260607T163802Z_d8ipslc2upec739mhv00.json.gz": {
+      "bytes": 88031,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:63e762ac95cb9f3fb87e015fd80e8dc2e67430c744dd74a1cfb9011a7f2ed99d"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch15_20260607T164416Z_d8ipvj5v8cos73f5tjq0.json.gz": {
+      "bytes": 88404,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:d93e386e228143684b1c6abf6a0d0ad83939339d7bdccb2952f2ec685c69b247"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch16_20260607T164436Z_d8ipvoc2upec739mi2s0.json.gz": {
+      "bytes": 88334,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:05c5d5a86de8f482f2984ec9b145cdcb66d1a50373d032c53820ef5fc4300903"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch17_20260607T164458Z_d8ipvtk2upec739mi32g.json.gz": {
+      "bytes": 87804,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:48687ab4001bee30b9a5c20cb737910549b8b182c426bd3ebe2b56eb291cd5e6"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch18_20260607T164520Z_d8iq02tv8cos73f5tkd0.json.gz": {
+      "bytes": 87589,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:eb2268094499f4371bebca79053d71f5cc59ddc9163df2385cc1c00ad861b67b"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch19_20260607T164540Z_d8iq08c2upec739mi3jg.json.gz": {
+      "bytes": 88572,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:f1cfb57a428f9859ae005f1f78b8d4ebf6a9fbe2d9541ae58fb8892963411422"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_epoch20_20260607T164603Z_d8iq0dlv8cos73f5tkqg.json.gz": {
+      "bytes": 88340,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:a0ded7b6fa3cddb04f0b3acda90d727bee20d15f213a2b8a6634497887654d6a"
+    },
+    "stage3_g6_k2_c000_ibm_marrakesh_full_analysis.json": {
+      "bytes": 26937,
+      "role": "consolidated_analysis_json",
+      "sha256": "sha256:c0b2da1993adcae81540b1190c0f978949cb694017d0092c690c6c502655f48a"
+    },
+    "stage3_g6_k2_c001_ibm_marrakesh_epoch01_20260607T175649Z_d8ir1ilv8cos73f5uqkg.json.gz": {
+      "bytes": 89288,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:4b212236f53e5135c5a3e4ff87058ef000cc08e7ab0146e75af0fe910ff16c59"
+    },
+    "stage3_g6_k2_c001_ibm_marrakesh_epoch01_20260607T175755Z_d8ir245v8cos73f5ur7g.json.gz": {
+      "bytes": 88599,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:8cd834d35ad17272c275faaf761e0a4838629ec6072f18ebb5d1473faf572ed0"
+    },
+    "stage3_g6_k2_c001_ibm_marrakesh_epoch01_20260607T214555Z_d8iud05v8cos73f63c70.json.gz": {
+      "bytes": 88542,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:92b5341c02a17221b650fd1df133ec2950324ef045a46e63e3f887a2638a7012"
+    },
+    "stage3_g6_k2_c001_ibm_marrakesh_epoch02_20260607T175818Z_d8ir29c2upec739mjcd0.json.gz": {
+      "bytes": 88878,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:eff153ce9adef15110be97566295187f3d2471b917f6b9c7f037c93e7bf636e2"
+    },
+    "stage3_g6_k2_c001_ibm_marrakesh_epoch02_20260607T214616Z_d8iud5dv8cos73f63ccg.json.gz": {
+      "bytes": 89186,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:3796098453da3ab5e0a26c5e03ae105089b371e72f26804b3f01bc1b4c08054b"
+    },
+    "stage3_g6_k2_c001_ibm_marrakesh_epoch03_20260607T175839Z_d8ir2f42upec739mjcj0.json.gz": {
+      "bytes": 88442,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:abc4ff437a2756cfb25ec8096c37dd3b509086ab46bad77827fce8940f0f9dc3"
+    },
+    "stage3_g6_k2_c001_ibm_marrakesh_epoch03_20260607T214637Z_d8iudak2upec739mo4b0.json.gz": {
+      "bytes": 89018,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:faf54844a52ce1e26297d6e942681b1471a63e8e5fb9a337dc36ce97a905dd19"
+    },
+    "stage3_g6_k2_c001_ibm_marrakesh_epoch04_20260607T214658Z_d8iudfu6983c73dska80.json.gz": {
+      "bytes": 88495,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:d25f0e92dfdebad7db1e7430530790acf49b163de124eaf5101d61d5bd22436c"
+    },
+    "stage3_g6_k2_c001_ibm_marrakesh_epoch05_20260607T214719Z_d8iudl66983c73dskafg.json.gz": {
+      "bytes": 88432,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:c28ffecdad444b8ee3103f76932549e545baf02eb4d32af5d18f0e062be5cace"
+    },
+    "stage3_g6_k2_c001_ibm_marrakesh_epoch06_20260607T214741Z_d8iudqdv8cos73f63d40.json.gz": {
+      "bytes": 88613,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:e458c3ab49166e68d59a4535e28f78cef0ad72a74d6772ba3527b3157fd10f94"
+    },
+    "stage3_g6_k2_c001_ibm_marrakesh_epoch07_20260607T214803Z_d8iudvtv8cos73f63dag.json.gz": {
+      "bytes": 88587,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:e83f50de5cf9969756e3f77705b5b08938f0ef62d73f163e5704551f2b55970e"
+    },
+    "stage3_g6_k2_c001_ibm_marrakesh_epoch08_20260607T214824Z_d8iue5c2upec739mo590.json.gz": {
+      "bytes": 88794,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:a290856ebebe90f97b029119e9b11018479460fd6f6cfeb9337c5651905eea6d"
+    },
+    "stage3_g6_k2_c001_ibm_marrakesh_epoch09_20260607T214847Z_d8iuealv8cos73f63dmg.json.gz": {
+      "bytes": 88822,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:c2080d7766e908b54926d89a49585d7efeca66ad2b784612e5a76118ffe29c60"
+    },
+    "stage3_g6_k2_c001_ibm_marrakesh_epoch10_20260607T214908Z_d8iueg66983c73dskbbg.json.gz": {
+      "bytes": 88875,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:0deea44332b91a7d5d8f83fc116ba6ecaf50fad913523bbd6c32aa9e27dffd00"
+    },
+    "stage3_g6_k2_c001_ibm_marrakesh_epoch11_20260607T214929Z_d8iueldv8cos73f63e4g.json.gz": {
+      "bytes": 88817,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:b9817f818da2584031e3964d9616d9fcab05d0a8812f0cbc1f1631c167301716"
+    },
+    "stage3_g6_k2_c001_ibm_marrakesh_epoch12_20260607T214950Z_d8iueqhe8nrc73biqkc0.json.gz": {
+      "bytes": 88940,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:8d4e44763e59a027811e4179254d8f6ea3f7e6cc093dd19411072c1490cc9b6d"
+    },
+    "stage3_g6_k2_c001_ibm_marrakesh_full_analysis.json": {
+      "bytes": 18416,
+      "role": "consolidated_analysis_json",
+      "sha256": "sha256:d7457e461b85c8236cb5e56084882816b75069597309fa3289b3d7a049a0f957"
+    },
+    "stage3_g8_k3_c000_ibm_marrakesh_epoch01_20260607T215152Z_d8iufope8nrc73biqlb0.json.gz": {
+      "bytes": 131462,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:3770cde235307f339b8c3606b57d11d6419153c4d3b5e07791bd5719fc90b4a8"
+    },
+    "stage3_g8_k3_c000_ibm_marrakesh_epoch01_20260607T215337Z_d8iugdm6983c73dskdd0.json.gz": {
+      "bytes": 131398,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:5b46e7393b73697ccf29012009b5a54a1ed7255267b14d466f9f5d0500c2610d"
+    },
+    "stage3_g8_k3_c000_ibm_marrakesh_epoch02_20260607T215401Z_d8iugotv8cos73f63g9g.json.gz": {
+      "bytes": 131520,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:06f1eeee4579122cdebd5ccdf777f4f8b35ce8e78bc622cc69210b77c0006ffa"
+    },
+    "stage3_g8_k3_c000_ibm_marrakesh_epoch03_20260607T215431Z_d8iugutv8cos73f63gf0.json.gz": {
+      "bytes": 131740,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:720386c0ffb1501cf8e580eab88677a03180a656a7f4d763e435eacfcedae59a"
+    },
+    "stage3_g8_k3_c000_ibm_marrakesh_epoch04_20260607T215455Z_d8iuh69e8nrc73biqmp0.json.gz": {
+      "bytes": 131994,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:1ca9c4b9e7ce792d16024e86e1d97fe2abdfcd63ae3754772fa85437828a2433"
+    },
+    "stage3_g8_k3_c000_ibm_marrakesh_epoch05_20260607T215602Z_d8iuhc9e8nrc73biqn00.json.gz": {
+      "bytes": 132087,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:6f51819b048beedaf751a163222fd295f850d8901a7d32036418e509e96b7e31"
+    },
+    "stage3_g8_k3_c000_ibm_marrakesh_epoch06_20260607T215647Z_d8iuhte6983c73dsket0.json.gz": {
+      "bytes": 132548,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:8fca834404fecadf7aa19ffe5fe80bde7122ff3d4d948cdee6f89e254f3cc21e"
+    },
+    "stage3_g8_k3_c000_ibm_marrakesh_epoch07_20260607T215710Z_d8iui8dv8cos73f63hp0.json.gz": {
+      "bytes": 132285,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:16fbe26d8dab8db2a6a635e33643f4dadcefb263252deb44eede195063a7ac06"
+    },
+    "stage3_g8_k3_c000_ibm_marrakesh_epoch08_20260607T215805Z_d8iuie66983c73dskfeg.json.gz": {
+      "bytes": 132313,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:291c719d81074ae597e6cacbc8964751a2e09edb6a218c0e808a5f35dc1b4edc"
+    },
+    "stage3_g8_k3_c000_ibm_marrakesh_epoch09_20260607T215828Z_d8iuirpe8nrc73biqodg.json.gz": {
+      "bytes": 132478,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:5261a7da9337f56f334e23ba94f7bfc7de8b432f19feefa8b4fa5fa4f0286a95"
+    },
+    "stage3_g8_k3_c000_ibm_marrakesh_epoch10_20260607T215851Z_d8iuj1lv8cos73f63ijg.json.gz": {
+      "bytes": 132464,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:000f91170c2fa323a6b425cb8018ed037a6a55585dc295803039dcd08ba8336e"
+    },
+    "stage3_g8_k3_c000_ibm_marrakesh_epoch11_20260607T215915Z_d8iuj7e6983c73dskg90.json.gz": {
+      "bytes": 132911,
+      "role": "raw_counts_archive",
+      "sha256": "sha256:837199694a0cb53e5cf05bab305dcfc3c6361a95123d29dce2deba916f7d2ce0"
+    },
+    "stage3_g8_k3_c000_ibm_marrakesh_full_analysis.json": {
+      "bytes": 16866,
+      "role": "consolidated_analysis_json",
+      "sha256": "sha256:983e4f8a51ccf67ff3b0a4093c02b9aef29736c35160650ab768555e1016d4e9"
+    }
+  },
+  "schema_version": "level3-archive-manifest-v1",
+  "scope": "Committed Level 3 raw-count JSON.GZ archives and consolidated analysis JSON files. Public DOI archives should preserve these checksums or supersede them with a DOI-time manifest."
+}

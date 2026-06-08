@@ -43,6 +43,12 @@ DETERMINISTIC_ENV_VARS = (
     "MKL_NUM_THREADS",
     "OPENBLAS_NUM_THREADS",
 )
+EXPECTED_DETERMINISTIC_ENV = {
+    "PYTHONHASHSEED": "0",
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+}
 
 
 def _sha256(path: Path) -> str:
@@ -79,6 +85,11 @@ def _git_commit(exclude_paths: tuple[Path, ...] = ()) -> tuple[str, bool, list[s
             stderr=subprocess.DEVNULL,
         ).splitlines()
     except Exception:
+        override = os.environ.get("REPRO_GIT_COMMIT_SHA")
+        if override:
+            dirty = os.environ.get("REPRO_GIT_DIRTY", "false").lower() in {"1", "true", "yes"}
+            paths = os.environ.get("REPRO_GIT_DIRTY_PATHS", "")
+            return override, dirty, [p for p in paths.split(";") if p]
         return "unknown", True, ["git unavailable"]
 
     relevant = []
@@ -107,6 +118,12 @@ def _hash_file_value(path: Path, key: str) -> str:
     return "absent"
 
 
+def _file_hash_record(path: Path) -> dict[str, str] | None:
+    if not path.exists():
+        return None
+    return {"path": _repo_relative(path), "sha256": _sha256(path)}
+
+
 def _rng_policy(path: Path) -> dict:
     if not path.exists():
         return {}
@@ -120,9 +137,15 @@ def preflight(output: Path, strict_env: bool = False) -> list[str]:
     import scipy
 
     warnings = []
-    for var in DETERMINISTIC_ENV_VARS:
-        if os.environ.get(var) is None:
+    for var, expected in EXPECTED_DETERMINISTIC_ENV.items():
+        actual = os.environ.get(var)
+        if actual is None:
             warnings.append(f"env {var} not set (tight cross-platform tolerances may not hold)")
+        elif actual != expected:
+            warnings.append(
+                f"env {var}={actual!r}, expected {expected!r} "
+                "(canonical exact reproduction may not hold)"
+            )
     if platform.machine().lower() not in ("x86_64", "amd64"):
         warnings.append(f"architecture {platform.machine()} is not x86_64 (ULP differences possible)")
     if strict_env and warnings:
@@ -188,6 +211,15 @@ def run_level1(
         "dependencies": {"numpy": np.__version__, "scipy": scipy.__version__},
         "deterministic_environment": {
             var: os.environ.get(var) for var in DETERMINISTIC_ENV_VARS
+        },
+        "environment_lock": {
+            "requirements_lock": _file_hash_record(REPO_ROOT / "requirements.lock"),
+        },
+        "canonical_container": {
+            "base_image": os.environ.get("REPRO_DOCKER_BASE_IMAGE"),
+            "base_digest": os.environ.get("REPRO_DOCKER_BASE_DIGEST"),
+            "platform": os.environ.get("REPRO_DOCKER_PLATFORM"),
+            "image_digest": os.environ.get("REPRO_DOCKER_IMAGE_DIGEST"),
         },
         "rng_policy": {
             "path": _repo_relative(rng_policy_path),

@@ -111,7 +111,11 @@ def verify_manifest_spec(spec: dict[str, Any]) -> ManifestResult:
 
         raw = target.read_bytes()
         raw_matches = _matches_entry(entry, raw)
-        logical_matches = raw_matches or _logical_checkout_matches(entry, path)
+        logical_matches = (
+            raw_matches
+            or _logical_checkout_matches(entry, path)
+            or _working_tree_representation_matches(entry, raw, path)
+        )
 
         if raw_matches or (logical_matches and path not in allowlist):
             ok += 1
@@ -176,7 +180,7 @@ def _matches_entry(entry: dict[str, Any], data: bytes) -> bool:
 def _logical_checkout_matches(entry: dict[str, Any], path: str) -> bool:
     try:
         blob = _git_show_bytes("HEAD", path)
-    except subprocess.CalledProcessError:
+    except (subprocess.CalledProcessError, FileNotFoundError):
         return False
     return any(_matches_entry(entry, candidate) for _label, candidate in _candidate_bytes(blob, path))
 
@@ -184,9 +188,20 @@ def _logical_checkout_matches(entry: dict[str, Any], path: str) -> bool:
 def _recoverable_at_frozen_commit(entry: dict[str, Any], commit: str, path: str) -> bool:
     try:
         blob = _git_show_bytes(commit, path)
-    except subprocess.CalledProcessError:
+    except (subprocess.CalledProcessError, FileNotFoundError):
         return False
     return any(_matches_entry(entry, candidate) for _label, candidate in _candidate_bytes(blob, path))
+
+
+def _working_tree_representation_matches(entry: dict[str, Any], data: bytes, path: str) -> bool:
+    if not _is_text_path(path):
+        return False
+    candidates = [data]
+    if b"\r\n" in data:
+        candidates.append(data.replace(b"\r\n", b"\n"))
+    elif b"\n" in data:
+        candidates.append(data.replace(b"\n", b"\r\n"))
+    return any(_matches_entry(entry, candidate) for candidate in candidates)
 
 
 def _candidate_bytes(blob: bytes, path: str) -> list[tuple[str, bytes]]:

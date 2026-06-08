@@ -4,17 +4,24 @@ on:
   push:
   pull_request:
 
+env:
+  PYTHONHASHSEED: "0"
+  OMP_NUM_THREADS: "1"
+  MKL_NUM_THREADS: "1"
+  OPENBLAS_NUM_THREADS: "1"
+
 jobs:
-  reproduce:
+  canonical-linux-docker:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: docker/build-push-action@v5
         with:
           context: .
+          platforms: linux/amd64
           load: true
           tags: vd-sv:test
-      - name: Container reproduction + archive verification (no quantum-cloud account)
+      - name: Canonical container exact reproduction + archive verification
         run: >
           docker run --rm
           -v ${{ github.workspace }}/ci-results:/app/results
@@ -27,6 +34,25 @@ jobs:
         with:
           name: ci-results
           path: ci-results/
-      - name: Advisory dependency audit
-        run: docker run --rm vd-sv:test pip-audit || true
-        continue-on-error: true
+      - name: Dependency audit
+        run: docker run --rm vd-sv:test python -m pip_audit -r requirements.lock
+
+  cross-platform-tolerance:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-13, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12.4"
+      - name: Install hash-locked environment
+        run: |
+          python -m pip install --require-hashes -r requirements.lock
+          python -m pip install --no-deps --no-build-isolation -e .
+      - name: Full reproduction with registered tolerances
+        run: |
+          python reproducibility/run_all_current.py --mode full --output results
+          python reproducibility/verify_current.py --reference reproducibility/reference --generated results

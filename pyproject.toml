@@ -29,8 +29,11 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
+    "pip-audit>=2.7",
     "pytest>=8.0",
     "ruff>=0.5",
+    "setuptools>=68",
+    "wheel>=0.43",
 ]
 figures = [
     "matplotlib>=3.7",
