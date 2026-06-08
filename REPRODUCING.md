@@ -1,7 +1,9 @@
 # Reproducing The Results
 
-The canonical environment is Linux/amd64 Docker. Windows and macOS are
-cross-platform tolerance checks, not the source of reference truth.
+The reference environment is packaged as Linux/amd64 Docker. Bit-for-bit
+numeric identity is a same-machine run-to-run determinism claim; runs on a
+different CPU/host, including another Docker host, are checked with the
+registered tolerances.
 
 ## One Command
 
@@ -37,9 +39,11 @@ PAP freeze auditor included in the image.
 
 - The canonical Linux/amd64 Docker environment is hash-locked by
   `requirements.lock` and pinned to the base image digest in `Dockerfile`.
-- Level 1 full outputs reproduce byte/float-stream exactly against
-  `reproducibility/reference/`.
-- Three full canonical runs are mutually exact via `make determinism-check`.
+- Three full runs on the same machine are mutually exact via
+  `make determinism-check`.
+- Level 1 full outputs from another CPU/host are verified against
+  `reproducibility/reference/` with the registered tolerances, allowing tiny
+  final-ULP BLAS/SIMD dispatch drift.
 - Level 3 analyses are recomputed from archived `.json.gz` count files without
   connecting to IBM Runtime.
 - Figures are regenerated from numerical outputs, but PDF byte identity is not
@@ -66,5 +70,6 @@ MKL_NUM_THREADS=1
 OPENBLAS_NUM_THREADS=1
 ```
 
-Tiny final-ULP drift outside the canonical Linux/Docker environment is expected
-and is covered by `reproducibility/config/tolerances.yaml`.
+Tiny final-ULP drift across different CPUs or hosts, including different
+Linux/Docker hosts, is expected and is covered by
+`reproducibility/config/tolerances.yaml`.

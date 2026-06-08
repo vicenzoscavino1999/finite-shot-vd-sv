@@ -49,7 +49,7 @@ audit:
 
 check: test verify verify-reference verify-level3 verify-freeze
 
-check-ci: check-env determinism-check reproduce-full test-ci verify-reference verify-level3
+check-ci: check-env determinism-check reproduce-full-tolerant test-ci verify-reference verify-level3
 
 reproduce-all: check-env reproduce-level1 test-ci verify-reference verify-level3 verify-freeze figures
 	@echo "REPRODUCE_ALL_PASS: Level 1 exact, tests, PAP freeze, Level 3 archived-count verification, and figures completed"

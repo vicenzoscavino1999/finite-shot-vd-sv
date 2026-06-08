@@ -54,7 +54,7 @@
     "run_manifest": "manifest.json",
     "run_manifest_sha256": "sha256:07f9e900c10ea08c750348aa4344c48bddee95b10ff2fa37f3f96074f3ddc926"
   },
-  "numeric_identity_contract": "Canonical linux/amd64 Docker runs are expected to match these CSV references with --exact-numeric. Non-canonical platforms are verified with the tolerances in reproducibility/config/tolerances.yaml.",
+  "numeric_identity_contract": "Bit-for-bit numeric identity is a same-machine run-to-run determinism contract, exercised by make determinism-check and by comparing the committed reference directory against itself. Docker runs on a different CPU/host can show final-ULP BLAS/SIMD drift and are verified against these CSV references with the registered tolerances in reproducibility/config/tolerances.yaml.",
   "pap_freezes": {
     "v1": {
       "frozen_commit_sha": "0814ba796b7d8819e709780ffa01e9f94be7a727",
