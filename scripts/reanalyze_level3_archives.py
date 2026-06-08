@@ -1,8 +1,8 @@
 """Re-run Level 3 analyses from archived hardware counts only.
 
 This script does not connect to IBM Runtime and does not submit QPU jobs. It
-only reads the committed `level3/archive/stage3_*.json.gz` archives and rewrites
-the consolidated JSON summaries used by the reports.
+only reads the committed `level3/archive/stage3_*.json.gz` archives by default.
+Pass ``--update`` to rewrite the consolidated JSON summaries used by the reports.
 """
 
 from __future__ import annotations
@@ -123,12 +123,25 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--instance", default="all", choices=["all", *CASES])
     parser.add_argument("--bootstrap-reps", type=int, default=2000)
     parser.add_argument("--quiet", action="store_true")
+    parser.add_argument(
+        "--update",
+        action="store_true",
+        help="rewrite the committed consolidated analysis JSON files",
+    )
     args = parser.parse_args(argv)
 
     for name in _case_names(args.instance):
         result, archives, out = analysis_for_case(name, int(args.bootstrap_reps))
-        out.write_text(json.dumps(result, indent=2, sort_keys=True), encoding="utf-8")
-        print(f"LEVEL3_ANALYSIS_WRITTEN instance={name} archives={len(archives)} json_out={out}")
+        if args.update:
+            out.write_text(json.dumps(result, indent=2, sort_keys=True), encoding="utf-8")
+            print(
+                f"LEVEL3_ANALYSIS_WRITTEN instance={name} archives={len(archives)} json_out={out}"
+            )
+        else:
+            print(
+                f"LEVEL3_ANALYSIS_READ_ONLY instance={name} archives={len(archives)} "
+                f"json_out={out}"
+            )
         if not args.quiet:
             print(render_summary(result), end="")
     return 0

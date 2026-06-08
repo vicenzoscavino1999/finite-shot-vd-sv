@@ -10,6 +10,11 @@ docker build --platform linux/amd64 -t finite-shot-vd-sv:repro .
 docker run --rm --platform linux/amd64 finite-shot-vd-sv:repro bash -lc "make reproduce-all"
 ```
 
+Canonical entrypoints are `reproducibility/run_all_current.py` and
+`reproducibility/verify_current.py`; the PAP-frozen `run_all.py`,
+`run_all_v2.py`, and `verify.py` are audit artifacts, not the current
+reproduction path. `verify.py` does not validate reference checksums.
+
 Expected final line:
 
 ```text

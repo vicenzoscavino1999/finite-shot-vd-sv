@@ -6,7 +6,8 @@ REFERENCE ?= reproducibility/reference
 .PHONY: reproduce run verify verify-exact verify-reference verify-freeze verify-level3 figures \
         test test-ci audit check check-ci reproduce-fast reproduce-full reproduce-full-tolerant \
         reproduce-level1 reproduce-all reference-manifest level3-manifest analysis-from-hardware \
-        level3-analysis check-env determinism-check level2-foundation level2-sampling
+        analysis-from-hardware-update level3-analysis check-env determinism-check \
+        level2-foundation level2-sampling
 
 reproduce: reproduce-full
 
@@ -74,7 +75,11 @@ reproduce-level1:
 	$(PYTHON) reproducibility/verify_current.py --reference $(REFERENCE) --generated $(RESULTS) --exact-numeric
 
 analysis-from-hardware:
+	@echo "analysis-from-hardware is read-only; use analysis-from-hardware-update to refresh committed Level 3 JSON summaries"
 	$(PYTHON) $(RUN_ALL) --level 3 --from-archived-counts
+
+analysis-from-hardware-update:
+	$(PYTHON) scripts/reanalyze_level3_archives.py --update
 
 level3-analysis:
 	$(PYTHON) $(RUN_ALL) --level 3 --from-archived-counts

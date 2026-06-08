@@ -21,6 +21,13 @@ The active post-freeze driver is `reproducibility/run_all_current.py`. The
 original `reproducibility/run_all.py` and `reproducibility/run_all_v2.py` remain
 unchanged PAP artifacts so the registered freezes stay auditable.
 
+Entrypoint status for reviewers:
+
+| Status | Entrypoints | Use |
+| --- | --- | --- |
+| Canonical | `reproducibility/run_all_current.py`, `reproducibility/verify_current.py` | Use these for current reproduction. `verify_current.py` validates the Level 1 reference checksums before comparing generated outputs. |
+| Frozen PAP artifacts | `reproducibility/run_all.py`, `reproducibility/run_all_v2.py`, `reproducibility/verify.py` | Do not run these for current reproduction; they remain only so the registered PAP freezes can be audited. `verify.py` does not validate reference checksums. |
+
 ## Canonical Reproduction Contract
 
 The canonical numerical environment is the Linux/amd64 Docker image defined by
@@ -117,7 +124,7 @@ Level 3 is in `level3/` and is reproducible from archived hardware counts only:
 - Preliminary `g6_k2_c001` robustness check:
   `level3/level3_robustness_g6c001_report.md`.
 
-Re-run the consolidated archive-only analyses with:
+Recompute the consolidated archive-only analyses in read-only mode with:
 
 ```bash
 python scripts/reanalyze_level3_archives.py
@@ -132,6 +139,10 @@ make analysis-from-hardware
 This path reads `level3/archive/*.json.gz`; it does not connect to IBM Runtime
 and does not submit QPU jobs. Hardware claims are qualitative feasibility and
 form/robustness claims, not coefficient validation.
+
+To intentionally refresh the versioned consolidated JSON summaries, use
+`python scripts/reanalyze_level3_archives.py --update` or
+`make analysis-from-hardware-update`.
 
 ## Quick Start
 
@@ -269,7 +280,10 @@ python -m level2.p10_smallnoise
 - `make level3-manifest`: refresh Level 3 archive checksums.
 - `make level2-foundation`: run the Level 2 foundation smoke check.
 - `make level2-sampling`: regenerate the Level 2 sampling report.
-- `make analysis-from-hardware`: re-run Level 3 analysis from archived counts.
+- `make analysis-from-hardware`: recompute Level 3 analysis from archived
+  counts without rewriting committed JSON summaries.
+- `make analysis-from-hardware-update`: intentionally refresh the consolidated
+  Level 3 analysis JSON summaries.
 
 ## Current Limits
 
