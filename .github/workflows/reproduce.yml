@@ -23,10 +23,15 @@ jobs:
           tags: vd-sv:test
       - name: Canonical container exact reproduction + archive verification
         run: >
-          docker run --rm
-          -v ${{ github.workspace }}/ci-results:/app/results
+          docker run --name vdsv-canonical
           vd-sv:test
           bash -lc "make check-ci"
+      - name: Extract results
+        if: always()
+        run: docker cp vdsv-canonical:/app/results ./ci-results
+      - name: Cleanup canonical container
+        if: always()
+        run: docker rm vdsv-canonical || true
       - name: PAP freeze audit
         run: python pap/verify_freeze.py
       - uses: actions/upload-artifact@v4
