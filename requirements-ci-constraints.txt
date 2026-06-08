@@ -1,0 +1,13 @@
+# Cross-platform CI/reproduction constraints for the current pre-release tree.
+#
+# This is intentionally smaller than requirements-lock.txt: it pins the packages
+# that affect the public Level 1/2/3 archive verification paths while avoiding
+# OS-specific transitive packages from the local Windows validation snapshot.
+# Regenerate a full hash-locked environment only for the final Zenodo/DOI image.
+numpy==2.2.1
+scipy==1.15.1
+PyYAML==6.0.3
+pytest==9.0.3
+ruff==0.15.16
+qiskit==2.4.1
+qiskit-aer==0.17.2

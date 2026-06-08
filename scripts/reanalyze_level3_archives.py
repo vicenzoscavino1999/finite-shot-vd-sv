@@ -99,6 +99,25 @@ def _repo_relative(path: Path) -> str:
     return str(path.resolve().relative_to(REPO_ROOT)).replace("\\", "/")
 
 
+def analysis_for_case(name: str, bootstrap_reps: int) -> tuple[dict, list[Path], Path]:
+    case = CASES[name]
+    archives, extras = _select_archives(case)
+    if not archives:
+        raise SystemExit(f"no archives found for {name}: {case['pattern']}")
+    result = analyze_archives(archives, bootstrap_reps=int(bootstrap_reps))
+    if case.get("analysis_role"):
+        result["analysis_inputs"]["analysis_role"] = case["analysis_role"]
+    if extras:
+        result["analysis_inputs"]["selection_rule"] = (
+            "first_14_unique_jobs_by_ibm_created_timestamp_pre_registered_fixed_epoch_stop"
+        )
+        result["analysis_inputs"]["extra_unique_archives_excluded_count"] = len(extras)
+        result["analysis_inputs"]["extra_unique_archives_excluded"] = [
+            _repo_relative(path) for path in extras
+        ]
+    return result, archives, ARCHIVE_DIR / case["json_out"]
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--instance", default="all", choices=["all", *CASES])
@@ -107,22 +126,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     for name in _case_names(args.instance):
-        case = CASES[name]
-        archives, extras = _select_archives(case)
-        if not archives:
-            raise SystemExit(f"no archives found for {name}: {case['pattern']}")
-        result = analyze_archives(archives, bootstrap_reps=int(args.bootstrap_reps))
-        if case.get("analysis_role"):
-            result["analysis_inputs"]["analysis_role"] = case["analysis_role"]
-        if extras:
-            result["analysis_inputs"]["selection_rule"] = (
-                "first_14_unique_jobs_by_ibm_created_timestamp_pre_registered_fixed_epoch_stop"
-            )
-            result["analysis_inputs"]["extra_unique_archives_excluded_count"] = len(extras)
-            result["analysis_inputs"]["extra_unique_archives_excluded"] = [
-                _repo_relative(path) for path in extras
-            ]
-        out = ARCHIVE_DIR / case["json_out"]
+        result, archives, out = analysis_for_case(name, int(args.bootstrap_reps))
         out.write_text(json.dumps(result, indent=2, sort_keys=True), encoding="utf-8")
         print(f"LEVEL3_ANALYSIS_WRITTEN instance={name} archives={len(archives)} json_out={out}")
         if not args.quiet:

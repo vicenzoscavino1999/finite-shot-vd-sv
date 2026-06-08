@@ -16,6 +16,10 @@ results/frozen/*
 results/pilot/*
 !results/pilot/pilot_power_report.csv
 !results/pilot/pilot_power_report.md
+!results/secondary/
+results/secondary/*
+!results/secondary/*.csv
+!results/secondary/*_report.md
 reproducibility/hardware/raw_counts/
 reproducibility/hardware/calibration_snapshots/
 *.pdf

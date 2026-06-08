@@ -8,7 +8,7 @@
   },
   "epochs": [
     {
-      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g8_k3_c000_ibm_marrakesh_epoch01_20260607T215152Z_d8iufope8nrc73biqlb0.json.gz",
+      "archive": "level3/archive/stage3_g8_k3_c000_ibm_marrakesh_epoch01_20260607T215152Z_d8iufope8nrc73biqlb0.json.gz",
       "backend": "ibm_marrakesh",
       "created_at_utc": "2026-06-07T21:51:52.227004Z",
       "epoch_index": 1,
@@ -18,7 +18,7 @@
       "total_shots": 40960
     },
     {
-      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g8_k3_c000_ibm_marrakesh_epoch01_20260607T215337Z_d8iugdm6983c73dskdd0.json.gz",
+      "archive": "level3/archive/stage3_g8_k3_c000_ibm_marrakesh_epoch01_20260607T215337Z_d8iugdm6983c73dskdd0.json.gz",
       "backend": "ibm_marrakesh",
       "created_at_utc": "2026-06-07T21:53:37.161058Z",
       "epoch_index": 2,
@@ -28,7 +28,7 @@
       "total_shots": 40960
     },
     {
-      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g8_k3_c000_ibm_marrakesh_epoch02_20260607T215401Z_d8iugotv8cos73f63g9g.json.gz",
+      "archive": "level3/archive/stage3_g8_k3_c000_ibm_marrakesh_epoch02_20260607T215401Z_d8iugotv8cos73f63g9g.json.gz",
       "backend": "ibm_marrakesh",
       "created_at_utc": "2026-06-07T21:54:00.930837Z",
       "epoch_index": 3,
@@ -38,7 +38,7 @@
       "total_shots": 40960
     },
     {
-      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g8_k3_c000_ibm_marrakesh_epoch03_20260607T215431Z_d8iugutv8cos73f63gf0.json.gz",
+      "archive": "level3/archive/stage3_g8_k3_c000_ibm_marrakesh_epoch03_20260607T215431Z_d8iugutv8cos73f63gf0.json.gz",
       "backend": "ibm_marrakesh",
       "created_at_utc": "2026-06-07T21:54:31.371764Z",
       "epoch_index": 4,
@@ -48,7 +48,7 @@
       "total_shots": 40960
     },
     {
-      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g8_k3_c000_ibm_marrakesh_epoch04_20260607T215455Z_d8iuh69e8nrc73biqmp0.json.gz",
+      "archive": "level3/archive/stage3_g8_k3_c000_ibm_marrakesh_epoch04_20260607T215455Z_d8iuh69e8nrc73biqmp0.json.gz",
       "backend": "ibm_marrakesh",
       "created_at_utc": "2026-06-07T21:54:55.130396Z",
       "epoch_index": 5,
@@ -58,7 +58,7 @@
       "total_shots": 40960
     },
     {
-      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g8_k3_c000_ibm_marrakesh_epoch05_20260607T215602Z_d8iuhc9e8nrc73biqn00.json.gz",
+      "archive": "level3/archive/stage3_g8_k3_c000_ibm_marrakesh_epoch05_20260607T215602Z_d8iuhc9e8nrc73biqn00.json.gz",
       "backend": "ibm_marrakesh",
       "created_at_utc": "2026-06-07T21:56:02.628796Z",
       "epoch_index": 6,
@@ -68,7 +68,7 @@
       "total_shots": 40960
     },
     {
-      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g8_k3_c000_ibm_marrakesh_epoch06_20260607T215647Z_d8iuhte6983c73dsket0.json.gz",
+      "archive": "level3/archive/stage3_g8_k3_c000_ibm_marrakesh_epoch06_20260607T215647Z_d8iuhte6983c73dsket0.json.gz",
       "backend": "ibm_marrakesh",
       "created_at_utc": "2026-06-07T21:56:47.131526Z",
       "epoch_index": 7,
@@ -78,7 +78,7 @@
       "total_shots": 40960
     },
     {
-      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g8_k3_c000_ibm_marrakesh_epoch07_20260607T215710Z_d8iui8dv8cos73f63hp0.json.gz",
+      "archive": "level3/archive/stage3_g8_k3_c000_ibm_marrakesh_epoch07_20260607T215710Z_d8iui8dv8cos73f63hp0.json.gz",
       "backend": "ibm_marrakesh",
       "created_at_utc": "2026-06-07T21:57:10.381726Z",
       "epoch_index": 8,
@@ -88,7 +88,7 @@
       "total_shots": 40960
     },
     {
-      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g8_k3_c000_ibm_marrakesh_epoch08_20260607T215805Z_d8iuie66983c73dskfeg.json.gz",
+      "archive": "level3/archive/stage3_g8_k3_c000_ibm_marrakesh_epoch08_20260607T215805Z_d8iuie66983c73dskfeg.json.gz",
       "backend": "ibm_marrakesh",
       "created_at_utc": "2026-06-07T21:58:04.738209Z",
       "epoch_index": 9,
@@ -98,7 +98,7 @@
       "total_shots": 40960
     },
     {
-      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g8_k3_c000_ibm_marrakesh_epoch09_20260607T215828Z_d8iuirpe8nrc73biqodg.json.gz",
+      "archive": "level3/archive/stage3_g8_k3_c000_ibm_marrakesh_epoch09_20260607T215828Z_d8iuirpe8nrc73biqodg.json.gz",
       "backend": "ibm_marrakesh",
       "created_at_utc": "2026-06-07T21:58:28.022891Z",
       "epoch_index": 10,
@@ -108,7 +108,7 @@
       "total_shots": 40960
     },
     {
-      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g8_k3_c000_ibm_marrakesh_epoch10_20260607T215851Z_d8iuj1lv8cos73f63ijg.json.gz",
+      "archive": "level3/archive/stage3_g8_k3_c000_ibm_marrakesh_epoch10_20260607T215851Z_d8iuj1lv8cos73f63ijg.json.gz",
       "backend": "ibm_marrakesh",
       "created_at_utc": "2026-06-07T21:58:51.342516Z",
       "epoch_index": 11,
@@ -118,7 +118,7 @@
       "total_shots": 40960
     },
     {
-      "archive": "D:\\paper fisica 4\\finite-shot-vd-sv\\level3\\archive\\stage3_g8_k3_c000_ibm_marrakesh_epoch11_20260607T215915Z_d8iuj7e6983c73dskg90.json.gz",
+      "archive": "level3/archive/stage3_g8_k3_c000_ibm_marrakesh_epoch11_20260607T215915Z_d8iuj7e6983c73dskg90.json.gz",
       "backend": "ibm_marrakesh",
       "created_at_utc": "2026-06-07T21:59:14.920621Z",
       "epoch_index": 12,

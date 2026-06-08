@@ -12,7 +12,8 @@ should run today.
 
 Current checkpoint:
 
-- Commit: `07fe23d`
+- Commit: use `git rev-parse HEAD` for the current checkout. This status file is
+  an operational note, not a hash-registered release manifest.
 - Level 1: frozen white-box coefficient-validation core.
 - Level 2: additive Qiskit/Aer device-simulation robustness layer complete
   through high-power exact-rho, realistic n=6 VD, denominator concentration,
@@ -56,14 +57,14 @@ committed git state with the documented Windows EOL tolerance.
 Minimal Level 1 verification needs only the base package:
 
 ```bash
-pip install -e .
+pip install -c requirements-ci-constraints.txt -e .
 ```
 
-The current full local test environment includes development, figures, Level 2,
-and Level 3 Runtime dependencies:
+The current public test/reproduction environment includes development tools and
+Level 2/Aer dependencies. It does not require an IBM account:
 
 ```bash
-pip install -e ".[dev,figures,level2,level3]"
+pip install -c requirements-ci-constraints.txt -e ".[dev,level2]"
 ```
 
 Level 3 analysis from archives does not require an IBM account. Device
@@ -73,14 +74,20 @@ public reproduction route.
 ### Level 1 Reference Verification
 
 ```bash
-python reproducibility/verify.py --reference reproducibility/reference/
+python reproducibility/run_all_current.py --mode fast --output results
+python reproducibility/verify_current.py --reference reproducibility/reference/ --generated results
 ```
 
 What it proves:
 
 - The current Level 1 canonical outputs match the committed reference package
   within registered tolerances.
+- The committed reference package SHA-256 manifest is intact.
 - The numerical white-box coefficient-validation path is intact.
+
+Use `--exact-numeric` only for same-platform determinism checks. Docker/Linux
+may differ from the Windows-authored reference at the final ULP while remaining
+within the registered tolerances.
 
 What it does not prove:
 
@@ -153,6 +160,12 @@ or:
 make analysis-from-hardware
 ```
 
+To verify without rewriting committed JSON summaries:
+
+```bash
+python scripts/verify_level3_archives.py
+```
+
 What it proves:
 
 - The Stage 3 `g6_k2_c000` and `g6_k2_c001` analyses can be reproduced from raw
@@ -171,8 +184,8 @@ What it does not prove:
 | Area | Current artifacts | Status |
 | --- | --- | --- |
 | Freeze audit | `pap/verify_freeze.py`, `pap/FREEZE_STATUS.md` | active, additive |
-| Level 1 reference | `reproducibility/reference/*` | official `verify.py` target |
-| v1/v2 confirmatory outputs | `results/confirmatory_full/`, `results/confirmatory_v2/` | frozen results, not modified |
+| Level 1 reference | `reproducibility/reference/*` | official Level 1 target; active verifier is `verify_current.py` |
+| Level 1 reference package | `reproducibility/reference/*` | committed reference CSVs plus SHA-256 manifest |
 | Post-adjudication analysis | `analysis/ensemble_coverage_*`, `analysis/c_vd_se_sensitivity_*`, `analysis/e6_spectral_resolvability_*` | analysis only |
 | Secondary endpoints | `results/secondary/e6/e8/e9/e10/e11/e12...` | descriptive, additive |
 | Level 2 reports/data | `level2/*_report.md`, `level2/*_results.csv`, `level2/LEVEL2_SUMMARY.md` | additive form-validation |
@@ -186,8 +199,8 @@ What it does not prove:
    the Docker platform/runtime.
 2. Add a documented relaxed-tolerance reference tier if Level 2 outputs are to
    be verified by `reproducibility/verify.py`.
-3. Decide whether Level 3 consolidated JSON outputs should be registered in a
-   separate archive-only reference manifest.
+3. Decide whether Level 3 consolidated JSON outputs should also get a separate
+   DOI-time checksum manifest.
 4. Regenerate final manuscript figures from the final included numerical
    outputs.
 5. Add CI for the Level 1 fast path and freeze audit.

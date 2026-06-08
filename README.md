@@ -17,6 +17,10 @@ For the current checkpoint, read:
   plans. These files are hashed artifacts and are not edited to track day-to-day
   implementation status.
 
+The active post-freeze driver is `reproducibility/run_all_current.py`. The
+original `reproducibility/run_all.py` and `reproducibility/run_all_v2.py` remain
+unchanged PAP artifacts so the registered freezes stay auditable.
+
 ## Freeze Status
 
 There are two registered freezes:
@@ -126,24 +130,43 @@ $env:MKL_NUM_THREADS=1
 $env:OPENBLAS_NUM_THREADS=1
 ```
 
-Install the current development environment, including Level 2 and Level 3
-analysis/runtime dependencies:
+Install the current development environment for Level 1, Level 2, and Level 3
+archive-only verification:
 
 ```bash
-pip install -e ".[dev,figures,level2,level3]"
+pip install -c requirements-ci-constraints.txt -e ".[dev,level2]"
 ```
+
+IBM Runtime submission tools are not needed for public reproduction. Install the
+`[level3]` extra only for private QPU submission/dry-run work.
 
 For a minimal Level 1-only reproduction environment, Qiskit/Aer is not needed:
 
 ```bash
-pip install -e .
+pip install -c requirements-ci-constraints.txt -e .
 ```
 
-Verify the frozen Level 1 reference outputs:
+Regenerate and verify the frozen Level 1 reference outputs:
 
 ```bash
-python reproducibility/verify.py --reference reproducibility/reference/
+python reproducibility/run_all_current.py --mode fast --output results
+python reproducibility/verify_current.py \
+  --reference reproducibility/reference/ \
+  --generated results
 ```
+
+Verify the committed reference package without regenerating:
+
+```bash
+python reproducibility/verify_current.py \
+  --reference reproducibility/reference/ \
+  --generated reproducibility/reference/ \
+  --exact-numeric
+```
+
+Use `--exact-numeric` for same-platform byte/float-stream checks. For
+Windows-to-Linux/Docker reproduction, use the registered tolerances above; tiny
+ULP differences in eigensolver/linear algebra paths are expected.
 
 Run tests:
 
@@ -156,6 +179,23 @@ Audit the freezes:
 ```bash
 python pap/verify_freeze.py
 ```
+
+Verify Level 3 archive-only analyses without rewriting committed JSON files:
+
+```bash
+python scripts/verify_level3_archives.py
+```
+
+Docker path:
+
+```bash
+docker build -t finite-shot-vd-sv:repro .
+docker run --rm finite-shot-vd-sv:repro
+```
+
+The Docker image runs the Level 1 reproduction path by default. The PAP freeze
+audit requires git object history, so run `python pap/verify_freeze.py` from a
+normal git checkout rather than inside the image.
 
 Run Level 2 commands when the `[level2]` extra is installed:
 
@@ -177,9 +217,15 @@ python -m level2.p10_smallnoise
 - `make reproduce-fast`: run the fast Level 1 reproduction path and verify.
 - `make reproduce-full`: current Level 1 full path; Level 2 remains a separate
   relaxed form-validation layer.
-- `make verify`: run `reproducibility/verify.py` against the reference outputs.
+- `make verify`: run `reproducibility/verify_current.py` against generated
+  outputs in `results/`.
+- `make verify-reference`: validate the committed Level 1 reference package.
 - `make verify-freeze`: run the real v1/v2 freeze audit.
+- `make verify-level3`: recompute Level 3 archive analyses in memory and compare
+  them to committed JSON summaries.
 - `make test`: run the test suite.
+- `make check-ci`: container-safe check path; excludes the git-dependent freeze
+  integrity test/audit because `.git` is not copied into the Docker image.
 - `make level2-foundation`: run the Level 2 foundation smoke check.
 - `make level2-sampling`: regenerate the Level 2 sampling report.
 - `make analysis-from-hardware`: re-run Level 3 analysis from archived counts.
@@ -187,13 +233,18 @@ python -m level2.p10_smallnoise
 ## Current Limits
 
 - The official `verify.py` reference package currently verifies the Level 1
-  canonical outputs.
+  canonical outputs. The active wrapper is `verify_current.py`, which also
+  checks reference SHA-256 manifests.
 - Level 2 outputs are committed and tested, but not yet registered as a
   relaxed-tolerance reference tier.
 - Level 3 hardware outputs are committed as raw-count archives plus reports;
-  public reproduction is analysis-from-archived-counts only.
+  public reproduction is analysis-from-archived-counts only. Use
+  `verify_level3_archives.py` for non-mutating verification and
+  `run_all_current.py --level 3 --from-archived-counts` to rewrite summaries.
 - `requirements-lock.txt` is a current environment snapshot. For the final DOI
-  release, regenerate it inside the final Docker image.
+  release, regenerate it inside the final Docker image. Until the manuscript is
+  finalized, `requirements-ci-constraints.txt` is the operational cross-platform
+  constraint file.
 - Figures are regenerated from numerical data; exact PDF byte identity is not a
   reproducibility claim.
 

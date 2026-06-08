@@ -14,12 +14,14 @@ jobs:
           context: .
           load: true
           tags: vd-sv:test
-      - name: Level 1 fast reproduction + tests (no quantum-cloud account)
+      - name: Container reproduction + archive verification (no quantum-cloud account)
         run: >
           docker run --rm
           -v ${{ github.workspace }}/ci-results:/app/results
           vd-sv:test
-          bash -c "make reproduce-fast && make test"
+          bash -lc "make check-ci"
+      - name: PAP freeze audit
+        run: python pap/verify_freeze.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:

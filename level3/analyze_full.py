@@ -21,6 +21,8 @@ from level3.analyze import (
 )
 from level3.archive import read_archive
 
+REPO_ROOT = Path(__file__).resolve().parents[1]
+
 
 BOOTSTRAP_SEED = 33033
 BOOTSTRAP_REPS = 2000
@@ -178,7 +180,7 @@ def method_row(
         twoq = float(resources["two_qubit_gate_proxy"]["unmitigated"]) * float(b)
     err = float(estimate - mu_ideal)
     return {
-        "archive": str(path),
+        "archive": repo_relative(path),
         "epoch_index": int(epoch_index),
         "job_id": payload["submission"]["job_id"],
         "backend": payload["backend"]["name"],
@@ -293,7 +295,7 @@ def epoch_metadata(payload: dict[str, Any], path: Path, epoch_index: int) -> dic
     quantum_seconds = usage.get("quantum_seconds", bss.get("seconds"))
     return {
         "epoch_index": int(epoch_index),
-        "archive": str(path),
+        "archive": repo_relative(path),
         "job_id": payload["submission"]["job_id"],
         "backend": payload["backend"]["name"],
         "created_at_utc": payload["created_at_utc"],
@@ -406,6 +408,13 @@ def quantile_pair(values: np.ndarray) -> list[float]:
         float(np.quantile(values, 0.025)),
         float(np.quantile(values, 0.975)),
     ]
+
+
+def repo_relative(path: Path) -> str:
+    try:
+        return path.resolve().relative_to(REPO_ROOT.resolve()).as_posix()
+    except ValueError:
+        return str(path.resolve())
 
 
 def render_summary(result: dict[str, Any]) -> str:
