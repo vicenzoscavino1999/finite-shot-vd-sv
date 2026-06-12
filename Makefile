@@ -3,7 +3,7 @@ RUN_ALL ?= reproducibility/run_all_current.py
 RESULTS ?= results
 REFERENCE ?= reproducibility/reference
 
-.PHONY: reproduce run verify verify-exact verify-reference verify-freeze verify-level3 figures \
+.PHONY: reproduce run verify verify-exact verify-reference verify-freeze verify-level3 figures figures-manuscript \
         test test-ci audit check check-ci reproduce-fast reproduce-full reproduce-full-tolerant \
         reproduce-level1 reproduce-all reference-manifest level3-manifest analysis-from-hardware \
         analysis-from-hardware-update level3-analysis check-env determinism-check \
@@ -37,6 +37,9 @@ level3-manifest:
 
 figures:
 	$(PYTHON) scripts/generate_all_figures.py
+
+figures-manuscript:
+	$(PYTHON) scripts/generate_manuscript_figures.py
 
 test:
 	$(PYTHON) -m pytest tests/ -q
