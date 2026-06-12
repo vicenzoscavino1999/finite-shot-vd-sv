@@ -1,0 +1,38 @@
+{
+  "git_commit_sha": "3344871ff98fcade3028320e8041e430fd68107d",
+  "git_dirty": false,
+  "pap_hash": "PAP_HASH=31e92d21e0faf32ded9aad84a189fa7ae447afa1fdd9d835f16b74fb8bc443bd",
+  "level": 1,
+  "mode": "full",
+  "python_version": "3.12.4",
+  "platform": "Windows-11-10.0.22621-SP0",
+  "timestamp_utc": "2026-06-04T14:53:00Z",
+  "dependencies": {
+    "numpy": "2.2.1",
+    "scipy": "1.15.1"
+  },
+  "rng_policy": {
+    "path": "D:\\paper fisica 4\\finite-shot-vd-sv\\reproducibility\\config\\rng_policy.yaml",
+    "per_experiment_seed": {
+      "e1_quotient_decomposition": 101,
+      "e2_c_sv_zero": 202,
+      "e3_delta_vd_generator": 303,
+      "e4_delta_sv_firstorder": 404,
+      "e5_denominator_concentration": 505,
+      "e7_certified_crossing": 707,
+      "e7_resource_observable_sensitivity": 808
+    }
+  },
+  "runtime_seconds": 588.268,
+  "execution_mode": "clean",
+  "recovered_blocks": 0,
+  "outputs": {
+    "e1_quotient_decomposition.csv": "sha256:b5ea76f6b916d18080b9da2add0cd9416afec4cea2c036fd0d2130fb4d66981d",
+    "e2_c_sv_zero.csv": "sha256:c24c0c40fa7938d9e412615a50b18c5e77a20e7eeec3a9c883427c0f590f723c",
+    "e3_delta_vd_generator.csv": "sha256:d02a8f33e4d2adb2b91238f693df6cbd31f68ef62fa9e2ee33efa93391d2a127",
+    "e4_delta_sv_firstorder.csv": "sha256:a604651a4f68f0bd16dd5876c7475fa33a812c856b9e59524130518d8df203a2",
+    "e5_denominator_concentration.csv": "sha256:2eb97d24432a73feaf6991f31a1c03c5230c3d44c9e4be7e7350c13e8576ee4e",
+    "e7_certified_crossing.csv": "sha256:d9876040943b06849d6774ea05ee099b10b01d64da7a27fe541ad2fa5702cf84",
+    "e7_resource_observable_sensitivity.csv": "sha256:183dd450c6b4d588c28b9c1112c6e9e75b1e70efe4ebab283d5eff5baa2e8362"
+  }
+}
