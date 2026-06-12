@@ -21,6 +21,7 @@ LEGACY_RESULTS = REPO / "results"
 V1_RESULTS = REPO / "results" / "confirmatory_full"
 FIGURES = REPO / "figures"
 LEVEL3_ARCHIVE = REPO / "level3" / "archive"
+LEVEL2_RESULTS = REPO / "level2" / "level2_crossing_denominator_results.csv"
 
 sys.path.insert(0, str(REPO / "src"))
 from vd_sv.plotting import _col, _require_mpl, load_csv  # noqa: E402
@@ -197,6 +198,81 @@ def fig_coverage_beta1(plt):
     _save(fig, plt, "coverage_beta1.pdf")
 
 
+def fig_level2_operating_window(plt):
+    rows = [
+        row
+        for row in _load_level2_rows()
+        if row["row_kind"] == "curve"
+        and row["instance_id"] == "g6_k2_c000"
+        and row["resource_definition"] == "two_qubit_gate_proxy"
+        and row["method"] in {"unmitigated", "sv_mitigated", "vd_selected"}
+    ]
+    if not rows:
+        raise SystemExit("missing Level 2 operating-window rows for g6_k2_c000")
+
+    methods = [
+        ("unmitigated", "unmitigated", "#999999"),
+        ("sv_mitigated", "SV (readout-mitigated)", "#0072B2"),
+        ("vd_selected", "VD selected (realistic n=6)", "#D55E00"),
+    ]
+    fig, ax = plt.subplots(figsize=(6.4, 4.2))
+    for method, label, color in methods:
+        sub = sorted((row for row in rows if row["method"] == method), key=lambda row: float(row["R"]))
+        if not sub:
+            raise SystemExit(f"missing Level 2 operating-window rows for {method}")
+        r_values = _col(sub, "R")
+        ax.loglog(r_values, _col(sub, "mse_law"), "-", color=color, lw=1.5, label=label)
+        ax.loglog(r_values, _col(sub, "mse_empirical"), "o", color=color, ms=4, label=None)
+
+    ax.set_xlabel("resource R (two-qubit-gate proxy)")
+    ax.set_ylabel("MSE")
+    ax.set_title("Level 2 operating window (g6_k2_c000)")
+    ax.grid(axis="both", which="both", color="0.9", lw=0.6)
+    ax.legend(frameon=False)
+    _save(fig, plt, "level2_operating_window.pdf")
+
+
+def fig_level2_denominator(plt):
+    groups: dict[float, dict[str, list[float]]] = defaultdict(
+        lambda: {"exact": [], "bernstein": []}
+    )
+    for row in _load_level2_rows():
+        if row["row_kind"] != "denominator":
+            continue
+        ratio = float(row["B_over_B_den"])
+        key = float(np.round(ratio, 3))
+        exact = float(row["bad_denominator_prob_exact"])
+        bound = float(row["bernstein_bound"])
+        if exact > 0.0 and bound > 0.0:
+            groups[key]["exact"].append(exact)
+            groups[key]["bernstein"].append(bound)
+
+    if not groups:
+        raise SystemExit("missing Level 2 denominator rows")
+
+    ratios = []
+    exact_medians = []
+    bound_medians = []
+    for ratio in sorted(groups):
+        values = groups[ratio]
+        if not values["exact"] or not values["bernstein"]:
+            continue
+        ratios.append(ratio)
+        exact_medians.append(float(np.median(values["exact"])))
+        bound_medians.append(float(np.median(values["bernstein"])))
+
+    fig, ax = plt.subplots(figsize=(5.8, 4.1))
+    ax.loglog(ratios, exact_medians, "-o", ms=4, label="median exact probability")
+    ax.loglog(ratios, bound_medians, "--s", ms=4, label="one-sided Bernstein bound")
+    ax.set_xlabel("B / B_den")
+    ax.set_ylabel("probability")
+    ax.set_title("Level 2 denominator concentration")
+    ax.set_ylim(bottom=1e-34)
+    ax.grid(axis="both", which="both", color="0.9", lw=0.6)
+    ax.legend(frameon=False)
+    _save(fig, plt, "level2_denominator.pdf")
+
+
 def fig_level3_hardware_mse(plt):
     paths = [
         LEVEL3_ARCHIVE / "stage3_g6_k2_c000_ibm_marrakesh_full_analysis.json",
@@ -286,6 +362,8 @@ def main() -> int:
     fig_e5(plt)
     fig_e7(plt)
     fig_coverage_beta1(plt)
+    fig_level2_operating_window(plt)
+    fig_level2_denominator(plt)
     fig_level3_hardware_mse(plt)
     if args.include_sensitivity:
         fig_e7_sensitivity(plt)
@@ -387,6 +465,12 @@ def _hardware_largest_b(path: Path) -> dict:
         for row in rows
     }
     return {"instance": path.name.split("_ibm_marrakesh")[0].replace("stage3_", ""), "mse": mse, "den": den}
+
+
+def _load_level2_rows() -> list[dict]:
+    if not LEVEL2_RESULTS.exists():
+        raise SystemExit(f"missing Level 2 figure input: {LEVEL2_RESULTS}")
+    return load_csv(LEVEL2_RESULTS)
 
 
 def _span(records: list[dict]) -> float:

@@ -68,6 +68,10 @@ freeze integrity.
 
 ## What Is Reproducible Now
 
+Manuscript figures regenerate with `make figures-manuscript` from committed
+`results/confirmatory_v2/`, Level 2 CSVs, `results/secondary/` where relevant,
+and `level3/archive/`. Exact PDF byte identity is not a reproducibility claim.
+
 ### Level 1 Core
 
 The hard reproducible numerical core is Level 1 white-box density-matrix
