@@ -47,6 +47,9 @@ results/confirmatory_full/*
 !results/confirmatory_full/e7_certified_crossing.csv
 !results/confirmatory_full/e7_resource_observable_sensitivity.csv
 !results/confirmatory_full/manifest.json
+!results/secondary/
+!results/secondary/*.csv
+!results/secondary/*.md
 results/.partial/*
 !results/.partial/.gitkeep
 data/*
