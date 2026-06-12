@@ -7,9 +7,10 @@ abstract: >-
   symmetry verification (SV). Includes exact density-matrix coefficient validation
   (delta_VD, delta_SV, c_SV = 0) and the certified crossing.
 authors:
-  - family-names: "Anonymous"
-    given-names: "Author"
-version: "0.1.0"
+  - family-names: "Scavino Alfaro"
+    given-names: "Vicenzo"
+    orcid: "https://orcid.org/0009-0000-2472-9785"
+version: "1.0.0"
 license: MIT
 keywords:
   - quantum error mitigation
@@ -18,4 +19,4 @@ keywords:
   - finite shots
   - operating windows
   - QAOA
-date-released: "2026-06-03"
+date-released: "2026-06-12"

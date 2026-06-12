@@ -2,11 +2,11 @@
   "title": "Code and data for: Finite-Shot Operating Windows for Virtual Distillation and Symmetry Verification",
   "creators": [
     {
-      "name": "Anonymous, Author",
-      "orcid": "0000-0000-0000-0000"
+      "name": "Scavino Alfaro, Vicenzo",
+      "orcid": "0009-0000-2472-9785"
     }
   ],
-  "description": "Reproduction package for the numerical experiments and figures accompanying the paper on finite-shot operating windows for virtual distillation (VD) and symmetry verification (SV). Includes white-box coefficient validation, certified-crossing experiments, and (Phase B) device-simulation robustness runs and archived hardware counts. Author metadata is anonymized for blinded review and is updated at de-blinding.",
+  "description": "Reproduction package for the numerical experiments and figures accompanying the paper on finite-shot operating windows for virtual distillation (VD) and symmetry verification (SV). Includes white-box coefficient validation, certified-crossing experiments, and (Phase B) device-simulation robustness runs and archived hardware counts. Code is MIT-licensed; archived data and figures are CC-BY-4.0 (see LICENSE-DATA).",
   "license": "MIT",
   "upload_type": "software",
   "keywords": [
