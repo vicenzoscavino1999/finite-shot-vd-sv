@@ -15,6 +15,21 @@ def _require_mpl():
         import matplotlib
 
         matplotlib.use("Agg")
+        matplotlib.rcParams.update({
+            "pdf.fonttype": 42,
+            "ps.fonttype": 42,
+            "font.size": 9,
+            "axes.prop_cycle": matplotlib.cycler(
+                color=[
+                    "#0072B2",  # blue
+                    "#D55E00",  # vermillion
+                    "#009E73",  # bluish green
+                    "#CC79A7",  # reddish purple
+                    "#E69F00",  # orange
+                    "#56B4E9",  # sky blue
+                ]
+            ),
+        })
         import matplotlib.pyplot as plt
 
         return plt
