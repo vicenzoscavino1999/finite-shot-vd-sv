@@ -7,7 +7,7 @@
     }
   ],
   "description": "Reproduction package for the numerical experiments and figures accompanying the paper on finite-shot operating windows for virtual distillation (VD) and symmetry verification (SV). Includes white-box coefficient validation, certified-crossing experiments, and (Phase B) device-simulation robustness runs and archived hardware counts. Code is MIT-licensed; archived data and figures are CC-BY-4.0 (see LICENSE-DATA).",
-  "version": "v1.0.0",
+  "version": "v1.0.1",
   "license": "MIT",
   "upload_type": "software",
   "keywords": [

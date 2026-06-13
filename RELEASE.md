@@ -49,7 +49,7 @@ preserve or supersede these checksums.
 
 ## Release Identifiers
 
-- Version: `v1.0.0`.
-- Zenodo DOI: `10.5281/zenodo.20670996`.
+- Version: `v1.0.1`.
+- Zenodo DOI: `10.5281/zenodo.20682998`.
 - Container registry digest: not claimed in this snapshot.
 - Byte-identical manuscript/figure PDFs: not claimed.

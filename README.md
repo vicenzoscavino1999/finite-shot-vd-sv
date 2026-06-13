@@ -305,7 +305,7 @@ python -m level2.p10_smallnoise
 - `requirements.lock` is the single dependency lock for the canonical Docker
   environment and is installed with `pip --require-hashes`.
 - The versioned archive DOI for the release used in the manuscript is
-  `10.5281/zenodo.20670996`.
+  `10.5281/zenodo.20682998`.
 - Figures are regenerated from numerical data; exact PDF byte identity is not a
   reproducibility claim.
 
