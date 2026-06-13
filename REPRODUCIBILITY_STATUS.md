@@ -1,7 +1,7 @@
 # Current Reproducibility Status
 
-Status: operational status note. Not a PAP freeze, not an adjudication, and not
-a replacement for the frozen `REPRODUCIBILITY_PLAN.md`.
+Status: operational status note. Not a PAP freeze, not a primary validation
+decision, and not a replacement for the frozen `REPRODUCIBILITY_PLAN.md`.
 
 ## Scope
 
@@ -117,8 +117,8 @@ python reproducibility/verify_current.py \
 
 Level 2 outputs and tests are committed as additive form validation under
 Qiskit/Aer. They are intentionally outside the official numeric reference
-contract. A future release may define a separate relaxed-tolerance Level 2 tier,
-but this release does not claim Level 2 byte- or coefficient-level identity.
+contract. A separate relaxed-tolerance Level 2 tier can be defined explicitly,
+but this snapshot does not claim Level 2 byte- or coefficient-level identity.
 
 Summary: `level2/LEVEL2_SUMMARY.md`.
 
@@ -157,16 +157,16 @@ It does not reconnect to IBM Runtime or re-execute hardware jobs.
 
 ## Release Boundary
 
-The package is ready for local/CI reproducibility hardening, but the following
-items are intentionally deferred until manuscript closure:
+This snapshot claims the code/data reproduction boundary above. It does not
+claim:
 
-- minting the Zenodo DOI,
-- adding the final DOI to `.zenodo.json` and `CITATION.cff`,
-- pushing and recording a final container registry digest,
-- claiming byte-identical manuscript/figure PDFs.
+- a container registry digest,
+- byte-identical manuscript/figure PDFs,
+- Level 2 coefficient-level identity,
+- new QPU submissions for Level 3 reproduction.
 
-These are release-publication tasks, not unresolved numerical reproducibility
-claims in the current package.
+The versioned archive DOI for the release used in the manuscript is
+`10.5281/zenodo.20670996`.
 
 ## Maintenance Guardrails
 

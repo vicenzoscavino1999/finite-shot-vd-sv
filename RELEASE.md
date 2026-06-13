@@ -1,7 +1,8 @@
 # Release Reproducibility Record
 
-Current status: pre-DOI release candidate. Zenodo DOI and final manuscript/PDF
-metadata are intentionally not closed yet.
+Current status: reproducibility snapshot for the submitted manuscript. This
+record documents the canonical environment, reference data, and archive boundary
+claimed by this repository snapshot.
 
 ## Canonical Container
 
@@ -14,8 +15,8 @@ metadata are intentionally not closed yet.
   `python -m pip install --require-hashes -r requirements.lock`
 
 The local validation image tag used during this hardening pass is
-`finite-shot-vd-sv:linux-canonical`. Record a registry digest here only after
-the final image is pushed.
+`finite-shot-vd-sv:linux-canonical`. No container registry digest is claimed in
+this snapshot.
 
 ## Reference Data
 
@@ -43,12 +44,12 @@ VERIFY PASS: 18260 numeric comparisons within tolerance across 7 files; referenc
 
 `level3/archive/level3_archive_manifest.json` and
 `level3/archive/checksums.sha256` register the committed raw-count `.json.gz`
-archives and consolidated analysis `.json` files. DOI-time hardware archives
-should preserve or supersede these checksums.
+archives and consolidated analysis `.json` files. External archive copies should
+preserve or supersede these checksums.
 
-## Out Of Scope Until Manuscript Closure
+## Release Identifiers
 
-- Minting the Zenodo DOI.
-- Adding the final DOI to `.zenodo.json` and `CITATION.cff`.
-- Recording a pushed container registry digest.
-- Claiming byte-identical PDF/figure artifacts.
+- Version: `v1.0.0`.
+- Zenodo DOI: `10.5281/zenodo.20670996`.
+- Container registry digest: not claimed in this snapshot.
+- Byte-identical manuscript/figure PDFs: not claimed.

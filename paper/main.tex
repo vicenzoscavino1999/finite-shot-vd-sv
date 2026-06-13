@@ -205,7 +205,7 @@ Then
 Divide numerator and denominator by \(\lambda_1^M\).  The difference from \(O_{11}\) is a weighted average of \(O_{jj}-O_{11}\) over \(j>1\), divided by \(1+r_M\).  Since \(\abs{O_{jj}-O_{11}}\leq2\norm O_\infty\), the bound follows.
 \end{proof}
 
-\subsection{First-order endpoint coefficient in terms of the noise generator}
+\subsection{First-order coefficient in terms of the noise generator}
 
 Assume now that \(\rho_\star=\ket{\psi_\star}\bra{\psi_\star}\) is pure.  Let
 \begin{equation}
@@ -973,7 +973,7 @@ and let \(\gamma(p)=1+\gamma_1p+\OO(p^2)\) denote the quasiprobability one-norm 
 \end{equation}
 Thus PEC fits the selector with \(s_{\mathrm{PEC}}\approx\kappa_{\mathrm{PEC}}\gamma^2\sigma_{\mathrm{PEC}}^2\), where \(\kappa_{\mathrm{PEC}}\) accounts for resource normalization.
 
-CDR is different.  Its bias and variance depend on the training distribution, regression model, target observable, and allocation of shots between training and target circuits \citep{Czarnik2021,Lowe2021}.  Therefore CDR should not be included in the rigorous lower envelope unless a separate local law is proven for the chosen training model.  In this draft, CDR remains an admissible future component, not a theorem-level member of the selector.
+CDR is different.  Its bias and variance depend on the training distribution, regression model, target observable, and allocation of shots between training and target circuits \citep{Czarnik2021,Lowe2021}.  Therefore CDR should not be included in the rigorous lower envelope unless a separate local law is proven for the chosen training model.  Here, CDR is treated as an admissible separate component, not a theorem-level member of the selector.
 
 \section{Certified operating-window crossings}
 
@@ -1595,7 +1595,7 @@ satisfy the small-angle assumptions and the certified-crossing condition, becaus
 \begin{equation}
     32768\cdot 10\cdot10^{-6}=3.2768\times10^{-1}<\frac12.
 \end{equation}
-At the worst endpoint \(p=p_{\max}\), the lower sandwich gives \(R_{\mathrm{SV}\leftrightarrow0}\ge1/(64\cdot10^{-6}\cdot10^{-1})>1.5\times10^5\), which is safely above the fixed exponential-absorption threshold \(R_{\min,\mathrm{toy}}\).  Thus the certified region is non-empty at ordinary small-noise parameters.  The improvement over the earlier \(\theta\sim10^{-6}\) check comes from using the direct second-order quotient remainder in this closed toy, not from the Efron--Stein total-variance bound.
+At \(p=p_{\max}\), the lower sandwich gives \(R_{\mathrm{SV}\leftrightarrow0}\ge1/(64\cdot10^{-6}\cdot10^{-1})>1.5\times10^5\), which is safely above the fixed exponential-absorption threshold \(R_{\min,\mathrm{toy}}\).  Thus the certified region is non-empty at ordinary small-noise parameters.  The improvement over the earlier \(\theta\sim10^{-6}\) check comes from using the direct second-order quotient remainder in this closed toy, not from the Efron--Stein total-variance bound.
 \end{proposition}
 
 \begin{proof}
@@ -2068,30 +2068,28 @@ which gives \cref{eq:generic_toy_N2_v12}.  Dividing \(N_2/D_2\) yields \(b_{\mat
 The first toy is SV-favourable because the postselected observable has zero residual first-order bias.  The sector toy is VD-favourable because the noisy state is diagonal in a fixed basis, so the dominant eigenvector does not rotate at first order.  \Cref{prop:generic_toy_v10} shows that neither simplification is generic: an in-sector coherence can make \(\delta_{\mathrm{VD}}\ne0\), and an undetectable in-sector population error can make \(\delta_{\mathrm{SV}}\ne0\).  In particular, a diagonal observable in the ideal eigenbasis has \(\delta_{\mathrm{VD}}=0\) because it cannot see the orthogonal first-order tilt direction \(Q_\star\Delta\ket{\psi_\star}\); off-diagonal observables generally can.
 \end{remark}
 
+\section{Reproducibility and data availability}
+
+The accompanying artifact is organized so that the level of reproducibility matches the level of claim.  The Level~1 coefficient-checking layer is the main reproducible core: it uses a white-box density-matrix implementation, fixed instances and thresholds, and reference outputs checked by a verifier.  The fixed analysis plan has two archived hashes, and the amended v2 package passes a zero-drift check.  A reviewer can rerun the Level~1 reference verification without Qiskit or any quantum-cloud account.
+
+Level~2 is a seeded Qiskit/Aer device-simulation layer.  Its outputs are included as a form-validation and robustness layer, but they are not mixed into the tight Level~1 reference tier.  They are documented as generated artifacts with seeds and reports, outside the Level~1 reference tier.
+
+Level~3 is hardware analysis-reproducible only.  The raw IBM count archives, job identifiers, backend provenance, transpilation summaries, layouts, and calibration-epoch metadata are archived.  Public reproduction reruns only the analysis from those archives; it does not require, and should not attempt, new QPU submissions.  Hardware credentials are not stored in the repository.
+
+The release package includes the code repository, archived analysis-plan hashes, reference outputs, archived hardware counts, exact dependency lockfiles, and release metadata.  The repository is public at \url{https://github.com/vicenzoscavino1999/finite-shot-vd-sv}, and the exact release used for this manuscript (\texttt{v1.0.0}) is archived at Zenodo under DOI \href{https://doi.org/10.5281/zenodo.20670996}{10.5281/zenodo.20670996}.
+
 \section{Scope and limitations}
 
-This draft proves conditional local laws, explicit quotient certificates, implementation-level VD variance constants for an idealized Hadamard/derangement estimator, a sharper Efron--Stein total-variance diagnostic, an asymptotic second-order quotient-variance diagnostic, finite-interval toy boundaries, a multiplicative implementation-noise baseline, and a restricted Le Cam lower bound.  The general toy certificates are numerically conservative; their large constants certify non-vacuity but are not intended as tight physical thresholds.  In the first closed toy, however, the direct SV second-order quotient calculation gives an operational remainder of order one and certifies the crossing at ordinary small-noise parameters.  It still does not prove a global optimality theorem over all possible QEM protocols.  Such a theorem would require a fully specified statistical decision model for estimating an ideal functional \(\mu_\star\) from noisy states \(\rho_p\), including what is known about the noise channel and which adaptive measurements are admissible.
+We prove conditional local laws, explicit quotient certificates, implementation-level VD variance constants for an idealized Hadamard/derangement estimator, a sharper Efron--Stein total-variance diagnostic, an asymptotic second-order quotient-variance diagnostic, finite-interval toy boundaries, a multiplicative implementation-noise baseline, and a restricted Le Cam lower bound.  The general toy certificates are numerically conservative; their large constants certify non-vacuity but are not intended as tight physical thresholds.  In the first closed toy, however, the direct SV second-order quotient calculation gives an operational remainder of order one and certifies the crossing at ordinary small-noise parameters.  The validation layer instantiates concrete QAOA instances, a concrete SV projector, realistic VD interferometry circuits, Aer device simulation, and qualitative IBM-hardware checks.  Those additions test form and feasibility, but they do not prove a global optimality theorem over all possible QEM protocols.  Such a theorem would require a fully specified statistical decision model for estimating an ideal functional \(\mu_\star\) from noisy states \(\rho_p\), including what is known about the noise channel and which adaptive measurements are admissible.
 
-The following items are intentionally left for the next version.
+The remaining limitations are therefore methodological rather than missing implementation steps.
 \begin{enumerate}[leftmargin=2em]
-    \item Replace the multiplicative implementation-noise baseline with the exact compiled circuit family intended for numerical validation, including correlated numerator-denominator errors and its own circuit noise.
-    \item Instantiate the SV projector and acceptance law for a concrete QAOA symmetry.
-    \item Decide whether CDR is excluded from the theorem-level selector or included under a proved training-model law.
-    \item Add numerical validation only after choosing the concrete QAOA instances and circuit implementation.
+    \item The compiled QAOA/VD/SV circuits are used in the validation layer, but the theorem-level implementation-noise model remains the idealized multiplicative baseline.
+    \item Level~2 and Level~3 use concrete QAOA families and readout-calibrated sector postselection, but they validate form and robustness rather than analytic coefficients.
+    \item The hardware conclusion concerns the global interferometric VD circuits implemented here.  Localized virtual distillation, layout-aware compilation, or other lower-depth purification circuits can change implementation constants such as \(\kappa_M\) and move a crossing window; they do not remove the need to certify denominator concentration, quotient bias, and physical resource normalization.
+    \item CDR remains outside the theorem-level selector unless a separate training-model law is proved.
+    \item The hardware layer is qualitative and budget-limited: it uses three archived instances on a primary backend plus one independent cross-backend replicate of \texttt{g6\_k2\_c000}, with cluster bootstrap over calibration epochs, so it supports feasibility and robustness rather than a hardware-universal ordering.
 \end{enumerate}
-
-\section{Code and data availability}
-
-The Phase A reproduction package contains a frozen pre-analysis plan, the
-Level~1 white-box NumPy/SciPy implementation, the pre-freeze artifacts, reference
-outputs, and verification scripts.  The frozen PAP hash is recorded in
-\texttt{PAP\_HASH.txt} and the corresponding target checksums are recorded in
-\texttt{freeze\_manifest.json}.  The Level~1 coefficient-validation and crossing
-checks are reproducible without a quantum-cloud account.  Level~2
-device-simulation and Level~3 hardware analyses are deferred to the archival
-Phase~B release; Level~3 is analysis-from-archived-counts only and does not
-require re-executing a quantum device.  The final public release will cite the
-version-specific archive DOI.
 
 \section{Conclusion}
 

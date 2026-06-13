@@ -1,7 +1,7 @@
 # Freeze Status
 
-Status: audit_provenance_note. Additive documentation; not a freeze, not an
-adjudication, and not a re-freeze.
+Status: audit_provenance_note. Additive documentation; not a freeze, not a
+primary validation decision, and not a re-freeze.
 
 ## Registered Freezes
 
@@ -52,13 +52,13 @@ In the current clean v2, amendment logic lives in new files:
 
 ## Which Freeze Governs What
 
-- The original v1 adjudication is governed by `freeze_manifest.json` /
+- The original v1 validation table is governed by `freeze_manifest.json` /
   `PAP_HASH.txt`.
 - The amended P1 negative-control run is governed by `freeze_manifest_v2.json` /
   `PAP_HASH_v2.txt` and the amendment document
   `pap/amendment_v2_p1_control_negative.md`.
-- The post-adjudication ensemble analyses and secondary endpoints after the
-  freeze are additive analysis layers. They are not new pre-registered freezes.
+- The post-freeze ensemble analyses and secondary benchmarks are additive
+  analysis layers. They are not new pre-registered freezes.
 
 ## Hash Check Caveat
 

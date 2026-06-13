@@ -4,18 +4,20 @@ Reproduction package for the numerical experiments accompanying the paper on
 finite-shot operating windows for virtual distillation (VD) and symmetry
 verification (SV).
 
-This repository now contains the frozen Level 1 reproduction core, the v2 PAP
-amendment audit trail, post-adjudication analysis layers, secondary descriptive
-endpoints, the completed additive Level 2 device-simulation layer, and the
-archive-only Level 3 IBM hardware analysis layer.
+This repository contains the frozen Level 1 reproduction core, the v2 PAP
+amendment audit trail, post-freeze diagnostic analyses, secondary robustness
+benchmarks, the additive Level 2 device-simulation layer, and the archive-only
+Level 3 IBM hardware analysis layer.
 
-For the current checkpoint, read:
+For current reproduction, use:
 
 - `REPRODUCIBILITY_STATUS.md` for the operational status and command map.
 - `pap/FREEZE_STATUS.md` for the freeze provenance and real freeze audit.
-- `EXPERIMENTAL_PLAN.md` and `REPRODUCIBILITY_PLAN.md` for the frozen formal
-  plans. These files are hashed artifacts and are not edited to track day-to-day
-  implementation status.
+- `REPRODUCING.md` for the one-command reviewer path.
+
+`EXPERIMENTAL_PLAN.md`, `REPRODUCIBILITY_PLAN.md`, and `METHODS.md` are frozen,
+hash-audited artifacts. They are retained for provenance and are not the current
+reviewer guide.
 
 The active post-freeze driver is `reproducibility/run_all_current.py`. The
 original `reproducibility/run_all.py` and `reproducibility/run_all_v2.py` remain
@@ -89,16 +91,16 @@ Canonical Level 1 outputs are verified against `reproducibility/reference/`:
 | E7 certified-crossing diagnostic | P9 | `e7_certified_crossing.csv` |
 | E7 resource/observable sensitivity | robustness | `e7_resource_observable_sensitivity.csv` |
 
-### Post-Adjudication And Secondary Layers
+### Post-Freeze Diagnostics And Secondary Layers
 
 The repository also includes additive, non-freeze analysis and secondary
-endpoints:
+benchmarks:
 
 - Ensemble coverage and `c_VD` SE sensitivity under `analysis/`.
 - E6, E8, E9, E10, E11, and E12 under `experiments/` with outputs under
   `results/secondary/`.
 - These layers are reported descriptively unless their own report says
-  otherwise. They are not a new PAP freeze or a new primary adjudication.
+  otherwise. They are not a new PAP freeze or a new primary validation tier.
 
 ### Level 2 Additive Device-Simulation
 
@@ -115,9 +117,8 @@ Level 2 is in `level2/` and remains an additive Phase B robustness layer:
   and small-noise P10 scaling.
 
 Level 2 validates laws in form only. It is not a Level 1 coefficient-validation
-claim, and it is not yet integrated into `reproducibility/verify.py` as an
-official relaxed-tolerance reference tier. The consolidated status is
-`level2/LEVEL2_SUMMARY.md`.
+claim, and it is outside the active `verify_current.py` reference contract. The
+consolidated status is `level2/LEVEL2_SUMMARY.md`.
 
 ### Level 3 Archive-Only Hardware Analysis
 
@@ -295,16 +296,16 @@ python -m level2.p10_smallnoise
   canonical outputs. The active wrapper is `verify_current.py`, which also
   checks reference SHA-256 manifests.
 - Level 2 outputs are committed and tested as form validation. They are outside
-  the official numeric reference contract unless a future release defines a
-  separate relaxed-tolerance Level 2 tier.
+  the official numeric reference contract unless a separate relaxed-tolerance
+  Level 2 tier is explicitly defined.
 - Level 3 hardware outputs are committed as raw-count archives plus reports;
   public reproduction is analysis-from-archived-counts only. The raw `.json.gz`
   archives and consolidated `.json` summaries are registered in
   `level3/archive/level3_archive_manifest.json`.
 - `requirements.lock` is the single dependency lock for the canonical Docker
   environment and is installed with `pip --require-hashes`.
-- Zenodo DOI metadata remains intentionally unminted until the manuscript/PDF is
-  finalized.
+- The versioned archive DOI for the release used in the manuscript is
+  `10.5281/zenodo.20670996`.
 - Figures are regenerated from numerical data; exact PDF byte identity is not a
   reproducibility claim.
 

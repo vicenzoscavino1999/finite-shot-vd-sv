@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use this reproduction package, please cite the accompanying paper."
-title: "Finite-Shot Operating Windows for Virtual Distillation and Symmetry Verification — reproduction package"
+title: "Finite-Shot Operating Windows for Virtual Distillation and Symmetry Verification - reproduction package"
 abstract: >-
   Level 1 white-box reproduction package for the numerical experiments accompanying
   the paper on finite-shot operating windows for virtual distillation (VD) and
@@ -11,6 +11,7 @@ authors:
     given-names: "Vicenzo"
     orcid: "https://orcid.org/0009-0000-2472-9785"
 version: "1.0.0"
+doi: "10.5281/zenodo.20670996"
 license: MIT
 keywords:
   - quantum error mitigation
