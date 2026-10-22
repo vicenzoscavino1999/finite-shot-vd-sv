@@ -1,9 +1,9 @@
 # Finite-Shot Operating Windows for Virtual Distillation and Symmetry Verification
 
 Code and data for the paper *Finite-Shot Operating Windows for Virtual Distillation and
-Symmetry Verification* (V. Scavino Alfaro, arXiv:2606.15464). The release used in the
-paper is archived at Zenodo under DOI
-[10.5281/zenodo.20682998](https://doi.org/10.5281/zenodo.20682998).
+Symmetry Verification* (V. Scavino Alfaro, arXiv:2606.15464). Each release is archived at
+Zenodo; DOI [10.5281/zenodo.20670995](https://doi.org/10.5281/zenodo.20670995) resolves to
+the latest version, and the paper cites the version it used.
 
 The paper compares virtual distillation (VD) and symmetry verification (SV) at a finite
 shot budget and tests its predictions at three levels:

@@ -10,8 +10,8 @@ authors:
   - family-names: "Scavino Alfaro"
     given-names: "Vicenzo"
     orcid: "https://orcid.org/0009-0000-2472-9785"
-version: "1.0.1"
-doi: "10.5281/zenodo.20682998"
+version: "1.0.2"
+doi: "10.5281/zenodo.20670995"
 repository-code: "https://github.com/vicenzoscavino1999/finite-shot-vd-sv"
 license: MIT
 keywords:
@@ -21,7 +21,7 @@ keywords:
   - finite shots
   - operating windows
   - QAOA
-date-released: "2026-06-13"
+date-released: "2026-10-22"
 preferred-citation:
   type: article
   title: "Finite-Shot Operating Windows for Virtual Distillation and Symmetry Verification"
