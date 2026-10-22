@@ -1,14 +1,15 @@
 # Contributing
 
-This repository is a research reproduction artifact, not a general-purpose
-open-source project.
+This repository accompanies a paper; it is maintained as a reproduction package rather
+than a general-purpose library.
 
-Issues reporting reproduction failures are welcome. Please include the Docker
-image digest (or local Python/NumPy/SciPy versions), Git tag, execution level,
-`results/manifest.json`, and `results/run.log`.
+Reports of reproduction problems are welcome as issues. Please include the Docker image
+digest or your Python, NumPy and SciPy versions, the Git tag, the command you ran, its
+output, and, for Level 1, the `manifest.json` written to the output directory.
 
-Pull requests are considered only for documented bug fixes or reproducibility
-fixes. New research extensions should generally be developed in forks.
+Pull requests are welcome for bug fixes and reproducibility fixes. Files listed in
+`freeze_manifest.json` or `freeze_manifest_v2.json` belong to the frozen analysis plan
+and are not changed. Research extensions are best developed in a fork.
 
-Code is under the MIT License (`LICENSE`); archived data and figures are under
-CC-BY-4.0 (`LICENSE-DATA`).
+Code is under the MIT license (`LICENSE`); data and figures are under CC-BY-4.0
+(`LICENSE-DATA`).

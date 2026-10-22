@@ -1,17 +1,18 @@
 cff-version: 1.2.0
-message: "If you use this reproduction package, please cite the accompanying paper."
-title: "Finite-Shot Operating Windows for Virtual Distillation and Symmetry Verification - reproduction package"
+message: "If you use this code or data, please cite the paper below."
+title: "Code and data for: Finite-Shot Operating Windows for Virtual Distillation and Symmetry Verification"
 abstract: >-
-  Level 1 white-box reproduction package for the numerical experiments accompanying
-  the paper on finite-shot operating windows for virtual distillation (VD) and
-  symmetry verification (SV). Includes exact density-matrix coefficient validation
-  (delta_VD, delta_SV, c_SV = 0) and the certified crossing.
+  Code and data for the paper. Level 1: exact density-matrix simulation of QAOA instances
+  that tests the finite-shot laws for virtual distillation (VD) and symmetry verification
+  (SV). Level 2: gate-level Qiskit/Aer simulation of the same instances. Level 3: archived
+  IBM hardware counts and their analysis.
 authors:
   - family-names: "Scavino Alfaro"
     given-names: "Vicenzo"
     orcid: "https://orcid.org/0009-0000-2472-9785"
 version: "1.0.1"
 doi: "10.5281/zenodo.20682998"
+repository-code: "https://github.com/vicenzoscavino1999/finite-shot-vd-sv"
 license: MIT
 keywords:
   - quantum error mitigation
@@ -21,3 +22,15 @@ keywords:
   - operating windows
   - QAOA
 date-released: "2026-06-13"
+preferred-citation:
+  type: article
+  title: "Finite-Shot Operating Windows for Virtual Distillation and Symmetry Verification"
+  authors:
+    - family-names: "Scavino Alfaro"
+      given-names: "Vicenzo"
+      orcid: "https://orcid.org/0009-0000-2472-9785"
+  year: 2026
+  url: "https://arxiv.org/abs/2606.15464"
+  identifiers:
+    - type: other
+      value: "arXiv:2606.15464"

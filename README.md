@@ -1,315 +1,114 @@
-# Finite-Shot Operating Windows for VD/SV
+# Finite-Shot Operating Windows for Virtual Distillation and Symmetry Verification
 
-Reproduction package for the numerical experiments accompanying the paper on
-finite-shot operating windows for virtual distillation (VD) and symmetry
-verification (SV).
+Code and data for the paper *Finite-Shot Operating Windows for Virtual Distillation and
+Symmetry Verification* (V. Scavino Alfaro, arXiv:2606.15464). The release used in the
+paper is archived at Zenodo under DOI
+[10.5281/zenodo.20682998](https://doi.org/10.5281/zenodo.20682998).
 
-This repository contains the frozen Level 1 reproduction core, the v2 PAP
-amendment audit trail, post-freeze diagnostic analyses, secondary robustness
-benchmarks, the additive Level 2 device-simulation layer, and the archive-only
-Level 3 IBM hardware analysis layer.
+The paper compares virtual distillation (VD) and symmetry verification (SV) at a finite
+shot budget and tests its predictions at three levels:
 
-For current reproduction, use:
+| Level | What it is | What it supports in the paper | How it is reproduced |
+| --- | --- | --- | --- |
+| 1 | Exact density-matrix simulation of ten QAOA instances (NumPy/SciPy only) | the coefficient checks, the Level 1 tables and figures | regenerated and compared number by number with archived outputs |
+| 2 | Gate-level Qiskit/Aer simulation with a synthetic noise model | the form of the laws under device conditions, the Level 2 table and figures | committed outputs; each step can be rerun with `python -m level2.<module>` |
+| 3 | Archived counts from IBM hardware (`ibm_marrakesh`, `ibm_kingston`) | the hardware ordering and denominator scale, the hardware table | re-analysed from the archived counts; no IBM account is needed |
 
-- `REPRODUCIBILITY_STATUS.md` for the operational status and command map.
-- `pap/FREEZE_STATUS.md` for the freeze provenance and real freeze audit.
-- `REPRODUCING.md` for the one-command reviewer path.
+## Reproduce everything with one command
 
-`EXPERIMENTAL_PLAN.md`, `REPRODUCIBILITY_PLAN.md`, and `METHODS.md` are frozen,
-hash-audited artifacts. They are retained for provenance and are not the current
-reviewer guide.
-
-The active post-freeze driver is `reproducibility/run_all_current.py`. The
-original `reproducibility/run_all.py` and `reproducibility/run_all_v2.py` remain
-unchanged PAP artifacts so the registered freezes stay auditable.
-
-Entrypoint status for reviewers:
-
-| Status | Entrypoints | Use |
-| --- | --- | --- |
-| Canonical | `reproducibility/run_all_current.py`, `reproducibility/verify_current.py` | Use these for current reproduction. `verify_current.py` validates the Level 1 reference checksums before comparing generated outputs. |
-| Frozen PAP artifacts | `reproducibility/run_all.py`, `reproducibility/run_all_v2.py`, `reproducibility/verify.py` | Do not run these for current reproduction; they remain only so the registered PAP freezes can be audited. `verify.py` does not validate reference checksums. |
-
-## Canonical Reproduction Contract
-
-The canonical numerical environment is the Linux/amd64 Docker image defined by
-`Dockerfile`. Its base image is pinned by digest and Python dependencies are
-installed from the single hash-locked `requirements.lock` file.
-
-Canonical Level 1 reference data in `reproducibility/reference/` are generated
-inside that Linux/amd64 container in `--mode full`. In the canonical container,
-`--exact-numeric` is the expected verification mode. Windows and macOS are
-treated as non-canonical cross-platform checks and are verified with the
-registered tolerances in `reproducibility/config/tolerances.yaml`.
-
-Use `REPRODUCING.md` for the one-command reviewer path.
-
-## Freeze Status
-
-There are two registered freezes:
-
-- v1 original PAP: `freeze_manifest.json`, `PAP_HASH.txt`, frozen commit
-  `0814ba7...`.
-- v2 P1 negative-control amendment: `freeze_manifest_v2.json`,
-  `PAP_HASH_v2.txt`, frozen commit `555d3dc...`.
-
-The current tree is expected to audit as:
-
-- v1: intact with the documented expected CRLF drift.
-- v2: intact with zero drift.
-
-Run the real audit with:
-
-```bash
-python pap/verify_freeze.py
-```
-
-`pap/hash_pap.py --check-only` and `pap/hash_pap_v2.py --check-only` are not the
-registered drift audit; they recompute hashes. Use `pap/verify_freeze.py` for
-freeze integrity.
-
-## What Is Reproducible Now
-
-Manuscript figures regenerate with `make figures-manuscript` from committed
-`results/confirmatory_v2/`, Level 2 CSVs, `results/secondary/` where relevant,
-and `level3/archive/`. Exact PDF byte identity is not a reproducibility claim.
-
-### Level 1 Core
-
-The hard reproducible numerical core is Level 1 white-box density-matrix
-simulation. It uses NumPy/SciPy only and does not require Qiskit.
-
-Canonical Level 1 outputs are verified against `reproducibility/reference/`:
-
-| Experiment | Prediction family | Output |
-| --- | --- | --- |
-| E1 quotient MSE decomposition | P1, P2 | `e1_quotient_decomposition.csv` |
-| E2 `c_SV = 0` vs `c_VD != 0` | P3, P4 | `e2_c_sv_zero.csv` |
-| E3 `delta_VD` from generator | P5 | `e3_delta_vd_generator.csv` |
-| E4 `delta_SV` first order | P6 | `e4_delta_sv_firstorder.csv` |
-| E5 denominator concentration | P7 | `e5_denominator_concentration.csv` |
-| E7 certified-crossing diagnostic | P9 | `e7_certified_crossing.csv` |
-| E7 resource/observable sensitivity | robustness | `e7_resource_observable_sensitivity.csv` |
-
-### Post-Freeze Diagnostics And Secondary Layers
-
-The repository also includes additive, non-freeze analysis and secondary
-benchmarks:
-
-- Ensemble coverage and `c_VD` SE sensitivity under `analysis/`.
-- E6, E8, E9, E10, E11, and E12 under `experiments/` with outputs under
-  `results/secondary/`.
-- These layers are reported descriptively unless their own report says
-  otherwise. They are not a new PAP freeze or a new primary validation tier.
-
-### Level 2 Additive Device-Simulation
-
-Level 2 is in `level2/` and remains an additive Phase B robustness layer:
-
-- Qiskit/Aer foundation, noiseless reference, ordering check, and synthetic Aer
-  noise model.
-- Noisy Aer sampling for unmitigated and readout-mitigated SV, with
-  postselection after readout mitigation.
-- VD Hadamard/SWAP smoke checks.
-- High-power exact-rho device-simulation harness.
-- Realistic n=6 VD with interferometry/c-SWAP overhead.
-- Denominator concentration, crossing diagnostics, Efron--Stein window checks,
-  and small-noise P10 scaling.
-
-Level 2 validates laws in form only. It is not a Level 1 coefficient-validation
-claim, and it is outside the active `verify_current.py` reference contract. The
-consolidated status is `level2/LEVEL2_SUMMARY.md`.
-
-### Level 3 Archive-Only Hardware Analysis
-
-Level 3 is in `level3/` and is reproducible from archived hardware counts only:
-
-- Stage 2 precursor: `level3/level3_hardware_run_report.md`.
-- Full Stage 3 `g6_k2_c000`: `level3/level3_full_p7p9_report.md`.
-- Preliminary `g6_k2_c001` robustness check:
-  `level3/level3_robustness_g6c001_report.md`.
-
-Recompute the consolidated archive-only analyses in read-only mode with:
-
-```bash
-python scripts/reanalyze_level3_archives.py
-```
-
-or:
-
-```bash
-make analysis-from-hardware
-```
-
-This path reads `level3/archive/*.json.gz`; it does not connect to IBM Runtime
-and does not submit QPU jobs. Hardware claims are qualitative feasibility and
-form/robustness claims, not coefficient validation.
-
-To intentionally refresh the versioned consolidated JSON summaries, use
-`python scripts/reanalyze_level3_archives.py --update` or
-`make analysis-from-hardware-update`.
-
-## Quick Start
-
-Canonical Docker path:
+With Docker installed, from the repository root:
 
 ```bash
 docker build --platform linux/amd64 -t finite-shot-vd-sv:repro .
-docker run --rm --platform linux/amd64 finite-shot-vd-sv:repro bash -lc "make check-ci"
-```
-
-Expected canonical verifier line:
-
-```bash
-VERIFY PASS: 18260 numeric comparisons within tolerance across 7 files; reference checksums OK
-```
-
-For the full reviewer command including freeze audit and figure regeneration:
-
-```bash
 docker run --rm --platform linux/amd64 finite-shot-vd-sv:repro bash -lc "make reproduce-all"
 ```
 
-Local non-Docker install from the canonical lock:
+This regenerates Level 1 and checks it against the reference outputs, runs the tests,
+checks that the frozen analysis plan is unchanged, re-analyses the Level 3 hardware
+archives, and regenerates the figures. It takes about 25 to 35 minutes on a laptop and
+ends with
 
-```bash
-python -m pip install --require-hashes -r requirements.lock
-python -m pip install --no-deps --no-build-isolation -e .
+```text
+REPRODUCE_ALL_PASS: Level 1 exact, tests, PAP freeze, Level 3 archived-count verification, and figures completed
 ```
 
-Set deterministic environment variables before local reproduction:
+[REPRODUCING.md](REPRODUCING.md) gives each step separately, a local install without Docker,
+how to regenerate the exact Level 1 run reported in the paper, and what to expect on
+Windows and macOS.
 
-```bash
-export PYTHONHASHSEED=0
-export OMP_NUM_THREADS=1
-export MKL_NUM_THREADS=1
-export OPENBLAS_NUM_THREADS=1
-```
+## Where each result comes from
 
-On PowerShell:
+| Paper item | Code | Data |
+| --- | --- | --- |
+| Level 1 primary checks (P1 to P9) and their figures | `experiments/e1_*.py` to `experiments/e7_certified_crossing.py`, `analysis/adjudicate_level1.py` | `results/confirmatory_v2/` (v2 run, reported in the paper), `results/confirmatory_full/` (v1 run) |
+| Calibration of the P1 all-instance rule | `analysis/ensemble_coverage_analysis.py` | `analysis/ensemble_coverage_report.md` |
+| Secondary checks E6 and E8 to E12 | `experiments/e6_*.py`, `experiments/e8_*.py` to `experiments/e12_*.py` | `results/secondary/` |
+| Resource and observable conventions for E7 | `experiments/e7_resource_observable_sensitivity.py` | `results/e7_resource_observable_sensitivity.csv` |
+| Clipping-threshold and depolarizing-channel checks | `experiments/clipping_threshold_sensitivity.py`, `experiments/channel_sensitivity_delta.py` | `results/secondary/` |
+| Level 2 table and figures | `level2/*.py` | `level2/*_results.csv`; overview in `level2/LEVEL2_SUMMARY.md` |
+| Hardware table | `level3/analyze_full.py`, `scripts/verify_level3_archives.py` | `level3/archive/` |
+| Certified VD-SV crossing in the sector toy (appendix) | `scripts/sector_toy_certified_crossing.py` | computed exactly; no data files |
+| Manuscript figures | `scripts/generate_manuscript_figures.py` (`make figures-manuscript`) | `figures/` |
 
-```powershell
-$env:PYTHONHASHSEED=0
-$env:OMP_NUM_THREADS=1
-$env:MKL_NUM_THREADS=1
-$env:OPENBLAS_NUM_THREADS=1
-```
+## Repository layout
 
-Regenerate and verify the canonical full Level 1 reference outputs:
+| Directory | Contents |
+| --- | --- |
+| `src/vd_sv/` | the library: density matrices, QAOA instances, noise channels, VD and SV samplers, closed-form coefficients, the comparison rule |
+| `experiments/` | the Level 1 experiments E1 to E12 and the robustness checks |
+| `analysis/` | adjudication of the Level 1 checks and the P1 calibration |
+| `level2/`, `level3/` | the device-simulation and hardware layers |
+| `reproducibility/` | the drivers `run_all_current.py` and `verify_current.py`, configuration, and the Level 1 reference outputs |
+| `pap/` | the analysis-plan freeze: hashing, audit, amendment |
+| `results/`, `figures/` | committed outputs |
+| `tests/` | the test suite |
 
-```bash
-python reproducibility/run_all_current.py --mode full --output results
-python reproducibility/verify_current.py \
-  --reference reproducibility/reference/ \
-  --generated results \
-  --exact-numeric
-```
+## The analysis plan and its freeze
 
-Verify the committed reference package without regenerating:
+The analysis plan (`EXPERIMENTAL_PLAN.md`, `REPRODUCIBILITY_PLAN.md`, `METHODS.md`) was
+written before the confirmatory runs and frozen by SHA-256 hash. It has two versions:
 
-```bash
-python reproducibility/verify_current.py \
-  --reference reproducibility/reference/ \
-  --generated reproducibility/reference/ \
-  --exact-numeric
-```
+- **v1**, the original plan (`freeze_manifest.json`, `PAP_HASH.txt`);
+- **v2**, its single amendment, which added a negative control to prediction P1
+  (`freeze_manifest_v2.json`, `PAP_HASH_v2.txt`,
+  `pap/amendment_v2_p1_control_negative.md`).
 
-Use `--exact-numeric` for canonical Linux/Docker checks. For Windows/macOS,
-omit `--exact-numeric` and use the registered tolerances; tiny ULP differences
-in eigensolver/linear-algebra paths are treated as expected non-canonical drift.
+The v1 and v2 runs use the same code and differ only in their random seeds
+(`reproducibility/config/rng_policy.yaml` and `rng_policy_v2.yaml`). The paper reports the
+v2 run and quotes the v1 run where they differ.
 
-Run tests:
-
-```bash
-python -m pytest tests/ -q
-```
-
-Audit the freezes:
+To check that no frozen file has changed:
 
 ```bash
 python pap/verify_freeze.py
 ```
 
-Verify Level 3 archive-only analyses without rewriting committed JSON files:
+It should report v2 `INTACT_ZERO_DRIFT` and v1 `INTACT_WITH_EXPECTED_DRIFT`; the two
+expected differences are line endings in a Windows checkout. Details are in
+[pap/FREEZE_STATUS.md](pap/FREEZE_STATUS.md).
 
-```bash
-python scripts/verify_level3_archives.py
-```
+The frozen files include the original drivers `reproducibility/run_all.py`,
+`run_all_v2.py` and `verify.py`. They are kept unchanged so that the freeze can be
+audited; use `run_all_current.py` and `verify_current.py` to reproduce.
 
-Docker path:
+## Make targets
 
-```bash
-docker build --platform linux/amd64 -t finite-shot-vd-sv:repro .
-docker run --rm --platform linux/amd64 finite-shot-vd-sv:repro
-```
+| Target | What it does |
+| --- | --- |
+| `make reproduce-all` | the full check described above |
+| `make check-ci` | three identical Level 1 runs, tests, reference integrity and Level 3 verification |
+| `make reproduce-level1` | regenerate Level 1 and compare it exactly with the reference |
+| `make verify-reference` | check the committed Level 1 reference outputs against their checksums |
+| `make verify-freeze` | check the analysis-plan freeze |
+| `make verify-level3` | re-analyse the hardware archives and compare with the committed summaries |
+| `make test` | run the tests |
+| `make figures-manuscript` | regenerate the manuscript figures |
+| `make audit` | check the locked dependencies for known vulnerabilities |
+| `make analysis-from-hardware-update` | rewrite the committed Level 3 summaries (maintainers only) |
+| `make reference-manifest`, `make level3-manifest` | rewrite reference or archive checksums (maintainers only) |
 
-The Docker image runs the canonical Level 1 reproduction path by default.
+## Citation and licenses
 
-Run Level 2 commands when the `[level2]` extra is installed:
-
-```bash
-pip install -e ".[level2]"
-python -m level2.circuits
-python -m level2.sampling
-python -m level2.vd
-python -m level2.highpower
-python -m level2.vd_realistic_n6
-python -m level2.crossing_denominator
-python -m level2.window_efronstein
-python -m level2.p10_smallnoise
-```
-
-## Make Targets
-
-- `make reproduce-level1`: regenerate Level 1 outputs and verify them.
-- `make reproduce-fast`: fast smoke/schema check against its own generated
-  output; not the canonical reference comparison.
-- `make reproduce-full`: regenerate the canonical full Level 1 outputs and
-  verify them with `--exact-numeric`.
-- `make reproduce-all`: run strict environment check, canonical Level 1,
-  tests, freeze audit, Level 3 archive verification, and figure generation.
-- `make verify`: run `reproducibility/verify_current.py` against generated
-  outputs in `results/`.
-- `make verify-exact`: exact numeric check against generated outputs in
-  `results/`.
-- `make verify-reference`: validate the committed Level 1 reference package.
-- `make verify-freeze`: run the real v1/v2 freeze audit.
-- `make verify-level3`: recompute Level 3 archive analyses in memory and compare
-  them to committed JSON summaries.
-- `make test`: run the test suite.
-- `make check-ci`: canonical container check path: strict env, three full
-  deterministic runs, exact full reproduction, tests, reference integrity, and
-  Level 3 archive verification.
-- `make audit`: run `pip-audit` against `requirements.lock`.
-- `make reference-manifest`: refresh `reproducibility/reference/` checksums.
-- `make level3-manifest`: refresh Level 3 archive checksums.
-- `make level2-foundation`: run the Level 2 foundation smoke check.
-- `make level2-sampling`: regenerate the Level 2 sampling report.
-- `make analysis-from-hardware`: recompute Level 3 analysis from archived
-  counts without rewriting committed JSON summaries.
-- `make analysis-from-hardware-update`: intentionally refresh the consolidated
-  Level 3 analysis JSON summaries.
-
-## Current Limits
-
-- The official `verify.py` reference package currently verifies the Level 1
-  canonical outputs. The active wrapper is `verify_current.py`, which also
-  checks reference SHA-256 manifests.
-- Level 2 outputs are committed and tested as form validation. They are outside
-  the official numeric reference contract unless a separate relaxed-tolerance
-  Level 2 tier is explicitly defined.
-- Level 3 hardware outputs are committed as raw-count archives plus reports;
-  public reproduction is analysis-from-archived-counts only. The raw `.json.gz`
-  archives and consolidated `.json` summaries are registered in
-  `level3/archive/level3_archive_manifest.json`.
-- `requirements.lock` is the single dependency lock for the canonical Docker
-  environment and is installed with `pip --require-hashes`.
-- The versioned archive DOI for the release used in the manuscript is
-  `10.5281/zenodo.20682998`.
-- Figures are regenerated from numerical data; exact PDF byte identity is not a
-  reproducibility claim.
-
-## Licenses
-
-Code is MIT (`LICENSE`). Data and generated figures are CC-BY-4.0
-(`LICENSE-DATA`).
+Please cite the paper; citation metadata are in [CITATION.cff](CITATION.cff). Code is under
+the MIT license (`LICENSE`); data and figures are under CC-BY-4.0 (`LICENSE-DATA`).
+Reproduction problems can be reported as issues; see [CONTRIBUTING.md](CONTRIBUTING.md).
