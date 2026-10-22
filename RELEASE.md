@@ -4,7 +4,7 @@
 | --- | --- |
 | Version | `v1.0.2` |
 | Zenodo DOI, all versions | `10.5281/zenodo.20670995` |
-| Zenodo DOI, this version | assigned by Zenodo when the release is published |
+| Zenodo DOI, this version | `10.5281/zenodo.23560231` |
 | Previous version | `v1.0.1`, `10.5281/zenodo.20682998` (cited by the first version of the paper) |
 | Paper | *Finite-Shot Operating Windows for Virtual Distillation and Symmetry Verification*, arXiv:2606.15464 |
 

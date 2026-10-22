@@ -6,8 +6,7 @@
       "orcid": "0009-0000-2472-9785"
     }
   ],
-  "description": "Reproduction package for the numerical experiments and figures accompanying the paper on finite-shot operating windows for virtual distillation (VD) and symmetry verification (SV). Includes white-box coefficient validation, certified-crossing experiments, and (Phase B) device-simulation robustness runs and archived hardware counts. Code is MIT-licensed; archived data and figures are CC-BY-4.0 (see LICENSE-DATA).",
-  "version": "v1.0.1",
+  "description": "Code and data for the paper \"Finite-Shot Operating Windows for Virtual Distillation and Symmetry Verification\" (arXiv:2606.15464). Level 1: exact density-matrix simulation of QAOA instances that tests the finite-shot laws for virtual distillation (VD) and symmetry verification (SV). Level 2: gate-level Qiskit/Aer simulation of the same instances. Level 3: archived IBM hardware counts and their analysis. Code is MIT-licensed; data and figures are CC-BY-4.0 (see LICENSE-DATA).",
   "license": "MIT",
   "upload_type": "software",
   "keywords": [
